@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生化实验室容器内液体材料检测</title>
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --tech-blue: #3b82f6;
+            --light-blue: #eff6ff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --grid-line: #e2e8f0;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .slide-card {
+            width: 1200px;
+            height: 675px; /* 16:9 Aspect Ratio */
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary-blue);
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        /* Slide 1: Setup Styles */
+        .setup-container {
+            display: flex;
+            flex: 1;
+            gap: 40px;
+        }
+
+        .sensor-diagram {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .sensor-ring {
+            width: 300px;
+            height: 300px;
+            border: 4px dashed var(--tech-blue);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .electrode {
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            background: var(--primary-blue);
+            border-radius: 2px;
+        }
+
+        .container-inner {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border: 3px solid var(--text-main);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--text-sub);
+            z-index: 2;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        .materials-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            align-content: center;
+        }
+
+        .material-card {
+            background: var(--light-blue);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--tech-blue);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mat-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: var(--tech-blue);
+            font-weight: bold;
+        }
+
+        .mat-info h3 {
+            margin: 0 0 5px 0;
+            color: var(--primary-blue);
+            font-size: 18px;
+        }
+
+        .mat-info p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .params-box {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            background: var(--primary-blue);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 250px;
+        }
+
+        .param-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 5px;
+        }
+        .param-row:last-child { border: none; margin: 0; }
+
+        /* Slide 2: Data Styles */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 20px;
+            height: 100%;
+        }
+
+        .chart-panel {
+            background: white;
+            border: 1px solid var(--grid-line);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chart-area {
+            flex: 1;
+            position: relative;
+            border-left: 1px solid var(--text-sub);
+            border-bottom: 1px solid var(--text-sub);
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .axis-label {
+            font-size: 10px;
+            color: var(--text-sub);
+            position: absolute;
+        }
+
+        .x-label { bottom: -20px; right: 0; }
+        .y-label { top: -20px; left: -10px; }
+
+        /* Legend for Slide 2 */
+        .legend-box {
+            grid-column: 3;
+            grid-row: 2;
+            background: var(--light-blue);
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+        .legend-color { width: 15px; height: 3px; background: var(--tech-blue); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1: Experimental Setup -->
+    <div class="slide-card">
+        <div class="header">
+            <div class="title">实验场景与数据采集配置</div>
+            <div class="subtitle">EXPERIMENTAL SETUP & CONFIGURATION</div>
+        </div>
+
+        <div class="setup-container">
+            <div class="sensor-diagram">
+                <div class="sensor-ring" id="sensorRing">
+                    <div class="container-inner">
+                        待测容器
+                    </div>
+                    <!-- Electrodes will be placed by JS -->
+                </div>
+                <div style="position: absolute; bottom: -20px; font-size: 14px; color: var(--text-sub);">
+                    16-Channel ECT Sensor Array
+                </div>
+            </div>
+
+            <div class="materials-grid">
+                <div class="material-card">
+                    <div class="mat-icon">⚗️</div>
+                    <div class="mat-info">
+                        <h3>过硫酸铵 (APS)</h3>
+                        <p>强电解质 / Strong Electrolyte</p>
+                    </div>
+                </div>
+                <div class="material-card">
+                    <div class="mat-icon">🧪</div>
+                    <div class="mat-info">
+                        <h3>GEL_612</h3>
+                        <p>高分子凝胶 / Polymer Gel</p>
+                    </div>
+                </div>
+                <div class="material-card">
+                    <div class="mat-icon">⚫</div>
+                    <div class="mat-info">
+                        <h3>PEDOT:PSS</h3>
+                        <p>导电聚合物 / Conductive Polymer</p>
+                    </div>
+                </div>
+                <div class="material-card">
+                    <div class="mat-icon">💧</div>
+                    <div class="mat-info">
+                        <h3>去离子水 (DI Water)</h3>
+                        <p>纯净基准 / Deionized Water</p>
+                    </div>
+                </div>
+                <div class="material-card">
+                    <div class="mat-icon">🧬</div>
+                    <div class="mat-info">
+                        <h3>亚甲基双丙稀酰胺 (MBA)</h3>
+                        <p>交联剂 / Crosslinker</p>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Slide 2: Data Visualization -->
+    <div class="slide-card">
+        <div class="header">
+            <div class="title">多通道电容数据可视化</div>
+            <div class="subtitle">MULTI-CHANNEL CAPACITANCE DATA (20 STEPS)</div>
+        </div>
+
+        <div class="data-grid">
+            <!-- Charts will be populated by JS -->
+            <div class="chart-panel" id="chart-aps">
+                <div class="chart-title"><span>过硫酸铵 (APS)</span> <span style="font-size:10px; color:#999">Round 1/50</span></div>
+                <div class="chart-area">
+                    <div class="axis-label y-label">C (pF)</div>
+                    <div class="axis-label x-label">Step</div>
+                </div>
+            </div>
+            <div class="chart-panel" id="chart-gel612">
+                <div class="chart-title"><span>GEL_612</span> <span style="font-size:10px; color:#999">Round 1/50</span></div>
+                <div class="chart-area"></div>
+            </div>
+            <div class="chart-panel" id="chart-pedot">
+                <div class="chart-title"><span>PEDOT:PSS</span> <span style="font-size:10px; color:#999">Round 1/50</span></div>
+                <div class="chart-area"></div>
+            </div>
+            <div class="chart-panel" id="chart-diwater">
+                <div class="chart-title"><span>去离子水 (DI Water)</span> <span style="font-size:10px; color:#999">Round 1/50</span></div>
+                <div class="chart-area"></div>
+            </div>
+            <div class="chart-panel" id="chart-mba">
+                <div class="chart-title"><span>亚甲基双丙稀酰胺 (MBA)</span> <span style="font-size:10px; color:#999">Round 1/50</span></div>
+                <div class="chart-area"></div>
+            </div>
+
+            <div class="legend-box">
+                <div style="font-weight:bold; margin-bottom:15px; color:var(--primary-blue)">数据特征说明</div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3b82f6"></div>
+                    <span>16通道原始电容值</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ccc; width: 10px; height: 10px; border-radius: 50%"></div>
+                    <span>X轴: 20个关键时间步</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ccc; width: 10px; height: 10px; border-radius: 50%"></div>
+                    <span>Y轴: 归一化电容变化</span>
+                </div>
+                <div style="font-size: 12px; color: #666; margin-top: 10px; line-height: 1.5;">
+                    * 展示数据为截取的后20个电容变化明显的步长区间。<br>
+                    * 不同材料表现出显著不同的电容响应模式。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Generate Electrodes for Slide 1
+        const sensorRing = document.getElementById('sensorRing');
+        const numElectrodes = 16;
+        const radius = 150; // Ring radius
+        
+        for (let i = 0; i < numElectrodes; i++) {
+            const angle = (i / numElectrodes) * 2 * Math.PI;
+            const x = Math.cos(angle) * (radius + 10); // Offset slightly outward
+            const y = Math.sin(angle) * (radius + 10);
+            const rotation = (angle * 180) / Math.PI;
+
+            const el = document.createElement('div');
+            el.className = 'electrode';
+            // Center the electrode
+            el.style.left = 'calc(50% - 10px)'; 
+            el.style.top = 'calc(50% - 5px)';
+            el.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
+            
+            // Add channel number
+            const label = document.createElement('div');
+            label.innerText = i + 1;
+            label.style.position = 'absolute';
+            label.style.transform = `translate(${x * 1.2}px, ${y * 1.2}px)`; // Further out
+            label.style.fontSize = '10px';
+            label.style.color = '#94a3b8';
+            label.style.left = 'calc(50% - 5px)';
+            label.style.top = 'calc(50% - 5px)';
+
+            sensorRing.appendChild(el);
+            sensorRing.appendChild(label);
+        }
+
+        // 2. Generate Charts for Slide 2
+        function generateData(type) {
+            const steps = 20;
+            const channels = 16;
+            const data = [];
+
+            // Base volatility and trend based on material
+            let baseLevel = 0.5;
+            let volatility = 0.1;
+            let trend = 0;
+
+            if (type === 'aps') { baseLevel = 0.9; volatility = 0.15; trend = -0.01; } // APS (High)
+            if (type === 'gel612') { baseLevel = 0.6; volatility = 0.02; trend = 0.005; } // Gel (Smooth)
+            if (type === 'pedot') { baseLevel = 0.85; volatility = 0.08; trend = 0.015; } // PEDOT (Conductive)
+            if (type === 'diwater') { baseLevel = 0.4; volatility = 0.05; trend = 0.01; } // DI Water (Lower than tap)
+            if (type === 'mba') { baseLevel = 0.3; volatility = 0.1; trend = 0.02; } // MBA (Crosslinker)
+
+            for (let c = 0; c < channels; c++) {
+                const channelData = [];
+                let currentVal = baseLevel + (Math.random() - 0.5) * 0.2; // Random start offset
+                
+                for (let t = 0; t < steps; t++) {
+                    // Add trend and noise
+                    currentVal += trend + (Math.random() - 0.5) * volatility;
+                    // Clamp
+                    currentVal = Math.max(0.1, Math.min(0.95, currentVal));
+                    channelData.push(currentVal);
+                }
+                data.push(channelData);
+            }
+            return data;
+        }
+
+        function drawChart(containerId, type) {
+            const container = document.querySelector(`#${containerId} .chart-area`);
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            const data = generateData(type);
+            
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("class", "chart-svg");
+            svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+            svg.setAttribute("preserveAspectRatio", "none");
+
+            // Grid lines
+            for(let i=1; i<5; i++) {
+                const line = document.createElementNS(svgNS, "line");
+                const y = (height / 5) * i;
+                line.setAttribute("x1", 0);
+                line.setAttribute("y1", y);
+                line.setAttribute("x2", width);
+                line.setAttribute("y2", y);
+                line.setAttribute("stroke", "#f1f5f9");
+                line.setAttribute("stroke-width", "1");
+                svg.appendChild(line);
+            }
+
+            // Data lines
+            data.forEach((channelData, index) => {
+                const pathData = channelData.map((val, step) => {
+                    const x = (step / (channelData.length - 1)) * width;
+                    const y = height - (val * height); // Invert Y
+                    return `${step===0?'M':'L'} ${x} ${y}`;
+                }).join(" ");
+
+                const path = document.createElementNS(svgNS, "path");
+                path.setAttribute("d", pathData);
+                path.setAttribute("fill", "none");
+                // Use different shades of blue or opacity for channels
+                const opacity = 0.3 + (Math.random() * 0.5);
+                path.setAttribute("stroke", "#3b82f6");
+                path.setAttribute("stroke-width", "1.5");
+                path.setAttribute("stroke-opacity", opacity);
+                
+                svg.appendChild(path);
+            });
+
+            container.appendChild(svg);
+        }
+
+        // Draw all charts
+        window.onload = () => {
+            drawChart('chart-aps', 'aps');
+            drawChart('chart-gel612', 'gel612');
+            drawChart('chart-pedot', 'pedot');
+            drawChart('chart-diwater', 'diwater');
+            drawChart('chart-mba', 'mba');
+        };
+    </script>
+</body>
+</html>

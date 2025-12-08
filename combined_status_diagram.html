@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人大面积触觉感知技术体系</title>
+    <style>
+        :root {
+            --primary-dark: #0f172a; /* Midnight Blue */
+            --primary-blue: #1e3a8a; /* Deep Blue */
+            --tech-blue: #3b82f6; /* Bright Tech Blue */
+            --accent-blue: #0ea5e9; /* Sky Blue */
+            --bg-grad-start: #f8fafc;
+            --bg-grad-end: #e2e8f0;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-main: #1e293b;
+            --text-sub: #475569;
+        }
+
+        body {
+            font-family: "KaiTi", "楷体", "Microsoft YaHei", "Segoe UI", serif;
+            background: white;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 16:9 Container */
+        .slide-container {
+            width: 1600px;
+            height: 900px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            height: 100px;
+            padding: 0 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .main-title {
+            font-size: 44px;
+            font-weight: 900;
+            color: var(--primary-dark);
+            letter-spacing: -1px;
+            position: relative;
+        }
+
+        .main-title::after {
+            content: "RESEARCH STATUS OVERVIEW";
+            position: absolute;
+            bottom: -15px;
+            left: 2px;
+            font-size: 14px;
+            color: var(--tech-blue);
+            letter-spacing: 4px;
+            font-weight: 700;
+        }
+
+        .header-badge {
+            background: var(--primary-dark);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 0;
+            font-family: Consolas, monospace;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+        }
+
+        /* Main Architecture Layout */
+        .architecture-diagram {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 60px 40px;
+            gap: 40px;
+            position: relative;
+        }
+
+
+
+        /* Modules */
+        .module {
+            flex: 1;
+            height: 600px;
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 0;
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.05),
+                inset 0 0 0 1px rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        /* Module Header */
+        .module-header {
+            padding: 25px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0;
+        }
+
+        .module-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .mod-1 .module-header::before { background: var(--tech-blue); }
+        .mod-2 .module-header::before { background: var(--primary-blue); }
+        .mod-3 .module-header::before { background: var(--accent-blue); }
+
+        .mod-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .mod-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .mod-subtitle {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Module Body */
+        .module-body {
+            flex: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Feature Block */
+        .feature-block {
+            background: rgba(241, 245, 249, 0.8);
+            border-radius: 0;
+            padding: 15px;
+            border-left: 4px solid #cbd5e1;
+        }
+
+        .mod-1 .feature-block { border-left-color: var(--tech-blue); }
+        .mod-2 .feature-block { border-left-color: var(--primary-blue); }
+        .mod-3 .feature-block { border-left-color: var(--accent-blue); }
+
+        .feature-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .feature-tag {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 0;
+            background: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            color: var(--text-sub);
+            margin-left: auto; /* Push to right or add spacing */
+        }
+        
+        .feature-subtitle {
+            display: none;
+        }
+
+        .feature-list {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 15px;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        .feature-list li::marker {
+            color: #94a3b8;
+        }
+
+        /* Central Highlight (ECT) */
+        .mod-2 {
+            /* Removed scaling to keep boxes regular */
+            border-color: var(--primary-blue);
+        }
+        
+        .mod-2:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        /* Arrow Flow */
+        .flow-arrow {
+            position: absolute;
+            top: 50%;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 5;
+            color: var(--primary-blue);
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .arrow-1 { left: 32%; }
+        .arrow-2 { right: 32%; }
+
+        /* Footer */
+        .footer {
+            position: absolute;
+            bottom: 30px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 600;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="slide-container">
+    <div class="header">
+        <div class="main-title">机器人大面积触觉感知技术体系</div>
+        <div class="header-badge">DOMESTIC & INTERNATIONAL STATUS</div>
+    </div>
+
+    <div class="architecture-diagram">
+        <!-- Connection line removed -->
+
+        <!-- Module 1: Sensing (Input) -->
+        <div class="module mod-1">
+            <div class="module-header">
+                <span class="mod-title">多模态传感</span>
+                <span class="mod-subtitle">MULTI-MODAL SENSING</span>
+            </div>
+            <div class="module-body">
+                <div class="feature-block">
+                    <div class="feature-title">压阻式 (Resistive) <span class="feature-tag">Stanford / NUS</span></div>
+                    <ul class="feature-list">
+                        <li>本质可拉伸材料 (Bao Zhenan)</li>
+                        <li>神经形态编码 (ACES)</li>
+                        <li>微结构高灵敏度 (张海霞)</li>
+                    </ul>
+                </div>
+                <div class="feature-block">
+                    <div class="feature-title">视觉式 (Optical) <span class="feature-tag">MIT / Bristol</span></div>
+                    <ul class="feature-list">
+                        <li>GelSight 微米级纹理重构</li>
+                        <li>TacTip 仿生指尖力感知</li>
+                        <li>光波导去耦合 (UCSD)</li>
+                    </ul>
+                </div>
+                <div class="feature-block">
+                    <div class="feature-title">磁性 (Magnetic) <span class="feature-tag">CityU / Meta</span></div>
+                    <ul class="feature-list">
+                        <li>三维力解耦 (申亚京)</li>
+                        <li>ReSkin 自监督学习</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Module 2: ECT Core (Process) -->
+        <div class="module mod-2">
+            <div class="module-header">
+                <span class="mod-title">电容成像技术</span>
+                <span class="mod-subtitle">ECT CORE TECHNOLOGY</span>
+            </div>
+            <div class="module-body">
+                <div class="feature-block">
+                    <div class="feature-title">结构创新 (Structure) <span class="feature-tag">Manchester / Lille</span></div>
+                    <ul class="feature-list">
+                        <li><strong>边缘电场效应</strong>：利用Fringing Field探测外部物体</li>
+                        <li><strong>共面电极设计</strong>：优化长宽比提升穿透深度 (Manchester)</li>
+                        <li><strong>主动屏蔽层</strong>：定向电场，抗干扰 (Lille)</li>
+                    </ul>
+                </div>
+                <div class="feature-block">
+                    <div class="feature-title">成像机理 (Mechanism) <span class="feature-tag">Warsaw / 天津大学</span></div>
+                    <ul class="feature-list">
+                        <li><strong>介电扰动</strong>：接触/非接触全感知</li>
+                        <li><strong>3D层析成像</strong>：Z轴深度动态追踪 (Warsaw)</li>
+                        <li><strong>灵敏度场分析</strong>：曲面适应性优化 (天津大学)</li>
+                    </ul>
+                </div>
+                <div class="feature-block">
+                    <div class="feature-title">融合感知 (Fusion) <span class="feature-tag">MIT FieldSense</span></div>
+                    <ul class="feature-list">
+                        <li>接近觉 + 触觉双模态</li>
+                        <li>盲抓取辅助 (MIT FieldSense)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Module 3: Algorithms (Output) -->
+        <div class="module mod-3">
+            <div class="module-header">
+                <span class="mod-title">智能重构算法</span>
+                <span class="mod-subtitle">INTELLIGENT RECONSTRUCTION</span>
+            </div>
+            <div class="module-body">
+                <div class="feature-block">
+                    <div class="feature-title">传统物理模型 <span class="feature-tag">Physics-Driven</span></div>
+                    <ul class="feature-list">
+                        <li><strong>LBP/SVD</strong>：实时性好，但有"拖尾"</li>
+                        <li><strong>Tikhonov正则化</strong>：抑制高频噪声</li>
+                        <li><strong>压缩感知 (CS)</strong>：保留锐利边缘</li>
+                    </ul>
+                </div>
+                <div class="feature-block">
+                    <div class="feature-title">深度学习驱动 <span class="feature-tag">Data-Driven</span></div>
+                    <ul class="feature-list">
+                        <li><strong>CNN/ResNet</strong>：端到端毫秒级成像</li>
+                        <li><strong>U-Net + Dense</strong>：克服平滑，提升精度</li>
+                        <li><strong>GAN/GCN</strong>：超分辨与物理约束 (PINN)</li>
+                    </ul>
+                </div>
+                <div class="feature-block" style="background: rgba(14, 165, 233, 0.1); border-left-color: var(--accent-blue);">
+                    <div class="feature-title" style="color: var(--accent-blue);">核心趋势</div>
+                    <div style="font-size: 16px; color: var(--text-main); font-weight: 700;">
+                        从“定性检测”向“定量超分辨”跨越
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <span>INTEGRATED TACTILE SENSING SYSTEM</span>
+        <span>2024 RESEARCH LANDSCAPE</span>
+    </div>
+</div>
+
+</body>
+</html>

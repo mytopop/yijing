@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单面式ECT传感器结构设计</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 900px;
+            width: 90%;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .diagram-box {
+            position: relative;
+            margin: 0 auto;
+            width: 700px;
+            height: 400px;
+            /* border: 1px dashed #ccc; */
+        }
+        .layer-label {
+            font-size: 14px;
+            fill: #2c3e50;
+            font-weight: bold;
+        }
+        .annotation {
+            font-size: 12px;
+            fill: #7f8c8d;
+        }
+        /* 3D effect simulation */
+        .layer-side {
+            filter: brightness(0.8);
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>单面式ECT传感器分层结构 (FPCB)</h1>
+    
+    <div class="diagram-box">
+        <svg width="700" height="400" viewBox="0 0 700 400">
+            <defs>
+                <linearGradient id="copper" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#d35400;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#e67e22;stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="substrate" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#f39c12;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#f1c40f;stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="shield" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#27ae60;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#2ecc71;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+
+            <!-- 1. Bottom Layer: Substrate -->
+            <g transform="translate(150, 280)">
+                <path d="M0 20 L400 20 L450 0 L50 0 Z" fill="url(#substrate)" stroke="#d35400" stroke-width="1"/>
+                <rect x="0" y="20" width="400" height="10" fill="#d35400" opacity="0.8"/> <!-- Side -->
+                <path d="M400 20 L450 0 L450 10 L400 30 Z" fill="#d35400" opacity="0.6"/> <!-- Side -->
+                
+                <!-- Label Line -->
+                <line x1="450" y1="10" x2="550" y2="10" stroke="#34495e" stroke-width="1"/>
+                <text x="560" y="15" class="layer-label">柔性基底 (Polyimide Substrate)</text>
+            </g>
+
+            <!-- 2. Active Shielding Layer -->
+            <g transform="translate(150, 240)">
+                <path d="M0 20 L400 20 L450 0 L50 0 Z" fill="url(#shield)" stroke="#27ae60" stroke-width="1"/>
+                <rect x="0" y="20" width="400" height="5" fill="#27ae60" opacity="0.8"/>
+                <path d="M400 20 L450 0 L450 5 L400 25 Z" fill="#27ae60" opacity="0.6"/>
+
+                <!-- Label Line -->
+                <line x1="450" y1="10" x2="550" y2="10" stroke="#34495e" stroke-width="1"/>
+                <text x="560" y="15" class="layer-label">主动屏蔽层 (Active Shielding)</text>
+                <text x="560" y="35" class="annotation">定向电场，减少寄生电容</text>
+            </g>
+
+            <!-- 3. Insulation Layer (Invisible/Thin) -->
+            
+            <!-- 4. Electrodes Layer (Coplanar) -->
+            <g transform="translate(150, 180)">
+                <!-- Electrode 1 -->
+                <g transform="translate(20, 0)">
+                    <path d="M0 20 L80 20 L100 0 L20 0 Z" fill="url(#copper)" stroke="#d35400"/>
+                    <rect x="0" y="20" width="80" height="5" fill="#a04000"/>
+                    <path d="M80 20 L100 0 L100 5 L80 25 Z" fill="#a04000"/>
+                </g>
+                <!-- Electrode 2 -->
+                <g transform="translate(120, 0)">
+                    <path d="M0 20 L80 20 L100 0 L20 0 Z" fill="url(#copper)" stroke="#d35400"/>
+                    <rect x="0" y="20" width="80" height="5" fill="#a04000"/>
+                    <path d="M80 20 L100 0 L100 5 L80 25 Z" fill="#a04000"/>
+                </g>
+                <!-- Electrode 3 -->
+                <g transform="translate(220, 0)">
+                    <path d="M0 20 L80 20 L100 0 L20 0 Z" fill="url(#copper)" stroke="#d35400"/>
+                    <rect x="0" y="20" width="80" height="5" fill="#a04000"/>
+                    <path d="M80 20 L100 0 L100 5 L80 25 Z" fill="#a04000"/>
+                </g>
+                <!-- Electrode 4 -->
+                <g transform="translate(320, 0)">
+                    <path d="M0 20 L80 20 L100 0 L20 0 Z" fill="url(#copper)" stroke="#d35400"/>
+                    <rect x="0" y="20" width="80" height="5" fill="#a04000"/>
+                    <path d="M80 20 L100 0 L100 5 L80 25 Z" fill="#a04000"/>
+                </g>
+
+                <!-- Label Line -->
+                <line x1="420" y1="10" x2="550" y2="10" stroke="#34495e" stroke-width="1"/>
+                <text x="560" y="15" class="layer-label">共面电极阵列 (Coplanar Electrodes)</text>
+                <text x="560" y="35" class="annotation">Tx/Rx 激励与测量电极</text>
+            </g>
+
+            <!-- 5. Overlay/Protection Layer -->
+            <g transform="translate(150, 140)">
+                <path d="M0 20 L400 20 L450 0 L50 0 Z" fill="#3498db" stroke="#2980b9" opacity="0.3"/>
+                <rect x="0" y="20" width="400" height="5" fill="#2980b9" opacity="0.3"/>
+                <path d="M400 20 L450 0 L450 5 L400 25 Z" fill="#2980b9" opacity="0.3"/>
+
+                <!-- Label Line -->
+                <line x1="450" y1="10" x2="550" y2="10" stroke="#34495e" stroke-width="1"/>
+                <text x="560" y="15" class="layer-label">绝缘保护层 (Overlay)</text>
+            </g>
+
+            <!-- Field Lines Indication -->
+            <g transform="translate(150, 140)" opacity="0.6">
+                 <path d="M 80 10 Q 130 -50 180 10" stroke="#e74c3c" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+                 <path d="M 180 10 Q 230 -50 280 10" stroke="#e74c3c" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+                 <path d="M 280 10 Q 330 -50 380 10" stroke="#e74c3c" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+                 <text x="230" y="-60" fill="#e74c3c" font-size="12" font-weight="bold">边缘电场 (Fringing Field)</text>
+            </g>
+
+        </svg>
+    </div>
+</div>
+
+</body>
+</html>

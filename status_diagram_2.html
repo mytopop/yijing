@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基于电容成像的触觉传感技术研究现状</title>
+    <style>
+        :root {
+            --primary-color: #1a365d; /* Deeper Blue */
+            --secondary-color: #3182ce; /* Bright Blue */
+            --accent-color: #e53e3e; /* Red */
+            --bg-color: #f0f4f8;
+            --panel-bg: #ffffff;
+            --border-color: #cbd5e0;
+            --text-main: #2d3748;
+            --text-sub: #4a5568;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 16:9 Container */
+        .slide-container {
+            width: 1600px;
+            height: 900px;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                linear-gradient(rgba(49, 130, 206, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(49, 130, 206, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Header */
+        .header {
+            height: 80px;
+            background: white;
+            border-bottom: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            justify-content: space-between;
+        }
+
+        .title-block {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .title-icon {
+            width: 8px;
+            height: 32px;
+            background: var(--secondary-color);
+        }
+
+        .main-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary-color);
+            letter-spacing: 0.5px;
+        }
+
+        .meta-info {
+            font-size: 14px;
+            color: var(--text-sub);
+            font-family: Consolas, monospace;
+            background: #edf2f7;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        /* Flow Layout */
+        .flow-container {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        /* Phase Column */
+        .phase-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+        }
+
+        /* Connecting Arrows */
+        .phase-column:not(:last-child)::after {
+            content: "➜";
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--secondary-color);
+            opacity: 0.5;
+        }
+
+        /* Phase Header */
+        .phase-header {
+            background: linear-gradient(135deg, var(--primary-color), #2c5282);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .phase-title {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .phase-number {
+            font-size: 32px;
+            font-weight: 900;
+            opacity: 0.2;
+            line-height: 1;
+        }
+
+        /* Content Box */
+        .content-box {
+            flex: 1;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        
+        .corner-accent {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 2px solid var(--secondary-color);
+        }
+        .tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+        .bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+
+        /* Key Point Block */
+        .key-point {
+            background: #f8fafc;
+            border-left: 3px solid var(--secondary-color);
+            padding: 10px 15px;
+        }
+
+        .key-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .key-text {
+            font-size: 14px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* Research Grid */
+        .research-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .research-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+
+        .research-card:hover {
+            border-color: var(--secondary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transform: translateX(2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 4px;
+        }
+
+        .inst {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .name {
+            font-size: 12px;
+            color: #718096;
+            font-family: Consolas, monospace;
+        }
+
+        .desc {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        .hl {
+            color: #c53030;
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="slide-container">
+    <div class="header">
+        <div class="title-block">
+            <div class="title-icon"></div>
+            <div class="main-title">基于电容成像的触觉传感技术研究现状</div>
+        </div>
+        <div class="meta-info">SECTION 2.2 // SYSTEM ARCHITECTURE</div>
+    </div>
+
+    <div class="flow-container">
+        <!-- Phase 1: Structure -->
+        <div class="phase-column">
+            <div class="phase-header">
+                <span class="phase-title">传感器结构设计</span>
+                <span class="phase-number">01</span>
+            </div>
+            <div class="content-box">
+                <div class="corner-accent tr"></div><div class="corner-accent bl"></div>
+                
+                <div class="key-point">
+                    <span class="key-label">CHALLENGE</span>
+                    <span class="key-text">封闭圆形 ➔ 单面平面 (Open-field)</span>
+                </div>
+
+                <div class="research-grid">
+                    <div class="research-card">
+                        <div class="card-header">
+                            <span class="inst">Manchester</span>
+                            <span class="name">W.Q. Yang</span>
+                        </div>
+                        <div class="desc">优化<span class="hl">共面电极</span>长宽比，增强穿透深度。</div>
+                    </div>
+                    <div class="research-card">
+                        <div class="card-header">
+                            <span class="inst">Lille</span>
+                            <span class="name">G. Pugach</span>
+                        </div>
+                        <div class="desc">柔性PCB + <span class="hl">主动屏蔽层</span>，定向电场。</div>
+                    </div>
+                    <div class="research-card">
+                        <div class="card-header">
+                            <span class="inst">天津大学</span>
+                            <span class="name">王化祥</span>
+                        </div>
+                        <div class="desc">基于<span class="hl">灵敏度场分析</span>优化曲面传感器。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Imaging -->
+        <div class="phase-column">
+            <div class="phase-header">
+                <span class="phase-title">成像机理研究</span>
+                <span class="phase-number">02</span>
+            </div>
+            <div class="content-box">
+                <div class="corner-accent tr"></div><div class="corner-accent bl"></div>
+
+                <div class="key-point">
+                    <span class="key-label">MECHANISM</span>
+                    <span class="key-text">外界物体对边缘电场的介电扰动</span>
+                </div>
+
+                <div class="research-grid">
+                    <div class="research-card">
+                        <div class="card-header">
+                            <span class="inst">Bath</span>
+                            <span class="name">M. Soleimani</span>
+                        </div>
+                        <div class="desc">互电容反演介电常数，<span class="hl">接触压力检测</span>。</div>
+                    </div>
+                    <div class="research-card">
+                        <div class="card-header">
+                            <span class="inst">Warsaw</span>
+                            <span class="name">R. Wajman</span>
+                        </div>
+                        <div class="desc">3D ECT多层电极，<span class="hl">Z轴(深度)</span>动态追踪。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 3: Fusion -->
+        <div class="phase-column">
+            <div class="phase-header">
+                <span class="phase-title">融合感知</span>
+                <span class="phase-number">03</span>
+            </div>
+            <div class="content-box">
+                <div class="corner-accent tr"></div><div class="corner-accent bl"></div>
+
+                <div class="key-point">
+                    <span class="key-label">ADVANTAGE</span>
+                    <span class="key-text">接近觉(Proximity) + 触觉(Tactile)</span>
+                </div>
+
+                <div class="research-grid">
+                    <div class="research-card">
+                        <div class="card-header">
+                            <span class="inst">Genoa</span>
+                            <span class="name">Cannata</span>
+                        </div>
+                        <div class="desc">虚拟成像检测障碍物，<span class="hl">预接触安全规划</span>。</div>
+                    </div>
+                    <div class="research-card">
+                        <div class="card-header">
+                            <span class="inst">MIT CSAIL</span>
+                            <span class="name">FieldSense</span>
+                        </div>
+                        <div class="desc">手势识别 & 反推几何形状，辅助<span class="hl">盲抓取</span>。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECT Research Methodology - Cycle</title>
+    <style>
+        :root {
+            --primary-blue: #5dade2; /* Light blue for arrows */
+            --icon-color: #2874a6;   /* Darker blue for icons */
+            --text-title: #1b2631;
+            --text-body: #2c3e50;
+            --bg-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 1200px;
+            height: 800px;
+            /* border: 1px dashed #ccc; Debugging */
+        }
+
+        /* Central Text */
+        .center-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .center-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: #17202a;
+            line-height: 1.5;
+        }
+
+        /* SVG Layer for Arrows */
+        .svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .arrow-path {
+            fill: none;
+            stroke: var(--primary-blue);
+            stroke-width: 35;
+            stroke-linecap: butt;
+        }
+
+        .arrow-head {
+            fill: var(--primary-blue);
+        }
+
+        /* Nodes */
+        .node {
+            position: absolute;
+            display: flex;
+            align-items: flex-start;
+            z-index: 5;
+            max-width: 400px;
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            border-radius: 50%;
+            /* box-shadow: 0 4px 10px rgba(0,0,0,0.1); */
+            z-index: 6;
+        }
+
+        .icon-svg {
+            width: 60px;
+            height: 60px;
+            stroke: var(--icon-color);
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .text-box {
+            padding: 10px;
+        }
+
+        .node-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-title);
+            margin-bottom: 8px;
+        }
+
+        .node-desc {
+            font-size: 14px;
+            color: var(--text-body);
+            line-height: 1.6;
+        }
+
+        .highlight {
+            font-weight: bold;
+        }
+
+        /* Positioning */
+        
+        /* Top Node: Mechanism */
+        .node-top {
+            top: 50px;
+            left: 50%;
+            transform: translateX(-10%); /* Shift slightly right to accommodate icon on left of text */
+        }
+        .node-top .icon-box {
+            margin-right: 20px;
+        }
+
+        /* Right Node: Hardware */
+        .node-right {
+            bottom: 150px;
+            right: 50px;
+            flex-direction: row;
+        }
+        .node-right .icon-box {
+            margin-right: 20px;
+        }
+
+        /* Left Node: Algorithm */
+        .node-left {
+            bottom: 150px;
+            left: 50px;
+            flex-direction: row-reverse; /* Text on left, Icon on right */
+            text-align: right;
+        }
+        .node-left .icon-box {
+            margin-left: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- SVG Arrows -->
+        <svg class="svg-layer" viewBox="0 0 1200 800">
+            <defs>
+                <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
+                    <path d="M0,0 L4,2 L0,4 Z" fill="#5dade2" />
+                </marker>
+                <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                    <feOffset dx="2" dy="2" result="offsetblur"/>
+                    <feComponentTransfer>
+                        <feFuncA type="linear" slope="0.3"/>
+                    </feComponentTransfer>
+                    <feMerge> 
+                        <feMergeNode in="offsetblur"/>
+                        <feMergeNode in="SourceGraphic"/> 
+                    </feMerge>
+                </filter>
+            </defs>
+            
+            <!-- Arrow 1: Top to Right -->
+            <path d="M 630 180 A 220 220 0 0 1 790 510" class="arrow-path" filter="url(#dropShadow)" />
+            <polygon points="760,480 820,520 750,540" fill="#5dade2" transform="rotate(-10, 790, 510)" />
+
+            <!-- Arrow 2: Right to Left -->
+            <path d="M 760 560 A 220 220 0 0 1 440 560" class="arrow-path" filter="url(#dropShadow)" />
+            <polygon points="470,530 410,560 470,590" fill="#5dade2" transform="rotate(10, 440, 560)" />
+
+            <!-- Arrow 3: Left to Top -->
+            <path d="M 410 510 A 220 220 0 0 1 570 180" class="arrow-path" filter="url(#dropShadow)" />
+            <polygon points="540,210 570,150 600,210" fill="#5dade2" transform="rotate(15, 570, 180)" />
+
+        </svg>
+
+        <!-- Center Text -->
+        <div class="center-content">
+            <div class="center-text">
+                <div style="font-size: 1.2em; color: #2874a6; margin-bottom: 10px;">深度耦合闭环</div>
+                用 <span style="color:#e74c3c">先进算法</span> 赋能<br>
+                <span style="color:#27ae60">低成本硬件</span><br>
+                实现 <span style="color:#f39c12">性能突破</span>
+            </div>
+        </div>
+
+        <!-- Top Node: Mechanism -->
+        <div class="node node-top">
+            <div class="icon-box">
+                <svg class="icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" opacity="0.1"/>
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+            </div>
+            <div class="text-box">
+                <div class="node-title">机理仿真与优化 <span style="font-size:0.7em; color:#7f8c8d; font-weight:normal;">Mechanism</span></div>
+                <div class="node-desc">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li><strong>多物理场耦合：</strong>利用 COMSOL/Maxwell 进行静电场与力学场联合仿真。</li>
+                        <li><strong>结构优化：</strong>针对单面开放场特性，优化电极形状（六边形/交指）与屏蔽层设计。</li>
+                        <li><strong>数据生成：</strong>构建包含不同物体、位置、介电常数的<span class="highlight" style="color:#e67e22">海量仿真数据集</span>，为AI训练提供先验知识。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Node: Hardware -->
+        <div class="node node-right">
+            <div class="icon-box">
+                <svg class="icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2" ry="2" opacity="0.1" />
+                    <path d="M6 18h2v-2h-2v2zM10 18h2v-2h-2v2zM14 18h2v-2h-2v2zM18 18h2v-2h-2v2z" />
+                    <path d="M6 9l3 3l3-3" />
+                    <path d="M15 12h3" />
+                    <path d="M2 12h20" opacity="0.2"/>
+                </svg>
+            </div>
+            <div class="text-box">
+                <div class="node-title">硬件系统实现 <span style="font-size:0.7em; color:#7f8c8d; font-weight:normal;">Hardware</span></div>
+                <div class="node-desc">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li><strong>柔性传感阵列：</strong>基于 FPCB 工艺，研制适应曲面的 16-32 通道电容传感器。</li>
+                        <li><strong>高精度采集：</strong>集成 FDC2214 电容转换芯片，实现 <span class="highlight" style="color:#27ae60">28-bit 高分辨率</span> 数据采集。</li>
+                        <li><strong>抗干扰设计：</strong>引入主动屏蔽技术，显著提升信噪比 (SNR)，适应复杂机器人环境。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Node: Algorithm -->
+        <div class="node node-left">
+            <div class="text-box">
+                <div class="node-title">算法革新与成像 <span style="font-size:0.7em; color:#7f8c8d; font-weight:normal;">Algorithm</span></div>
+                <div class="node-desc">
+                    <ul style="margin: 0; padding-left: 20px; direction: ltr;">
+                        <li><strong>生成式AI引入：</strong>应用 Latent Consistency Models (LCM) 解决逆问题不适定性。</li>
+                        <li><strong>Sim-to-Real：</strong>建立“仿真预训练 + 实测微调”策略，跨越虚实鸿沟。</li>
+                        <li><strong>实时成像：</strong>实现 <span class="highlight" style="color:#8e44ad">>30fps</span> 的高分辨率触觉图像重建，支持动态交互。</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="icon-box">
+                <svg class="icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z" opacity="0.1"/>
+                    <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
+                    <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
+                </svg>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
