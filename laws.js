@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》天象五大定律核心引擎 - (laws.js)
-   特点：纯粹数理逻辑 3D 浑天天象坐标体系 + 五大定律交互演示
+   特点：纯粹数理逻辑 3D 浑天坐标 + 地支数据动态脉冲运动 (Data Motion)
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -46,6 +46,8 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
 class LawsPureMath3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        if (!this.container) return;
+
         this.width = this.container.clientWidth || 400;
         this.height = this.container.clientHeight || 500;
 
@@ -62,6 +64,10 @@ class LawsPureMath3DEngine {
         this.laws3DGroup = new THREE.Group();
 
         this.autoRotate = true;
+        this.pulseProgress = 0;
+        this.speedMultiplier = 1.0;
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
 
         this.initScene();
         this.createArmillaryRings();
@@ -228,21 +234,34 @@ class LawsPureMath3DEngine {
             if (obj.geometry) obj.geometry.dispose();
             if (obj.material) obj.material.dispose();
         }
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
     }
 
     highlightBranchPos(branchIdx, colorHex = 0xff5252) {
         this.clearLaws3DGroup();
         const pos = getBranch3DPos(branchIdx, 6.0);
+
+        // 创建一条绕地支游走的路径
+        const branchPoints = [];
+        for (let i = 0; i < 12; i++) {
+            branchPoints.push(getBranch3DPos(i));
+        }
+        branchPoints.push(branchPoints[0]);
+        this.activeCurve = new THREE.CatmullRomCurve3(branchPoints, true);
+
+        // 高亮目标地支点
         const sphereGeom = new THREE.SphereGeometry(0.55, 32, 32);
-        const sphereMat = new THREE.MeshStandardMaterial({
-            color: colorHex,
-            emissive: colorHex,
-            emissiveIntensity: 0.8,
-            metalness: 0.9
-        });
+        const sphereMat = new THREE.MeshStandardMaterial({ color: colorHex, emissive: colorHex, emissiveIntensity: 0.9 });
         const mesh = new THREE.Mesh(sphereGeom, sphereMat);
         mesh.position.copy(pos);
         this.laws3DGroup.add(mesh);
+
+        // 光速数据脉冲球
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: colorHex, emissiveIntensity: 1.5 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.laws3DGroup.add(this.dataPulseMesh);
     }
 
     renderStar7Line() {
@@ -255,18 +274,25 @@ class LawsPureMath3DEngine {
         }
         points.push(points[0]);
 
-        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        this.activeCurve = new THREE.CatmullRomCurve3(points, true);
+        const geom = new THREE.BufferGeometry().setFromPoints(this.activeCurve.getPoints(120));
         const mat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
         const line = new THREE.Line(geom, mat);
         this.laws3DGroup.add(line);
 
-        points.forEach(p => {
+        points.slice(0, 12).forEach(p => {
             const sGeom = new THREE.SphereGeometry(0.35, 16, 16);
             const sMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xaa7c11 });
             const sMesh = new THREE.Mesh(sGeom, sMat);
             sMesh.position.copy(p);
             this.laws3DGroup.add(sMesh);
         });
+
+        // 光速数据脉冲球
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.laws3DGroup.add(this.dataPulseMesh);
     }
 
     renderSanheTriangle(branchIndices, colorHex) {
@@ -276,7 +302,8 @@ class LawsPureMath3DEngine {
         const p3 = getBranch3DPos(branchIndices[2]);
         const points = [p1, p2, p3, p1];
 
-        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        this.activeCurve = new THREE.CatmullRomCurve3(points, true);
+        const geom = new THREE.BufferGeometry().setFromPoints(this.activeCurve.getPoints(60));
         const mat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 3 });
         const line = new THREE.Line(geom, mat);
         this.laws3DGroup.add(line);
@@ -288,14 +315,21 @@ class LawsPureMath3DEngine {
             sMesh.position.copy(p);
             this.laws3DGroup.add(sMesh);
         });
+
+        // 光速数据脉冲球
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: colorHex, emissiveIntensity: 1.5 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.laws3DGroup.add(this.dataPulseMesh);
     }
 
     renderYongjingAxis() {
         this.clearLaws3DGroup();
         const pSi = getBranch3DPos(5);
         const pHai = getBranch3DPos(11);
+        const points = [pSi, pHai, pSi];
 
-        const points = [pSi, pHai];
+        this.activeCurve = new THREE.CatmullRomCurve3(points, true);
         const geom = new THREE.BufferGeometry().setFromPoints(points);
         const mat = new THREE.LineDashedMaterial({ color: 0x4dabf7, dashSize: 0.3, gapSize: 0.1, linewidth: 3 });
         const line = new THREE.Line(geom, mat);
@@ -310,6 +344,12 @@ class LawsPureMath3DEngine {
             sMesh.position.copy(p);
             this.laws3DGroup.add(sMesh);
         });
+
+        // 天地门轴线光速脉冲
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 1.5 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.laws3DGroup.add(this.dataPulseMesh);
     }
 
     animate() {
@@ -319,8 +359,16 @@ class LawsPureMath3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
+        // 数据脉冲地支间游走运动
+        if (this.activeCurve && this.dataPulseMesh) {
+            this.pulseProgress += 0.004 * this.speedMultiplier;
+            if (this.pulseProgress > 1.0) this.pulseProgress = 0;
+            const pos = this.activeCurve.getPointAt(this.pulseProgress);
+            this.dataPulseMesh.position.copy(pos);
+        }
+
+        if (this.controls) this.controls.update();
+        if (this.renderer) this.renderer.render(this.scene, this.camera);
     }
 }
 
@@ -405,8 +453,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         engine.highlightBranchPos(branch.idx, 0xff5252);
-        if (lawBadgeTitle) lawBadgeTitle.innerText = `☀️ 10^${n} 太阳赤道守恒律`;
-        if (lawBadgeDesc) lawBadgeDesc.innerText = `余数 ${rem12} 对应【${branch.name}】位，属于赤道(天)正位！`;
+        if (lawBadgeTitle) lawBadgeTitle.innerText = `☀️ 10^${n} 太阳赤道守恒律数据运动`;
+        if (lawBadgeDesc) lawBadgeDesc.innerText = `余数 ${rem12} 对应【${branch.name}】位，数据在赤道正位之间闪耀游走`;
     }
 
     if (powerSlider) {
@@ -426,8 +474,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 engine.renderStar7Line();
 
                 document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.add("active-pos"));
-                if (lawBadgeTitle) lawBadgeTitle.innerText = "✨ 数 7 · 北斗七星芒星律 3D 轨迹";
-                if (lawBadgeDesc) lawBadgeDesc.innerText = "按 7 × k 顺次环绕 12 地支，赤黄白三道连成 12 芒星阵";
+                if (lawBadgeTitle) lawBadgeTitle.innerText = "✨ 数 7 · 12 芒星数据流光运动";
+                if (lawBadgeDesc) lawBadgeDesc.innerText = "按 7 × k 顺次环绕 12 地支，数据粒子在芒星阵上光速游走";
             } else {
                 btnDemoStar7.classList.remove("active");
                 engine.clearLaws3DGroup();
@@ -478,7 +526,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        if (lawBadgeTitle) lawBadgeTitle.innerText = `🌀 周天 ${item.deg} 切割归九律`;
+        if (lawBadgeTitle) lawBadgeTitle.innerText = `🌀 周天 ${item.deg} 归九运动`;
         if (lawBadgeDesc) lawBadgeDesc.innerText = `数位众和数 ${item.expr} 恒无条件收敛归于 9！`;
     }
 
@@ -523,8 +571,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
-            if (lawBadgeTitle) lawBadgeTitle.innerText = `🔺 地支三合局 · ${data.name}`;
-            if (lawBadgeDesc) lawBadgeDesc.innerText = `在 3D 浑天坐标球上构建稳固的 ${data.name} 能量三角形`;
+            if (lawBadgeTitle) lawBadgeTitle.innerText = `🔺 地支三合局 · ${data.name} 数据脉冲`;
+            if (lawBadgeDesc) lawBadgeDesc.innerText = `在 3D 浑天坐标球上，数据粒子在 ${data.name} 能量三角形上循环运动`;
         });
     });
 
@@ -548,8 +596,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 });
 
-                if (lawBadgeTitle) lawBadgeTitle.innerText = "🚪 永静数 6 天地门轴线";
-                if (lawBadgeDesc) lawBadgeDesc.innerText = "6 × 奇数落巳位 (地户)，6 × 偶数落亥位 (天门)，贯穿天地门轴线";
+                if (lawBadgeTitle) lawBadgeTitle.innerText = "🚪 永静数 6 天地门轴线数据脉冲";
+                if (lawBadgeDesc) lawBadgeDesc.innerText = "数据粒子在巳位(地户)与亥位(天门)轴线之间穿梭运动";
             } else {
                 btnDemoYongjing.classList.remove("active");
                 engine.clearLaws3DGroup();
@@ -568,29 +616,45 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSpeed.addEventListener("click", () => {
             currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
             const level = speedLevels[currentSpeedIdx];
+            engine.speedMultiplier = level;
             if (speedVal) speedVal.innerText = `${level}x`;
         });
     }
 
-    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.equatorGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.eclipticGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.lunarGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-reset-view").addEventListener("click", () => {
-        engine.adjustCameraFit();
-    });
-    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.autoRotate = this.classList.contains("active");
-    });
+    const btnEq = document.getElementById("btn-toggle-equator");
+    if (btnEq) {
+        btnEq.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.equatorGroup) engine.equatorGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnEc = document.getElementById("btn-toggle-ecliptic");
+    if (btnEc) {
+        btnEc.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.eclipticGroup) engine.eclipticGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnLu = document.getElementById("btn-toggle-lunar");
+    if (btnLu) {
+        btnLu.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.lunarGroup) engine.lunarGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnReset = document.getElementById("btn-reset-view");
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            engine.adjustCameraFit();
+        });
+    }
+    const btnRot = document.getElementById("btn-toggle-autorotate");
+    if (btnRot) {
+        btnRot.addEventListener("click", function() {
+            this.classList.toggle("active");
+            engine.autoRotate = this.classList.contains("active");
+        });
+    }
 
     updateLaw1(3);
 });

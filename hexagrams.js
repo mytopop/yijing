@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》六十四卦 3D 拓扑解构馆 - (hexagrams.js)
-   特点：纯粹数理逻辑 3D 浑天天象坐标体系 + 64 卦六爻 5 栏直列网格对齐
+   特点：纯粹数理逻辑 3D 浑天坐标 + 地支数据动态脉冲运动 (Data Motion)
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -113,6 +113,8 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
 class HexagramPureMath3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        if (!this.container) return;
+
         this.width = this.container.clientWidth || 400;
         this.height = this.container.clientHeight || 500;
 
@@ -129,6 +131,10 @@ class HexagramPureMath3DEngine {
         this.hex3DGroup = new THREE.Group();
 
         this.autoRotate = true;
+        this.pulseProgress = 0;
+        this.speedMultiplier = 1.0;
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
 
         this.initScene();
         this.createArmillaryRings();
@@ -295,6 +301,8 @@ class HexagramPureMath3DEngine {
             if (obj.geometry) obj.geometry.dispose();
             if (obj.material) obj.material.dispose();
         }
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
     }
 
     renderHexagram3DTrajectory(hexNum) {
@@ -311,20 +319,25 @@ class HexagramPureMath3DEngine {
 
         points.push(points[0]);
 
-        const geom = new THREE.BufferGeometry().setFromPoints(points);
-        const mat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
-        const line = new THREE.Line(geom, mat);
+        this.activeCurve = new THREE.CatmullRomCurve3(points, true);
+        const lineGeom = new THREE.BufferGeometry().setFromPoints(this.activeCurve.getPoints(80));
+        const lineMat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
+        const line = new THREE.Line(lineGeom, lineMat);
         this.hex3DGroup.add(line);
 
-        points.forEach((p, idx) => {
-            if (idx < 6) {
-                const sGeom = new THREE.SphereGeometry(0.35, 16, 16);
-                const sMat = new THREE.MeshStandardMaterial({ color: 0xff5252, emissive: 0xff5252 });
-                const sMesh = new THREE.Mesh(sGeom, sMat);
-                sMesh.position.copy(p);
-                this.hex3DGroup.add(sMesh);
-            }
+        points.slice(0, 6).forEach((p) => {
+            const sGeom = new THREE.SphereGeometry(0.35, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: 0xff5252, emissive: 0xff5252 });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.hex3DGroup.add(sMesh);
         });
+
+        // 光速数据脉冲球 (Data Pulse Motion)
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.hex3DGroup.add(this.dataPulseMesh);
     }
 
     animate() {
@@ -334,8 +347,16 @@ class HexagramPureMath3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
+        // 六爻轨迹数据脉冲游走
+        if (this.activeCurve && this.dataPulseMesh) {
+            this.pulseProgress += 0.004 * this.speedMultiplier;
+            if (this.pulseProgress > 1.0) this.pulseProgress = 0;
+            const pos = this.activeCurve.getPointAt(this.pulseProgress);
+            this.dataPulseMesh.position.copy(pos);
+        }
+
+        if (this.controls) this.controls.update();
+        if (this.renderer) this.renderer.render(this.scene, this.camera);
     }
 }
 
@@ -369,7 +390,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.innerText = num;
                 cell.addEventListener("click", () => {
                     if (num <= 64) {
-                        document.getElementById("hex-select").value = num;
+                        const hexSelect = document.getElementById("hex-select");
+                        if (hexSelect) hexSelect.value = num;
                         renderHexagramDetail(num);
                     }
                 });
@@ -407,13 +429,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const rem81 = hex.num % 81 === 0 ? 81 : hex.num % 81;
 
         let rowsHtml = "";
-        const yaoRem12List = [];
-
         hex.lines.forEach((type, idx) => {
             const yaoIdx = idx + 1;
             const mathVal = hex.num * yaoIdx;
             const rem12 = mathVal % 12 === 0 ? 12 : mathVal % 12;
-            yaoRem12List.push(rem12);
             const branch = EARTHLY_BRANCHES[rem12 - 1];
 
             const symbolHtml = type === 1 ? 
@@ -431,15 +450,17 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         });
 
-        hexDetailBox.innerHTML = `
-            <div class="hex-header">
-                <div class="hex-name">${hex.symbol} 第 ${hex.num} 卦 · ${hex.name}</div>
-                <div class="hex-sum">初爻开局算式: ${hex.num} × 1 = ${hex.num} (太乙 81 降维落第 ${rem81} 宫)</div>
-            </div>
-            <div class="hex-lines-grid">
-                ${rowsHtml}
-            </div>
-        `;
+        if (hexDetailBox) {
+            hexDetailBox.innerHTML = `
+                <div class="hex-header">
+                    <div class="hex-name">${hex.symbol} 第 ${hex.num} 卦 · ${hex.name}</div>
+                    <div class="hex-sum">初爻算式: ${hex.num} × 1 = ${hex.num} (太乙 81 降维落第 ${rem81} 宫)</div>
+                </div>
+                <div class="hex-lines-grid">
+                    ${rowsHtml}
+                </div>
+            `;
+        }
 
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
             const p = parseInt(cell.dataset.pos, 10);
@@ -452,8 +473,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         engine.renderHexagram3DTrajectory(hex.num);
 
-        hexBadgeTitle.innerText = `${hex.name} (${hex.symbol}) 3D 轨迹闭环`;
-        hexBadgeDesc.innerText = `六爻 1~6 递进推演，在天体空间勾勒出该卦的 3D 闭环图谱`;
+        if (hexBadgeTitle) hexBadgeTitle.innerText = `${hex.name} (${hex.symbol}) 3D 地支数据运动轨迹`;
+        if (hexBadgeDesc) hexBadgeDesc.innerText = `六爻 1~6 数据在 12 地支之间作流光脉冲巡航运动`;
     }
 
     const btnSpeed = document.getElementById("btn-speed-control");
@@ -465,29 +486,45 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSpeed.addEventListener("click", () => {
             currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
             const level = speedLevels[currentSpeedIdx];
+            engine.speedMultiplier = level;
             if (speedVal) speedVal.innerText = `${level}x`;
         });
     }
 
-    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.equatorGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.eclipticGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.lunarGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-reset-view").addEventListener("click", () => {
-        engine.adjustCameraFit();
-    });
-    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.autoRotate = this.classList.contains("active");
-    });
+    const btnEq = document.getElementById("btn-toggle-equator");
+    if (btnEq) {
+        btnEq.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.equatorGroup) engine.equatorGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnEc = document.getElementById("btn-toggle-ecliptic");
+    if (btnEc) {
+        btnEc.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.eclipticGroup) engine.eclipticGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnLu = document.getElementById("btn-toggle-lunar");
+    if (btnLu) {
+        btnLu.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.lunarGroup) engine.lunarGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnReset = document.getElementById("btn-reset-view");
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            engine.adjustCameraFit();
+        });
+    }
+    const btnRot = document.getElementById("btn-toggle-autorotate");
+    if (btnRot) {
+        btnRot.addEventListener("click", function() {
+            this.classList.toggle("active");
+            engine.autoRotate = this.classList.contains("active");
+        });
+    }
 
     renderHexagramDetail(1);
 });

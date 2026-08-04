@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》纯粹数理逻辑 3D 浑天天象与太乙 81 宫阵图引擎 (home.js)
-   特点：天极中轴 + 全息天球经纬网 + 12地支 3D 全息天珠 (纯粹数理化展示)
+   《易经数理秘笈》纯粹数理逻辑 3D 浑天坐标与地支数据动态脉冲运动引擎 - (home.js)
+   特点：地支之间数据流光脉冲运动 (Data Motion Between Earthly Branches)
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -46,6 +46,8 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
 class HomePureMath3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        if (!this.container) return;
+
         this.width = this.container.clientWidth || 400;
         this.height = this.container.clientHeight || 500;
 
@@ -59,13 +61,18 @@ class HomePureMath3DEngine {
         this.lunarGroup = new THREE.Group();
         this.celestialGridGroup = new THREE.Group();
         this.orbsGroup = new THREE.Group();
-        this.focusHighlightGroup = new THREE.Group();
+        this.dataMotionGroup = new THREE.Group();
 
         this.autoRotate = true;
+        this.pulseProgress = 0;
+        this.speedMultiplier = 1.0;
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
 
         this.initScene();
         this.createArmillaryRings();
         this.createCelestialGridAndPoles();
+        this.setupDataMotionPulse();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -95,7 +102,7 @@ class HomePureMath3DEngine {
         this.scene.add(this.lunarGroup);
         this.scene.add(this.celestialGridGroup);
         this.scene.add(this.orbsGroup);
-        this.scene.add(this.focusHighlightGroup);
+        this.scene.add(this.dataMotionGroup);
     }
 
     adjustCameraFit() {
@@ -195,6 +202,37 @@ class HomePureMath3DEngine {
         });
     }
 
+    setupDataMotionPulse() {
+        const branchPoints = [];
+        for (let i = 0; i < 12; i++) {
+            branchPoints.push(getBranch3DPos(i));
+        }
+        branchPoints.push(branchPoints[0]); // 闭环运动
+
+        this.activeCurve = new THREE.CatmullRomCurve3(branchPoints, true);
+        
+        // 渲染 12 地支之间的流光连线轨迹
+        const lineGeom = new THREE.BufferGeometry().setFromPoints(this.activeCurve.getPoints(100));
+        const lineMat = new THREE.LineDashedMaterial({ color: 0xffe066, dashSize: 0.3, gapSize: 0.15, transparent: true, opacity: 0.6 });
+        const motionLine = new THREE.Line(lineGeom, lineMat);
+        motionLine.computeLineDistances();
+        this.dataMotionGroup.add(motionLine);
+
+        // 创建地支间游走的光速数据粒子 (Data Motion Orb)
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5, metalness: 0.9 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        
+        // 外围光晕圈
+        const haloGeom = new THREE.TorusGeometry(0.65, 0.04, 16, 32);
+        const haloMat = new THREE.MeshBasicMaterial({ color: 0xff5252, side: THREE.DoubleSide });
+        const haloMesh = new THREE.Mesh(haloGeom, haloMat);
+        haloMesh.rotation.x = Math.PI / 2;
+        this.dataPulseMesh.add(haloMesh);
+
+        this.dataMotionGroup.add(this.dataPulseMesh);
+    }
+
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
@@ -223,23 +261,10 @@ class HomePureMath3DEngine {
     }
 
     highlightBranchPos(branchIdx, colorHex = 0xffe066) {
-        while (this.focusHighlightGroup.children.length > 0) {
-            const obj = this.focusHighlightGroup.children.pop();
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
-        }
-
         const pos = getBranch3DPos(branchIdx, 6.0);
-        const sphereGeom = new THREE.SphereGeometry(0.55, 32, 32);
-        const sphereMat = new THREE.MeshStandardMaterial({
-            color: colorHex,
-            emissive: colorHex,
-            emissiveIntensity: 0.9,
-            metalness: 0.9
-        });
-        const mesh = new THREE.Mesh(sphereGeom, sphereMat);
-        mesh.position.copy(pos);
-        this.focusHighlightGroup.add(mesh);
+        if (this.dataPulseMesh) {
+            this.dataPulseMesh.position.copy(pos);
+        }
     }
 
     animate() {
@@ -249,8 +274,16 @@ class HomePureMath3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
+        // 地支之间数据流光脉冲持续运动
+        if (this.activeCurve && this.dataPulseMesh) {
+            this.pulseProgress += 0.003 * this.speedMultiplier;
+            if (this.pulseProgress > 1.0) this.pulseProgress = 0;
+            const pos = this.activeCurve.getPointAt(this.pulseProgress);
+            this.dataPulseMesh.position.copy(pos);
+        }
+
+        if (this.controls) this.controls.update();
+        if (this.renderer) this.renderer.render(this.scene, this.camera);
     }
 }
 
@@ -306,27 +339,43 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSpeed.addEventListener("click", () => {
             currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
             const level = speedLevels[currentSpeedIdx];
+            engine.speedMultiplier = level;
             if (speedVal) speedVal.innerText = `${level}x`;
         });
     }
 
-    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.equatorGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.eclipticGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.lunarGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-reset-view").addEventListener("click", () => {
-        engine.adjustCameraFit();
-    });
-    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.autoRotate = this.classList.contains("active");
-    });
+    const btnEq = document.getElementById("btn-toggle-equator");
+    if (btnEq) {
+        btnEq.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.equatorGroup) engine.equatorGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnEc = document.getElementById("btn-toggle-ecliptic");
+    if (btnEc) {
+        btnEc.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.eclipticGroup) engine.eclipticGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnLu = document.getElementById("btn-toggle-lunar");
+    if (btnLu) {
+        btnLu.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.lunarGroup) engine.lunarGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnReset = document.getElementById("btn-reset-view");
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            engine.adjustCameraFit();
+        });
+    }
+    const btnRot = document.getElementById("btn-toggle-autorotate");
+    if (btnRot) {
+        btnRot.addEventListener("click", function() {
+            this.classList.toggle("active");
+            engine.autoRotate = this.classList.contains("active");
+        });
+    }
 });

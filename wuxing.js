@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》五行三元与地支三合月相解构馆 - (wuxing.js)
-   特点：纯粹数理逻辑 3D 浑天天象坐标体系 + 四大五行三元权威模块
+   《易经数理秘笈》五行三元解构馆 - (wuxing.js)
+   特点：纯粹数理逻辑 3D 浑天坐标 + 地支数据动态脉冲运动 (Data Motion)
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -46,6 +46,8 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
 class WuxingPureMath3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        if (!this.container) return;
+
         this.width = this.container.clientWidth || 400;
         this.height = this.container.clientHeight || 500;
 
@@ -62,6 +64,10 @@ class WuxingPureMath3DEngine {
         this.wuxing3DGroup = new THREE.Group();
 
         this.autoRotate = true;
+        this.pulseProgress = 0;
+        this.speedMultiplier = 1.0;
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
 
         this.initScene();
         this.createArmillaryRings();
@@ -228,6 +234,8 @@ class WuxingPureMath3DEngine {
             if (obj.geometry) obj.geometry.dispose();
             if (obj.material) obj.material.dispose();
         }
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
     }
 
     renderSanheTriangle(branchIndices, colorHex) {
@@ -237,7 +245,8 @@ class WuxingPureMath3DEngine {
         const p3 = getBranch3DPos(branchIndices[2]);
         const points = [p1, p2, p3, p1];
 
-        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        this.activeCurve = new THREE.CatmullRomCurve3(points, true);
+        const geom = new THREE.BufferGeometry().setFromPoints(this.activeCurve.getPoints(60));
         const mat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 3 });
         const line = new THREE.Line(geom, mat);
         this.wuxing3DGroup.add(line);
@@ -249,6 +258,12 @@ class WuxingPureMath3DEngine {
             sMesh.position.copy(p);
             this.wuxing3DGroup.add(sMesh);
         });
+
+        // 光速数据脉冲球
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: colorHex, emissiveIntensity: 1.5 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.wuxing3DGroup.add(this.dataPulseMesh);
     }
 
     renderPentagramKe() {
@@ -256,7 +271,8 @@ class WuxingPureMath3DEngine {
         const pentIndices = [0, 6, 9, 3, 4, 0];
         const points = pentIndices.map(idx => getBranch3DPos(idx));
 
-        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        this.activeCurve = new THREE.CatmullRomCurve3(points, true);
+        const geom = new THREE.BufferGeometry().setFromPoints(this.activeCurve.getPoints(100));
         const mat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
         const line = new THREE.Line(geom, mat);
         this.wuxing3DGroup.add(line);
@@ -268,6 +284,12 @@ class WuxingPureMath3DEngine {
             sMesh.position.copy(p);
             this.wuxing3DGroup.add(sMesh);
         });
+
+        // 光速数据脉冲球
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.wuxing3DGroup.add(this.dataPulseMesh);
     }
 
     animate() {
@@ -277,8 +299,16 @@ class WuxingPureMath3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
+        // 光速数据粒子在三合三角形或五角星拓扑线上巡航游走
+        if (this.activeCurve && this.dataPulseMesh) {
+            this.pulseProgress += 0.004 * this.speedMultiplier;
+            if (this.pulseProgress > 1.0) this.pulseProgress = 0;
+            const pos = this.activeCurve.getPointAt(this.pulseProgress);
+            this.dataPulseMesh.position.copy(pos);
+        }
+
+        if (this.controls) this.controls.update();
+        if (this.renderer) this.renderer.render(this.scene, this.camera);
     }
 }
 
@@ -337,24 +367,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (modKey === "sanhe") {
             if (moduleCardSanhe) moduleCardSanhe.style.display = "block";
-            wuxingBadgeTitle.innerText = "地支三合局 3D 三角形与月相算法";
-            wuxingBadgeDesc.innerText = "根据原书 P246，申子辰水局、巳酉丑金局等预报农历出落时辰";
+            if (wuxingBadgeTitle) wuxingBadgeTitle.innerText = "地支三合局 3D 三角形数据运动";
+            if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = "数据粒子在申子辰水局等 3D 三角形边线上巡航游走";
             engine.renderSanheTriangle([8, 0, 4], 0x4dabf7);
             highlightMatrixByBranches([8, 0, 4]);
         } else if (modKey === "tiangan") {
             if (moduleCardTiangan) moduleCardTiangan.style.display = "block";
-            wuxingBadgeTitle.innerText = "天干五合化气律与九宫归属表";
-            wuxingBadgeDesc.innerText = "甲己合化土、乙庚合化金、丙辛合化水、丁壬合化木、戊癸合化火";
+            if (wuxingBadgeTitle) wuxingBadgeTitle.innerText = "天干五合化气律数据运动";
+            if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = "甲己合化土、乙庚合化金等化气律数据流动";
             engine.clearWuxing3DGroup();
         } else if (modKey === "shengke") {
             if (moduleCardShengke) moduleCardShengke.style.display = "block";
-            wuxingBadgeTitle.innerText = "五行相生相克 3D 五角星阵";
-            wuxingBadgeDesc.innerText = "相生(水木火土金)与 3D 天球五行相克五角星阵拓扑";
+            if (wuxingBadgeTitle) wuxingBadgeTitle.innerText = "五行相生相克 3D 五角星数据运动";
+            if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = "数据粒子在 3D 五角星相克拓扑边线上高速巡航";
             engine.renderPentagramKe();
         } else if (modKey === "sanyuan") {
             if (moduleCardSanyuan) moduleCardSanyuan.style.display = "block";
-            wuxingBadgeTitle.innerText = "180 年甲子三元九运大周天历表";
-            wuxingBadgeDesc.innerText = "上中下三元共 180 年（每运 20 年），解构天道运化81宫归属";
+            if (wuxingBadgeTitle) wuxingBadgeTitle.innerText = "180 年甲子三元九运数据运动";
+            if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = "解构三元九运历法天道运化81宫数据归属";
             engine.clearWuxing3DGroup();
         }
     }
@@ -407,29 +437,45 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSpeed.addEventListener("click", () => {
             currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
             const level = speedLevels[currentSpeedIdx];
+            engine.speedMultiplier = level;
             if (speedVal) speedVal.innerText = `${level}x`;
         });
     }
 
-    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.equatorGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.eclipticGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.lunarGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-reset-view").addEventListener("click", () => {
-        engine.adjustCameraFit();
-    });
-    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.autoRotate = this.classList.contains("active");
-    });
+    const btnEq = document.getElementById("btn-toggle-equator");
+    if (btnEq) {
+        btnEq.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.equatorGroup) engine.equatorGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnEc = document.getElementById("btn-toggle-ecliptic");
+    if (btnEc) {
+        btnEc.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.eclipticGroup) engine.eclipticGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnLu = document.getElementById("btn-toggle-lunar");
+    if (btnLu) {
+        btnLu.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.lunarGroup) engine.lunarGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnReset = document.getElementById("btn-reset-view");
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            engine.adjustCameraFit();
+        });
+    }
+    const btnRot = document.getElementById("btn-toggle-autorotate");
+    if (btnRot) {
+        btnRot.addEventListener("click", function() {
+            this.classList.toggle("active");
+            engine.autoRotate = this.classList.contains("active");
+        });
+    }
 
     switchModule("sanhe");
 });
