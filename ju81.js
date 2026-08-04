@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》用矩法·一矩至十二矩运动规律 - 核心逻辑 (ju81.js)
-   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 1矩(81) ~ 12矩(972) 3D 螺旋拓扑
+   《易经数理秘笈》用矩法·一矩至十二矩运动规律 - 核心全景引擎 (ju81.js)
+   特点：纯粹数理逻辑 3D 浑天坐标 + 四大原书《用矩法》解构模块 (1~12矩/四白分属/324筐/圆出于方)
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,7 +43,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class Ju81Vivid3DEngine {
+class Ju81PureMath3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.width = this.container.clientWidth || 400;
@@ -61,16 +61,11 @@ class Ju81Vivid3DEngine {
         this.orbsGroup = new THREE.Group();
         this.juSpiralGroup = new THREE.Group();
 
-        this.sunMesh = null;
-        this.moonMesh = null;
-        this.sunAngle = 0;
-        this.moonAngle = 0;
         this.autoRotate = true;
 
         this.initScene();
         this.createArmillaryRings();
         this.createCelestialGridAndPoles();
-        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -200,18 +195,6 @@ class Ju81Vivid3DEngine {
         });
     }
 
-    createSunAndMoonObjects() {
-        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
-        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
-        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
-        this.scene.add(this.sunMesh);
-
-        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
-        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
-        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
-        this.scene.add(this.moonMesh);
-    }
-
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
@@ -239,12 +222,16 @@ class Ju81Vivid3DEngine {
         return sprite;
     }
 
-    renderJu3DSpiral(juCount = 1) {
+    clearJuSpiralGroup() {
         while (this.juSpiralGroup.children.length > 0) {
             const obj = this.juSpiralGroup.children.pop();
             if (obj.geometry) obj.geometry.dispose();
             if (obj.material) obj.material.dispose();
         }
+    }
+
+    renderJu3DSpiral(juCount = 1) {
+        this.clearJuSpiralGroup();
 
         const points = [];
         const totalSteps = juCount * 9;
@@ -282,6 +269,25 @@ class Ju81Vivid3DEngine {
         });
     }
 
+    renderFourCornersSquare() {
+        this.clearJuSpiralGroup();
+        const cornerIndices = [8, 5, 2, 11, 8]; // 申(8), 巳(5), 寅(2), 亥(11)
+        const points = cornerIndices.map(idx => getBranch3DPos(idx));
+
+        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = new THREE.LineBasicMaterial({ color: 0x4dabf7, linewidth: 3 });
+        const line = new THREE.Line(geom, mat);
+        this.juSpiralGroup.add(line);
+
+        points.slice(0, 4).forEach(p => {
+            const sGeom = new THREE.SphereGeometry(0.45, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, emissive: 0x0033aa });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.juSpiralGroup.add(sMesh);
+        });
+    }
+
     animate() {
         requestAnimationFrame(() => this.animate());
 
@@ -289,24 +295,13 @@ class Ju81Vivid3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        this.sunAngle += 0.008;
-        const sunRadius = 6.0;
-        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
-        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
-        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
-
-        this.moonAngle -= 0.012;
-        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
-        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
-        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
-
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Ju81Vivid3DEngine("three-canvas-ju");
+    const engine = new Ju81PureMath3DEngine("three-canvas-ju");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -405,9 +400,57 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    const juModuleSelect = document.getElementById("ju-module-select");
+    const moduleJu12 = document.getElementById("module-ju-12");
+    const moduleJuCorners = document.getElementById("module-ju-corners");
+    const moduleJuBasket = document.getElementById("module-ju-basket");
+    const moduleJuSquare = document.getElementById("module-ju-square");
+
     const juDetailBox = document.getElementById("ju-detail-box");
     const juBadgeTitle = document.getElementById("ju-badge-title");
     const juBadgeDesc = document.getElementById("ju-badge-desc");
+
+    function switchJuModule(modKey) {
+        [moduleJu12, moduleJuCorners, moduleJuBasket, moduleJuSquare].forEach(el => {
+            if (el) el.style.display = "none";
+        });
+
+        document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+
+        if (modKey === "12ju") {
+            if (moduleJu12) moduleJu12.style.display = "block";
+            renderJuDetail(1);
+        } else if (modKey === "four_corners") {
+            if (moduleJuCorners) moduleJuCorners.style.display = "block";
+            juBadgeTitle.innerText = "申巳寅亥“四白定畴”四角分属拓扑";
+            juBadgeDesc.innerText = "申(水)开局、寅(木)演进、巳(火)质变、亥(金)归宿，勾勒白道四角方阵";
+            engine.renderFourCornersSquare();
+            highlightMatrixByPositions([9, 18, 27, 36, 45, 54, 63, 72, 81]);
+        } else if (modKey === "basket") {
+            if (moduleJuBasket) moduleJuBasket.style.display = "block";
+            juBadgeTitle.innerText = "天门 324“承受天德之筐”与复卦算法";
+            juBadgeDesc.innerText = "324 - 60×5 = 24，归妹六交 4 矩扣除 5 节后复见天地之心 24 六";
+            engine.clearJuSpiralGroup();
+            highlightMatrixByPositions([24, 54, 81]);
+        } else if (modKey === "square_circle") {
+            if (moduleJuSquare) moduleJuSquare.style.display = "block";
+            juBadgeTitle.innerText = "“圆出于方，规出于矩”周天化圆推演";
+            juBadgeDesc.innerText = "81 矩(方)经 60 花甲子节卦按 6×60° 转化为 360° 圆周天";
+            engine.renderJu3DSpiral(4);
+            highlightMatrixByPositions([81]);
+        }
+    }
+
+    function highlightMatrixByPositions(posList) {
+        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+            const p = parseInt(cell.dataset.pos, 10);
+            if (posList.includes(p)) {
+                cell.classList.add("active-pos");
+            } else {
+                cell.classList.remove("active-pos");
+            }
+        });
+    }
 
     function renderJuDetail(juNum) {
         const data = JU_DATA[juNum] || JU_DATA[1];
@@ -427,20 +470,17 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `;
 
-        const rem81 = data.val % 81 === 0 ? 81 : data.val % 81;
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            const p = parseInt(cell.dataset.pos, 10);
-            if (p === rem81 || p === 81) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
-        });
-
+        highlightMatrixByPositions([data.rem81]);
         engine.renderJu3DSpiral(juNum);
 
         juBadgeTitle.innerText = `${data.name} 3D 运动拓扑`;
         juBadgeDesc.innerText = `包含 ${juNum} 个 81 矩 (共 ${data.val} 气数)，在天体空间形成 ${juNum * 9} 步螺旋展开`;
+    }
+
+    if (juModuleSelect) {
+        juModuleSelect.addEventListener("change", (e) => {
+            switchJuModule(e.target.value);
+        });
     }
 
     document.querySelectorAll(".ju-btn").forEach(btn => {
@@ -484,5 +524,5 @@ document.addEventListener("DOMContentLoaded", () => {
         engine.autoRotate = this.classList.contains("active");
     });
 
-    renderJuDetail(1);
+    switchJuModule("12ju"); // 默认模块 1
 });
