@@ -728,29 +728,22 @@ input[type="number"] {
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
-}
-
-.sanhe-btn.active, .wuxing-btn.active, .yuan-card-btn.active {
-    border-color: var(--border-gold-bright);
-    color: var(--color-gold);
-    background: rgba(212, 175, 55, 0.2);
-    font-weight: 700;
-}
-
-/* ==========================================================================
-   全新右侧栏显眼点击位置高亮与闪耀动画 (Right Panel Click Highlights)
+    /* ==========================================================================
+   全站 11 个页面统一 100% 媲美 64 卦六爻行金胶囊显眼高亮特效
    ========================================================================== */
 
-/* 1. 表格行/六爻行/卡片点击高亮态闪耀微动画 */
-.interactive-row, .interactive-yao-row, .sanhe-btn, .wuxing-btn, .power-quick-btn, .split-quick-btn, .palace-tab-btn, .sys-filter-btn {
+/* 所有可点击元素统一悬浮与过渡 */
+.interactive-row, .interactive-yao-row, .portal-card, .pipeline-step-item, .sanhe-btn, .wuxing-btn, .power-quick-btn, .split-quick-btn, .palace-tab-btn, .sys-filter-btn, tr.interactive-row {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     cursor: pointer;
     position: relative;
+    border-radius: 8px !important;
 }
 
-.interactive-row:hover, .interactive-yao-row:hover {
+.interactive-row:hover, .interactive-yao-row:hover, .portal-card:hover, .pipeline-step-item:hover {
     background: rgba(77, 171, 247, 0.15) !important;
     transform: translateX(4px) !important;
+    border-color: rgba(255, 224, 102, 0.4) !important;
 }
 
 /* 点击刹那间的闪光冲击动画 */
@@ -768,35 +761,44 @@ input[type="number"] {
     }
 }
 
-.interactive-row.active-row, .interactive-yao-row.active-yao-row {
-    background: linear-gradient(90deg, rgba(255, 224, 102, 0.35), rgba(77, 171, 247, 0.25)) !important;
+/* 媲美 64 卦六爻行的 100% 金胶囊边框 + 渐变金蓝光晕 + 6px 右移脉冲 */
+.interactive-row.active-row, 
+.interactive-yao-row.active-yao-row, 
+tr.interactive-row.active-row,
+.portal-card.active,
+.pipeline-step-item.active {
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.35) 0%, rgba(77, 171, 247, 0.22) 100%) !important;
     border-left: 6px solid #ffe066 !important;
-    box-shadow: 0 0 20px rgba(255, 224, 102, 0.5), inset 0 0 14px rgba(77, 171, 247, 0.3) !important;
-    transform: translateX(8px) !important;
+    border-top: 1px solid rgba(255, 224, 102, 0.5) !important;
+    border-right: 1px solid rgba(255, 224, 102, 0.5) !important;
+    border-bottom: 1px solid rgba(255, 224, 102, 0.5) !important;
+    box-shadow: 0 0 20px rgba(255, 224, 102, 0.55), inset 0 0 14px rgba(77, 171, 247, 0.28) !important;
+    transform: translateX(6px) !important;
     font-weight: 700 !important;
-    animation: activeRowGlowPulse 1.6s infinite alternate !important;
+    animation: activeYaoRowGlowPulse 1.8s infinite alternate !important;
 }
 
-@keyframes activeRowGlowPulse {
+@keyframes activeYaoRowGlowPulse {
     0% {
-        box-shadow: 0 0 15px rgba(255, 224, 102, 0.4), inset 0 0 10px rgba(77, 171, 247, 0.2);
+        box-shadow: 0 0 14px rgba(255, 224, 102, 0.45), inset 0 0 10px rgba(77, 171, 247, 0.2);
     }
     100% {
-        box-shadow: 0 0 25px rgba(255, 224, 102, 0.75), inset 0 0 18px rgba(77, 171, 247, 0.45);
+        box-shadow: 0 0 24px rgba(255, 224, 102, 0.75), inset 0 0 18px rgba(77, 171, 247, 0.45);
     }
 }
 
-/* 2. 右侧按钮激活态强化高亮 */
+/* 按钮类激活态与六爻行完全一致 */
 .sanhe-btn.active, .wuxing-btn.active, .power-quick-btn.active, .split-quick-btn.active, .palace-tab-btn.active, .sys-filter-btn.active {
     border-color: #ffe066 !important;
+    border-left: 4px solid #ffe066 !important;
     color: #ffe066 !important;
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.35) 0%, rgba(77, 171, 247, 0.25) 100%) !important;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.4) 0%, rgba(77, 171, 247, 0.25) 100%) !important;
     font-weight: 800 !important;
-    box-shadow: 0 0 16px rgba(255, 224, 102, 0.6) !important;
+    box-shadow: 0 0 18px rgba(255, 224, 102, 0.6) !important;
     transform: scale(1.04) !important;
 }
 
-/* 3. 太乙 81 宫单元格高亮：干净清晰，无缩放震荡，严禁重叠遮挡 */
+/* 太乙 81 宫单元格高亮：干净清晰，无缩放震荡，严禁重叠遮挡 */
 .taiyi-81-cell {
     transition: background 0.15s ease, border-color 0.15s ease;
     box-sizing: border-box;
