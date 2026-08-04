@@ -30,6 +30,31 @@ const LUOSHU_PALACES_EXACT = [
     { num: 6, name: "乾六宫 (金)", numbers: [33, 78, 15, 24, 42, 60, 69, 6, 51], class: "palace-qian" },
 ];
 
+
+const PALACE_NAME_MAP = {
+    "一": "坎一宫", "二": "坤二宫", "三": "震三宫",
+    "四": "巽四宫", "五": "中五宫", "六": "乾六宫",
+    "七": "兑七宫", "八": "艮八宫", "九": "离九宫"
+};
+
+const POS_NAME_MAP = {
+    "₁": "一位", "₂": "二位", "₃": "三位",
+    "₄": "四位", "₅": "五位", "₆": "六位",
+    "₇": "七位", "₈": "八位", "₉": "九位"
+};
+
+function getPalacePosDesc(num) {
+    const sub = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[num]) ? TAIYI_81_SUB_LABELS[num] : "";
+    if (sub.length >= 4) {
+        const palChar = sub.charAt(1);
+        const posChar = sub.charAt(2);
+        const palName = PALACE_NAME_MAP[palChar] || `${palChar}宫`;
+        const posName = POS_NAME_MAP[posChar] || "";
+        return `${palName}${posName} ${sub}`;
+    }
+    return `${num}号 ${sub}`;
+}
+
 const TAIYI_81_SUB_LABELS = {
     31: "(四₄)", 76: "(四₉)", 13: "(四₂)", 22: "(四₃)", 40: "(四₅)", 58: "(四₇)", 67: "(四₈)", 4: "(四₁)", 49: "(四₆)",
     36: "(九₄)", 81: "(九₉)", 18: "(九₂)", 27: "(九₃)", 45: "(九₅)", 63: "(九₇)", 72: "(九₈)", 9: "(九₁)", 54: "(九₆)",
@@ -396,7 +421,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         🔢 序号 ${seq} · 数 ${num} 双向联动解析
                     </div>
                     <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
-                        • 太乙 81 降维: <strong>${rem81} 号宫</strong><br>
+                        • 太乙 81 降维: <strong>${rem81} </strong><br>
                         • 12 地支映射: <span style="color:${branch.color}; font-weight:800;">${branch.name}位 (${branch.system})</span>
                     </div>
                     <div style="margin-top: 6px; font-size: 11px; color: #ffffff; background: rgba(77,171,247,0.18); padding: 4px 8px; border-radius: 4px;">
