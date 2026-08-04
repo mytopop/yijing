@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>易经数理秘笈 - 五行与三元周天全景馆</title>
+    <title>易经数理秘笈 - 五行生克、天干合化与三元周天全景馆</title>
     <!-- 引入 Google 字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v6">
+    <link rel="stylesheet" href="index.css?v=20260804_v10">
 </head>
 <body>
     <div class="app-container">
@@ -24,7 +24,7 @@
                 <div class="logo-icon">☯</div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
-                    <span class="subtitle">根据梁致堂原著解构 · 五行与三元周天全景馆</span>
+                    <span class="subtitle">根据梁致堂原著解构 · 五行生克、天干合化与三元周天全景馆</span>
                 </div>
             </div>
             
@@ -43,11 +43,11 @@
 
         <!-- 三栏并行主容器 -->
         <main class="main-three-split-container">
-            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <!-- 栏一：3D 浑天时空仪与五行 3D 模型 (34%) -->
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪
+                        <span>🌌</span> 3D 浑天与五行三元能量仪
                     </div>
                     <div class="orbit-legend">
                         <span class="legend-item equator">● 赤道(天)</span>
@@ -84,8 +84,8 @@
 
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
-                        <div id="wuxing-badge-title" class="badge-title">地支三合局 3D 能量三角形</div>
-                        <div id="wuxing-badge-desc" class="badge-desc">包含地支三合局数理解构与原书 P246 月相预测算法</div>
+                        <div id="wuxing-badge-title" class="badge-title">五行与三元周天 3D 拓扑</div>
+                        <div id="wuxing-badge-desc" class="badge-desc">展现地支三合局、天干合化、五行相生相克与 180 年三元周天</div>
                     </div>
                 </div>
             </section>
@@ -94,42 +94,128 @@
             <section class="col-middle-taiyi">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                        <span>📜</span> 太乙九宫八十一宫阵图 (原书五行九色分布)
                     </div>
                     <div class="law-desc-text">
-                        宏观按洛书 9 宫分块，微观 9 数按原书《太乙九宫图》精确定准。点击单元格可联动态象。
+                        点击右侧四大解构 Tab，太乙 81 宫阵图中的五行宫位与三元运数同步亮起！
                     </div>
                 </div>
 
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：三合局与月相预测控制台 (33%) -->
+            <!-- 栏三：原书五行三元 4 大权威解构模块控制台 (33%) -->
             <section class="col-right-controls">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>🔺</span> 地支三合局 3D 能量三角形与月相算法
+                        <span>☯</span> 梁致堂原著《五行与三元周天》四大解构模块
                     </div>
                     <div class="law-desc-text">
-                        梁致堂先生原著中指出：地支三合局（申子辰、巳酉丑、寅午戌、亥卯未）对应天体日月位置与月相出落时间预测！
+                        梁致堂先生在原著中写道：“八卦者三才之定位，五行者二气之流行。” 五行与三元贯穿中医与天文学全过程。
                     </div>
                 </div>
 
+                <!-- 四大选项卡 Toggle Tabs -->
                 <div class="sanhe-btn-grid" style="margin-top: 6px;">
-                    <button class="sanhe-btn sanhe-detail-btn active" data-sanhe="water">申子辰 (水局·润下)</button>
-                    <button class="sanhe-btn sanhe-detail-btn" data-sanhe="metal">巳酉丑 (金局·从革)</button>
-                    <button class="sanhe-btn sanhe-detail-btn" data-sanhe="fire">寅午戌 (火局·炎上)</button>
-                    <button class="sanhe-btn sanhe-detail-btn" data-sanhe="wood">亥卯未 (木局·发生)</button>
+                    <button class="sanhe-btn wuxing-tab-btn active" data-tab="tab-sanhe">1. 地支三合与月相</button>
+                    <button class="sanhe-btn wuxing-tab-btn" data-tab="tab-hehua">2. 天干五合化气律</button>
+                    <button class="sanhe-btn wuxing-tab-btn" data-tab="tab-shengke">3. 五行生克五角星</button>
+                    <button class="sanhe-btn wuxing-tab-btn" data-tab="tab-sanyuan">4. 180年三元九运历</button>
                 </div>
 
-                <div id="sanhe-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
-                    <!-- 动态渲染 -->
+                <!-- 模块一：地支三合局与月相预测 -->
+                <div id="section-sanhe" class="wuxing-section-box">
+                    <div class="glass-panel" style="margin-top: 6px;">
+                        <div class="card-title"><span>🔺</span> 选择三合局解析月相出落 (原书 P246)</div>
+                        <div class="sanhe-btn-grid" style="margin-top: 6px;">
+                            <button class="sanhe-btn sanhe-detail-btn active" data-sanhe="water">申子辰 (水局)</button>
+                            <button class="sanhe-btn sanhe-detail-btn" data-sanhe="metal">巳酉丑 (金局)</button>
+                            <button class="sanhe-btn sanhe-detail-btn" data-sanhe="fire">寅午戌 (火局)</button>
+                            <button class="sanhe-btn sanhe-detail-btn" data-sanhe="wood">亥卯未 (木局)</button>
+                        </div>
+                    </div>
+                    <div id="sanhe-result-box" class="hexagram-detail-box" style="margin-top: 6px;"></div>
+                </div>
+
+                <!-- 模块二：天干五合与化气五行数理 -->
+                <div id="section-hehua" class="wuxing-section-box" style="display:none;">
+                    <div class="glass-panel" style="margin-top: 6px;">
+                        <div class="card-title"><span>🤝</span> 原著十天干五合化气五行数理表</div>
+                        <div class="law-desc-text">“天有十日，天一地二……甲己合土，乙庚合金，丙辛合水，丁壬合木，戊癸合火。”</div>
+                    </div>
+                    <div class="sequence-table-container" style="max-height: 250px; margin-top: 6px;">
+                        <table class="seq-table">
+                            <thead>
+                                <tr>
+                                    <th>天干组合</th>
+                                    <th>天干原数</th>
+                                    <th>和值</th>
+                                    <th>合化五行</th>
+                                    <th>太乙宫位</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>甲 (1) + 己 (6)</td><td>1 + 6</td><td>7</td><td style="color:#ffe066; font-weight:700;">坤/艮/中土</td><td>二宫、五宫、八宫</td></tr>
+                                <tr><td>乙 (2) + 庚 (7)</td><td>2 + 7</td><td>9</td><td style="color:#dee2e6; font-weight:700;">乾/兑金</td><td>六宫、七宫</td></tr>
+                                <tr><td>丙 (3) + 辛 (8)</td><td>3 + 8</td><td>11 ➔ 亥/子</td><td style="color:#4dabf7; font-weight:700;">坎水</td><td>一宫 (坎水)</td></tr>
+                                <tr><td>丁 (4) + 壬 (9)</td><td>4 + 9</td><td>13 ➔ 寅/卯</td><td style="color:#40c057; font-weight:700;">震/巽木</td><td>三宫、四宫</td></tr>
+                                <tr><td>戊 (5) + 癸 (10)</td><td>5 + 10</td><td>15 ➔ 巳/午</td><td style="color:#ff5252; font-weight:700;">离火</td><td>九宫 (离火)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 模块三：五行相生相克 9 宫分布 -->
+                <div id="section-shengke" class="wuxing-section-box" style="display:none;">
+                    <div class="glass-panel" style="margin-top: 6px;">
+                        <div class="card-title"><span>五</span> 五行相生与五角星相克数理</div>
+                        <div class="law-desc-text">
+                            相生: 木(3,4) ➔ 火(9) ➔ 土(2,5,8) ➔ 金(6,7) ➔ 水(1) ➔ 木。<br>
+                            相克: 木克土 ➔ 土克水 ➔ 水克火 ➔ 火克金 ➔ 金克木。
+                        </div>
+                    </div>
+                    <div id="shengke-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                        <!-- 动态渲染 -->
+                    </div>
+                </div>
+
+                <!-- 模块四：180 年甲子三元九运历法 -->
+                <div id="section-sanyuan" class="wuxing-section-box" style="display:none;">
+                    <div class="glass-panel" style="margin-top: 6px;">
+                        <div class="card-title"><span>⏳</span> 180 年甲子三元九运大周天历表</div>
+                        <div class="law-desc-text">
+                            一甲子 60 年，三元 (上元/中元/下元) 共 $3 \times 60 = 180$ 年。每运 20 年，合称三元九运大周天。
+                        </div>
+                    </div>
+                    <div class="sequence-table-container" style="max-height: 250px; margin-top: 6px;">
+                        <table class="seq-table">
+                            <thead>
+                                <tr>
+                                    <th>三元</th>
+                                    <th>运次</th>
+                                    <th>对应五行</th>
+                                    <th>九宫归属</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td rowspan="3" style="color:#4dabf7; font-weight:700;">上元 60年</td><td>一运 (20年)</td><td>一运坎水</td><td>坎一宫 (水)</td></tr>
+                                <tr><td>二运 (20年)</td><td>二运坤土</td><td>坤二宫 (土)</td></tr>
+                                <tr><td>三运 (20年)</td><td>三运震木</td><td>震三宫 (木)</td></tr>
+                                <tr><td rowspan="3" style="color:#ffe066; font-weight:700;">中元 60年</td><td>四运 (20年)</td><td>四运巽木</td><td>巽四宫 (木)</td></tr>
+                                <tr><td>五运 (20年)</td><td>五运中土</td><td>中五宫 (土)</td></tr>
+                                <tr><td>六运 (20年)</td><td>六运乾金</td><td>乾六宫 (金)</td></tr>
+                                <tr><td rowspan="3" style="color:#ff5252; font-weight:700;">下元 60年</td><td>七运 (20年)</td><td>七运兑金</td><td>兑七宫 (金)</td></tr>
+                                <tr><td>八运 (20年)</td><td>八运艮土</td><td>艮八宫 (土)</td></tr>
+                                <tr><td>九运 (20年)</td><td>九运离火</td><td>离九宫 (火)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
 
     <!-- 五行引擎 (带版本防缓存) -->
-    <script src="wuxing.js?v=20260804_v6"></script>
+    <script src="wuxing.js?v=20260804_v10"></script>
 </body>
 </html>
