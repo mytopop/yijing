@@ -655,3 +655,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     switchJuModule("12ju");
 });
+
+/* 全局屏幕点击金彩粒子波纹火花特效 (Click Visual Spark Listener) */
+document.addEventListener("click", (e) => {
+    const spark = document.createElement("div");
+    spark.className = "click-spark-efx";
+    spark.style.left = `${e.clientX}px`;
+    spark.style.top = `${e.clientY}px`;
+    document.body.appendChild(spark);
+    setTimeout(() => {
+        if (spark.parentNode) {
+            spark.parentNode.removeChild(spark);
+        }
+    }, 450);
+});

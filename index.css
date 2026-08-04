@@ -737,3 +737,99 @@ input[type="number"] {
     background: rgba(212, 175, 55, 0.2);
     font-weight: 700;
 }
+
+/* ==========================================================================
+   全新显眼点击视觉特效 (Click Visual Effects & Micro-Animations)
+   ========================================================================== */
+
+/* 1. 表格行/六爻行点击高亮态闪耀微动画 */
+.interactive-row, .interactive-yao-row {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+}
+
+.interactive-row:hover, .interactive-yao-row:hover {
+    background: rgba(77, 171, 247, 0.12) !important;
+    transform: translateX(3px);
+}
+
+.interactive-row.active-row, .interactive-yao-row.active-yao-row {
+    background: linear-gradient(90deg, rgba(255, 224, 102, 0.28), rgba(77, 171, 247, 0.18)) !important;
+    border-left: 4px solid #ffe066 !important;
+    box-shadow: 0 0 16px rgba(255, 224, 102, 0.45), inset 0 0 12px rgba(77, 171, 247, 0.25) !important;
+    transform: translateX(6px) !important;
+    animation: activeRowPulse 1.8s infinite alternate !important;
+}
+
+@keyframes activeRowPulse {
+    0% {
+        box-shadow: 0 0 12px rgba(255, 224, 102, 0.35), inset 0 0 8px rgba(77, 171, 247, 0.15);
+    }
+    100% {
+        box-shadow: 0 0 22px rgba(255, 224, 102, 0.65), inset 0 0 16px rgba(77, 171, 247, 0.35);
+    }
+}
+
+/* 2. 81 宫单元格点击高亮金光冲击波 */
+.taiyi-81-cell {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.taiyi-81-cell.active-pos {
+    background: radial-gradient(circle, rgba(255, 224, 102, 0.9) 0%, rgba(255, 82, 82, 0.7) 100%) !important;
+    color: #000000 !important;
+    font-weight: 900 !important;
+    transform: scale(1.18) !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 0 20px rgba(255, 224, 102, 0.9), 0 0 35px rgba(255, 82, 82, 0.7) !important;
+    z-index: 10 !important;
+    animation: cellClickGlow 1.2s infinite alternate !important;
+}
+
+@keyframes cellClickGlow {
+    0% { transform: scale(1.14); box-shadow: 0 0 15px rgba(255, 224, 102, 0.7); }
+    100% { transform: scale(1.22); box-shadow: 0 0 26px rgba(255, 224, 102, 1), 0 0 40px rgba(77, 171, 247, 0.8); }
+}
+
+/* 3. 按钮点击水波纹反馈 */
+button, .action-btn, .sanhe-btn, .power-quick-btn, .split-quick-btn, .palace-tab-btn, .nav-tab {
+    position: relative;
+    overflow: hidden;
+}
+
+button:active, .action-btn:active, .sanhe-btn:active, .power-quick-btn:active, .split-quick-btn:active, .palace-tab-btn:active, .nav-tab:active {
+    transform: scale(0.95) !important;
+    box-shadow: 0 0 15px rgba(255, 224, 102, 0.6) !important;
+}
+
+/* 4. 全局屏幕点击金彩粒子波纹火花特效 (.click-spark-efx) */
+.click-spark-efx {
+    position: fixed;
+    pointer-events: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #ffe066;
+    background: radial-gradient(circle, rgba(255,224,102,0.8) 0%, rgba(77,171,247,0.4) 60%, transparent 100%);
+    box-shadow: 0 0 15px #ffe066, 0 0 25px #4dabf7;
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 1;
+    z-index: 99999;
+    animation: clickSparkExpand 0.45s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes clickSparkExpand {
+    0% {
+        transform: translate(-50%, -50%) scale(0.2);
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2.4);
+        opacity: 0;
+    }
+}
+

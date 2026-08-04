@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》九宫七输入通用推演解构馆 - (jiugong_qi.js)
-   特点：纯粹数理逻辑 3D 浑天坐标体系 + 七行通用参数降维推演
+   《易经数理秘笈》九宫纪气数一览表全景馆引擎 - (jiugong_tables.js)
+   特点：9 大宫 81 纪气数巨表展示 + 搜索筛选 + 全页三向联动 (Column 1, 2, 3 双向交互)
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -30,6 +30,17 @@ const LUOSHU_PALACES_EXACT = [
     { num: 6, name: "乾六宫 (金)", numbers: [33, 78, 15, 24, 42, 60, 69, 6, 51], class: "palace-qian" },
 ];
 
+const HEXAGRAM_NAMES_MAP = {
+    1: "乾为天", 2: "坤为地", 3: "水雷屯", 4: "山水蒙", 5: "水天需", 6: "天水讼", 7: "地水师", 8: "水地比",
+    9: "风天小畜", 10: "天泽履", 11: "地天泰", 12: "天地否", 13: "天火同人", 14: "火天大有", 15: "地山谦", 16: "雷地豫",
+    17: "泽雷随", 18: "山风蛊", 19: "地泽临", 20: "风地观", 21: "火雷噬嗑", 22: "山火贲", 23: "山地剥", 24: "地雷复",
+    25: "天雷无妄", 26: "山天大畜", 27: "山雷颐", 28: "泽风大过", 29: "坎为水", 30: "离为火", 31: "泽山咸", 32: "雷风恒",
+    33: "天山遁", 34: "雷天大壮", 35: "火地晋", 36: "地火明夷", 37: "风火家人", 38: "火泽睽", 39: "水山蹇", 40: "雷水解",
+    41: "山泽损", 42: "风雷益", 43: "泽天夬", 44: "天风姤", 45: "泽地萃", 46: "地风升", 47: "泽水困", 48: "水风井",
+    49: "泽火革", 50: "火风鼎", 51: "震为雷", 52: "艮为山", 53: "风山渐", 54: "雷泽归妹", 55: "雷火丰", 56: "火山旅",
+    57: "巽为风", 58: "兑为泽", 59: "风水涣", 60: "水泽节", 61: "风泽中孚", 62: "雷山小过", 63: "水火既济", 64: "火水未济"
+};
+
 function getBranch3DPos(branchIdx, radius = 6.0) {
     const angle = THREE.MathUtils.degToRad(90 - branchIdx * 30);
     const baseVec = new THREE.Vector3(radius * Math.cos(angle), radius * Math.sin(angle), 0);
@@ -43,7 +54,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class JiugongQiPureMath3DEngine {
+class JiugongTablesPureMath3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         if (!this.container) return;
@@ -61,13 +72,18 @@ class JiugongQiPureMath3DEngine {
         this.lunarGroup = new THREE.Group();
         this.celestialGridGroup = new THREE.Group();
         this.orbsGroup = new THREE.Group();
-        this.qi7Group = new THREE.Group();
+        this.jgt3DGroup = new THREE.Group();
 
         this.autoRotate = true;
+        this.pulseProgress = 0;
+        this.speedMultiplier = 1.0;
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
 
         this.initScene();
         this.createArmillaryRings();
         this.createCelestialGridAndPoles();
+        this.setupDataMotionPulse();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -97,7 +113,7 @@ class JiugongQiPureMath3DEngine {
         this.scene.add(this.lunarGroup);
         this.scene.add(this.celestialGridGroup);
         this.scene.add(this.orbsGroup);
-        this.scene.add(this.qi7Group);
+        this.scene.add(this.jgt3DGroup);
     }
 
     adjustCameraFit() {
@@ -197,6 +213,26 @@ class JiugongQiPureMath3DEngine {
         });
     }
 
+    setupDataMotionPulse() {
+        const branchPoints = [];
+        for (let i = 0; i < 12; i++) {
+            branchPoints.push(getBranch3DPos(i));
+        }
+        branchPoints.push(branchPoints[0]);
+
+        this.activeCurve = new THREE.CatmullRomCurve3(branchPoints, true);
+        const lineGeom = new THREE.BufferGeometry().setFromPoints(this.activeCurve.getPoints(100));
+        const lineMat = new THREE.LineDashedMaterial({ color: 0xffe066, dashSize: 0.3, gapSize: 0.15, transparent: true, opacity: 0.6 });
+        const motionLine = new THREE.Line(lineGeom, lineMat);
+        motionLine.computeLineDistances();
+        this.jgt3DGroup.add(motionLine);
+
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.jgt3DGroup.add(this.dataPulseMesh);
+    }
+
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
@@ -224,37 +260,11 @@ class JiugongQiPureMath3DEngine {
         return sprite;
     }
 
-    clearQi7Group() {
-        while (this.qi7Group.children.length > 0) {
-            const obj = this.qi7Group.children.pop();
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
+    highlightBranchPos(branchIdx) {
+        const pos = getBranch3DPos(branchIdx);
+        if (this.dataPulseMesh) {
+            this.dataPulseMesh.position.copy(pos);
         }
-    }
-
-    render7ValuesTrajectory(values) {
-        this.clearQi7Group();
-        const points = [];
-
-        values.forEach(val => {
-            const rem12 = val % 12 === 0 ? 12 : val % 12;
-            points.push(getBranch3DPos(rem12 - 1));
-        });
-
-        points.push(points[0]); // 闭环
-
-        const geom = new THREE.BufferGeometry().setFromPoints(points);
-        const mat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
-        const line = new THREE.Line(geom, mat);
-        this.qi7Group.add(line);
-
-        points.slice(0, 7).forEach(p => {
-            const sGeom = new THREE.SphereGeometry(0.38, 16, 16);
-            const sMat = new THREE.MeshStandardMaterial({ color: 0xff5252, emissive: 0xff5252 });
-            const sMesh = new THREE.Mesh(sGeom, sMat);
-            sMesh.position.copy(p);
-            this.qi7Group.add(sMesh);
-        });
     }
 
     animate() {
@@ -264,15 +274,52 @@ class JiugongQiPureMath3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
+        if (this.activeCurve && this.dataPulseMesh) {
+            this.pulseProgress += 0.003 * this.speedMultiplier;
+            if (this.pulseProgress > 1.0) this.pulseProgress = 0;
+            const pos = this.activeCurve.getPointAt(this.pulseProgress);
+            this.dataPulseMesh.position.copy(pos);
+        }
+
         if (this.controls) this.controls.update();
         if (this.renderer) this.renderer.render(this.scene, this.camera);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new JiugongQiPureMath3DEngine("three-canvas-jiugong_qi");
+    const engine = new JiugongTablesPureMath3DEngine("three-canvas-jiugong-tables");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
+    const tableBody = document.getElementById("jgt-table-body");
+    const tableTitle = document.getElementById("jgt-table-title");
+    const detailCard = document.getElementById("jgt-detail-card");
+    const badgeTitle = document.getElementById("jgt-badge-title");
+    const badgeDesc = document.getElementById("jgt-badge-desc");
+
+    // 生成全 81 宫完整纪气数数据集
+    const ALL_81_DATA = [];
+    LUOSHU_PALACES_EXACT.forEach(palace => {
+        palace.numbers.forEach(num => {
+            const rem12 = num % 12 === 0 ? 12 : num % 12;
+            const branch = EARTHLY_BRANCHES[rem12 - 1];
+            const hexName = HEXAGRAM_NAMES_MAP[num] || (num <= 64 ? `第${num}卦` : `大局后续数 ${num}`);
+            const deg = (num * 4.4444).toFixed(1) + "°";
+            const expr = `${palace.num} 宫 × ${num} = ${palace.num * num}`;
+
+            ALL_81_DATA.push({
+                num: num,
+                palaceNum: palace.num,
+                palaceName: palace.name,
+                hexName: hexName,
+                expr: expr,
+                deg: deg,
+                rem12: rem12,
+                branchName: branch.name,
+                branchColor: branch.color,
+                system: branch.system
+            });
+        });
+    });
 
     function initLuoshuTaiyi9x9Matrix() {
         if (!matrixContainer) return;
@@ -297,6 +344,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.dataset.pos = num;
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
+                cell.addEventListener("click", () => {
+                    // 三向联动：点击阵图 81 宫单元格 ➔ 定位 3D 节点与表格行
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                    cell.classList.add("active-pos");
+
+                    const target = ALL_81_DATA.find(d => d.num === num);
+                    if (target) {
+                        highlightRowAnd3D(target);
+                    }
+                });
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -306,69 +363,119 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
-    const tableBody = document.getElementById("qi7-table-body");
-    const badgeTitle = document.getElementById("jiugong-qi-badge-title");
-    const badgeDesc = document.getElementById("jiugong-qi-badge-desc");
-    const btnCalculate = document.getElementById("btn-qi7-calculate");
+    function renderTable(filterPalace = "all", searchText = "") {
+        if (!tableBody) return;
+        tableBody.innerHTML = "";
 
-    function getDigitalRoot(n) {
-        let val = Math.abs(n);
-        while (val >= 10) {
-            val = val.toString().split('').reduce((sum, d) => sum + parseInt(d, 10), 0);
-        }
-        return val;
-    }
+        let filtered = ALL_81_DATA;
 
-    function run7ValuesCalculation() {
-        const vals = [];
-        for (let i = 1; i <= 7; i++) {
-            const el = document.getElementById(`qi7-input-${i}`);
-            const v = el ? parseInt(el.value, 10) : 0;
-            vals.push(isNaN(v) ? i * 9 : v);
+        if (filterPalace !== "all") {
+            const pNum = parseInt(filterPalace, 10);
+            filtered = filtered.filter(d => d.palaceNum === pNum);
         }
 
-        let tableRowsHtml = "";
-        const rem81List = [];
+        if (searchText.trim() !== "") {
+            const q = searchText.trim().toLowerCase();
+            filtered = filtered.filter(d => 
+                d.num.toString().includes(q) || 
+                d.hexName.toLowerCase().includes(q) || 
+                d.palaceName.toLowerCase().includes(q) || 
+                d.branchName.toLowerCase().includes(q)
+            );
+        }
 
-        vals.forEach((v, idx) => {
-            const rem81 = v % 81 === 0 ? 81 : v % 81;
-            const rem12 = v % 12 === 0 ? 12 : v % 12;
-            const branch = EARTHLY_BRANCHES[rem12 - 1];
-            const root = getDigitalRoot(v);
-            rem81List.push(rem81);
+        if (tableTitle) {
+            const pObj = LUOSHU_PALACES_EXACT.find(p => p.num === parseInt(filterPalace, 10));
+            const pTitleStr = pObj ? pObj.name : "全九宫";
+            tableTitle.innerText = `📋 ${pTitleStr} ${filtered.length} 条纪气数明细 (点击行三向联动)`;
+        }
 
-            tableRowsHtml += `
-                <tr>
-                    <td>第 ${idx + 1} 行</td>
-                    <td><strong>${v}</strong></td>
-                    <td>${rem81} 号宫</td>
-                    <td style="color:${branch.color}; font-weight:700;">${branch.name}</td>
-                    <td>${branch.system.split('(')[0]}</td>
-                    <td style="color:#ffe066; font-weight:700;">${root}</td>
-                </tr>
+        filtered.forEach(d => {
+            const tr = document.createElement("tr");
+            tr.className = "interactive-row";
+            tr.dataset.num = d.num;
+            tr.innerHTML = `
+                <td style="font-weight:700; color:#ffe066;">${d.palaceName.split(' ')[0]}</td>
+                <td style="font-family:var(--font-times); font-weight:800;">${d.num}</td>
+                <td>${d.hexName}</td>
+                <td style="font-family:var(--font-times); font-size:11px;">${d.expr}</td>
+                <td style="font-family:var(--font-times);">${d.deg}</td>
+                <td style="color:${d.branchColor}; font-weight:800;">${d.branchName}位</td>
+                <td>${d.system}</td>
             `;
+
+            tr.addEventListener("click", () => {
+                document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+                tr.classList.add("active-row");
+                highlightRowAnd3D(d);
+            });
+
+            tableBody.appendChild(tr);
         });
 
-        if (tableBody) tableBody.innerHTML = tableRowsHtml;
-
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            const p = parseInt(cell.dataset.pos, 10);
-            if (rem81List.includes(p)) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
-        });
-
-        engine.render7ValuesTrajectory(vals);
-
-        if (badgeTitle) badgeTitle.innerText = `七行参数太乙 81 降维拓扑`;
-        if (badgeDesc) badgeDesc.innerText = `七行参数 [${vals.join(', ')}] 已成功在 3D 空间与 81 宫渲染`;
+        if (filtered.length > 0) {
+            highlightRowAnd3D(filtered[0]);
+        }
     }
 
-    if (btnCalculate) {
-        btnCalculate.addEventListener("click", () => {
-            run7ValuesCalculation();
+    function highlightRowAnd3D(d) {
+        // 高亮中间太乙 81 宫
+        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+            cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === d.num);
+        });
+
+        // 驱动 3D 节点
+        engine.highlightBranchPos(d.rem12 - 1);
+
+        if (detailCard) {
+            detailCard.innerHTML = `
+                <div style="font-size: 14px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
+                    📊 【${d.palaceName}】 · 数 ${d.num} 纪气数三向联动解析
+                </div>
+                <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
+                    • 对应易卦: <strong>${d.hexName}</strong> | 纪气算式: ${d.expr}<br>
+                    • 周天角度: <strong>${d.deg}</strong> | 12地支余数: 余 ${d.rem12}<br>
+                    • 坐标系归属: <span style="color:${d.branchColor}; font-weight:800;">${d.branchName}位 · ${d.system}</span>
+                </div>
+                <div style="margin-top: 6px; font-size: 11px; color: #ffffff; background: rgba(77,171,247,0.18); padding: 4px 8px; border-radius: 4px;">
+                    原著分析：数值 ${d.num} 归属于【${d.palaceName}】，数据脉冲已定位至【${d.branchName}位】！
+                </div>
+            `;
+        }
+
+        if (badgeTitle) badgeTitle.innerText = `${d.palaceName} · 数 ${d.num} (${d.branchName}位) 3D 节点`;
+        if (badgeDesc) badgeDesc.innerText = `${d.hexName} · ${d.expr}，太乙 81 阵图与 3D 浑天坐标系同步闪耀`;
+    }
+
+    // 绑定 9 大宫切选按钮
+    document.querySelectorAll(".palace-tab-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(".palace-tab-btn").forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+
+            const palaceKey = this.dataset.palace;
+            const searchVal = document.getElementById("jgt-search-input") ? document.getElementById("jgt-search-input").value : "";
+            renderTable(palaceKey, searchVal);
+        });
+    });
+
+    // 绑定搜索输入框
+    const searchInput = document.getElementById("jgt-search-input");
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            const activePalaceBtn = document.querySelector(".palace-tab-btn.active");
+            const palaceKey = activePalaceBtn ? activePalaceBtn.dataset.palace : "all";
+            renderTable(palaceKey, e.target.value);
+        });
+    }
+
+    const resetSearchBtn = document.getElementById("jgt-reset-search");
+    if (resetSearchBtn) {
+        resetSearchBtn.addEventListener("click", () => {
+            if (searchInput) searchInput.value = "";
+            const activePalaceBtn = document.querySelector(".palace-tab-btn.active");
+            const palaceKey = activePalaceBtn ? activePalaceBtn.dataset.palace : "all";
+            renderTable(palaceKey, "");
         });
     }
 
@@ -381,6 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSpeed.addEventListener("click", () => {
             currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
             const level = speedLevels[currentSpeedIdx];
+            engine.speedMultiplier = level;
             if (speedVal) speedVal.innerText = `${level}x`;
         });
     }
@@ -420,7 +528,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    run7ValuesCalculation();
+    renderTable("all", "");
 });
 
 /* 全局屏幕点击金彩粒子波纹火花特效 (Click Visual Spark Listener) */
