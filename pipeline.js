@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》任意数据 12 步拆解推演流水线 - (pipeline.js)
-   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 12 步推演数据轨迹
+   特点：纯粹数理逻辑 3D 浑天天象坐标体系 + 12 步推演数据脉冲轨迹
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,7 +43,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class PipelineVivid3DEngine {
+class PipelinePureMath3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.width = this.container.clientWidth || 400;
@@ -61,10 +61,6 @@ class PipelineVivid3DEngine {
         this.orbsGroup = new THREE.Group();
         this.pipe3DGroup = new THREE.Group();
 
-        this.sunMesh = null;
-        this.moonMesh = null;
-        this.sunAngle = 0;
-        this.moonAngle = 0;
         this.autoRotate = true;
 
         this.activeCurve = null;
@@ -75,7 +71,6 @@ class PipelineVivid3DEngine {
         this.initScene();
         this.createArmillaryRings();
         this.createCelestialGridAndPoles();
-        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -205,18 +200,6 @@ class PipelineVivid3DEngine {
         });
     }
 
-    createSunAndMoonObjects() {
-        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
-        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
-        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
-        this.scene.add(this.sunMesh);
-
-        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
-        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
-        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
-        this.scene.add(this.moonMesh);
-    }
-
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
@@ -295,17 +278,6 @@ class PipelineVivid3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        this.sunAngle += 0.008;
-        const sunRadius = 6.0;
-        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
-        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
-        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
-
-        this.moonAngle -= 0.012;
-        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
-        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
-        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
-
         if (this.activeCurve && this.dataPulseMesh) {
             this.pulseProgress += 0.004 * this.pulseSpeedMultiplier;
             if (this.pulseProgress > 1.0) this.pulseProgress = 0;
@@ -319,7 +291,7 @@ class PipelineVivid3DEngine {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new PipelineVivid3DEngine("three-canvas-pipeline");
+    const engine = new PipelinePureMath3DEngine("three-canvas-pipeline");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -465,5 +437,5 @@ document.addEventListener("DOMContentLoaded", () => {
         engine.autoRotate = this.classList.contains("active");
     });
 
-    calculatePipeline(7); // 默认 7
+    calculatePipeline(7);
 });
