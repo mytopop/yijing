@@ -14,11 +14,11 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v16">
+    <link rel="stylesheet" href="index.css?v=20260804_v21">
 </head>
 <body>
     <div class="app-container">
-        <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
+        <!-- 统一 100% 结构固定 Header 顶栏 (11 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
                 <div class="logo-icon">☯</div>
@@ -28,7 +28,7 @@
                 </div>
             </div>
             
-                        <nav class="header-nav-tabs">
+            <nav class="header-nav-tabs">
                 <a href="index.html" class="nav-tab">🏠 首页</a>
                 <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
                 <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
@@ -39,6 +39,7 @@
                 <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
                 <a href="coordinates12.html" class="nav-tab">🌌 12方位3坐标</a>
                 <a href="ju81.html" class="nav-tab">📐 用矩81</a>
+                <a href="jiugong_tables.html" class="nav-tab">📊 九宫纪气大表</a>
             </nav>
         </header>
 
@@ -106,7 +107,7 @@
             </section>
 
             <!-- 栏三：五行三元 4 大权威解构主模块 (33%) -->
-            <section class="col-right-controls">
+            <section class="col-right-controls" style="overflow-y: auto; max-height: calc(100vh - 120px);">
                 <div class="glass-panel">
                     <div class="card-title">
                         <span>☯</span> 五行三元原书 4 大权威解构主模块
@@ -128,21 +129,15 @@
                         <button class="sanhe-btn" data-sanhe="fire">寅午戌 (火局)</button>
                     </div>
 
-                    <div class="hexagram-detail-box" style="margin-top: 6px;">
-                        <div style="font-size: 13px; font-weight: 800; color: #4dabf7; margin-bottom: 4px;">
-                            🌙 申子辰水局与农历出落时辰预报 (原书 P246)
-                        </div>
-                        <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
-                            • <strong>生于申</strong>：初一至初七，月出在申位（西南）。<br>
-                            • <strong>旺于子</strong>：十五月圆，子时居于正北夜空。<br>
-                            • <strong>墓于辰</strong>：二十二后，残月在辰位（东南）没入。
-                        </div>
+                    <!-- 动态渲染的文字介绍卡片 (增加 ID id="sanhe-detail-card") -->
+                    <div id="sanhe-detail-card" class="hexagram-detail-box" style="margin-top: 6px;">
+                        <!-- JS 动态实时更新 -->
                     </div>
                 </div>
 
                 <!-- 模块 2：天干五合化气律 -->
                 <div id="module-card-tiangan" class="wuxing-module-card" style="display:none; margin-top: 4px;">
-                    <div class="sequence-table-container" style="max-height: 180px;">
+                    <div class="sequence-table-container" style="max-height: 240px;">
                         <table class="seq-table">
                             <thead>
                                 <tr>
@@ -153,11 +148,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>甲己</td><td style="color:#ffe066;">合化土</td><td>中五宫 / 坤二宫 / 艮八宫</td><td>中央中正之土</td></tr>
-                                <tr><td>乙庚</td><td style="color:#dee2e6;">合化金</td><td>乾六宫 / 兑七宫</td><td>西方肃杀之金</td></tr>
-                                <tr><td>丙辛</td><td style="color:#4dabf7;">合化水</td><td>坎一宫</td><td>北方润下之水</td></tr>
-                                <tr><td>丁壬</td><td style="color:#40c057;">合化木</td><td>震三宫 / 巽四宫</td><td>东方曲直之木</td></tr>
-                                <tr><td>戊癸</td><td style="color:#ff5252;">合化火</td><td>离九宫</td><td>南方炎上之火</td></tr>
+                                <tr class="interactive-row active-row" data-tg="1"><td>甲己</td><td style="color:#ffe066; font-weight:700;">合化土</td><td>中五宫 / 坤二宫 / 艮八宫</td><td>中央中正之土</td></tr>
+                                <tr class="interactive-row" data-tg="2"><td>乙庚</td><td style="color:#dee2e6; font-weight:700;">合化金</td><td>乾六宫 / 兑七宫</td><td>西方肃杀之金</td></tr>
+                                <tr class="interactive-row" data-tg="3"><td>丙辛</td><td style="color:#4dabf7; font-weight:700;">合化水</td><td>坎一宫</td><td>北方润下之水</td></tr>
+                                <tr class="interactive-row" data-tg="4"><td>丁壬</td><td style="color:#40c057; font-weight:700;">合化木</td><td>震三宫 / 巽四宫</td><td>东方曲直之木</td></tr>
+                                <tr class="interactive-row" data-tg="5"><td>戊癸</td><td style="color:#ff5252; font-weight:700;">合化火</td><td>离九宫</td><td>南方炎上之火</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -178,7 +173,7 @@
 
                 <!-- 模块 4：三元九运历表 -->
                 <div id="module-card-sanyuan" class="wuxing-module-card" style="display:none; margin-top: 4px;">
-                    <div class="sequence-table-container" style="max-height: 180px;">
+                    <div class="sequence-table-container" style="max-height: 260px;">
                         <table class="seq-table">
                             <thead>
                                 <tr>
@@ -189,15 +184,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>上元</td><td>一运坎水</td><td>1864 - 1883</td><td>坎一宫 (贪狼)</td></tr>
-                                <tr><td>上元</td><td>二运坤土</td><td>1884 - 1903</td><td>坤二宫 (巨门)</td></tr>
-                                <tr><td>上元</td><td>三运震木</td><td>1904 - 1923</td><td>震三宫 (禄存)</td></tr>
-                                <tr><td>中元</td><td>四运巽木</td><td>1924 - 1943</td><td>巽四宫 (文曲)</td></tr>
-                                <tr><td>中元</td><td>五运中土</td><td>1944 - 1963</td><td>中五宫 (廉贞)</td></tr>
-                                <tr><td>中元</td><td>六运乾金</td><td>1964 - 1983</td><td>乾六宫 (武曲)</td></tr>
-                                <tr><td>下元</td><td>七运兑金</td><td>1984 - 2003</td><td>兑七宫 (破军)</td></tr>
-                                <tr><td>下元</td><td>八运艮土</td><td>2004 - 2023</td><td>艮八宫 (左辅)</td></tr>
-                                <tr><td>下元</td><td>九运离火</td><td>2024 - 2043</td><td>离九宫 (右弼)</td></tr>
+                                <tr class="interactive-row" data-yun="1"><td>上元</td><td style="color:#4dabf7; font-weight:700;">一运坎水</td><td>1864 - 1883</td><td>坎一宫 (贪狼)</td></tr>
+                                <tr class="interactive-row" data-yun="2"><td>上元</td><td style="color:#e5c07b; font-weight:700;">二运坤土</td><td>1884 - 1903</td><td>坤二宫 (巨门)</td></tr>
+                                <tr class="interactive-row" data-yun="3"><td>上元</td><td style="color:#40c057; font-weight:700;">三运震木</td><td>1904 - 1923</td><td>震三宫 (禄存)</td></tr>
+                                <tr class="interactive-row" data-yun="4"><td>中元</td><td style="color:#40c057; font-weight:700;">四运巽木</td><td>1924 - 1943</td><td>巽四宫 (文曲)</td></tr>
+                                <tr class="interactive-row" data-yun="5"><td>中元</td><td style="color:#ffe066; font-weight:700;">五运中土</td><td>1944 - 1963</td><td>中五宫 (廉贞)</td></tr>
+                                <tr class="interactive-row" data-yun="6"><td>中元</td><td style="color:#dee2e6; font-weight:700;">六运乾金</td><td>1964 - 1983</td><td>乾六宫 (武曲)</td></tr>
+                                <tr class="interactive-row" data-yun="7"><td>下元</td><td style="color:#dee2e6; font-weight:700;">七运兑金</td><td>1984 - 2003</td><td>兑七宫 (破军)</td></tr>
+                                <tr class="interactive-row" data-yun="8"><td>下元</td><td style="color:#e5c07b; font-weight:700;">八运艮土</td><td>2004 - 2023</td><td>艮八宫 (左辅)</td></tr>
+                                <tr class="interactive-row active-row" data-yun="9"><td>下元</td><td style="color:#ff5252; font-weight:700;">九运离火</td><td>2024 - 2043</td><td>离九宫 (右弼)</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -207,6 +202,6 @@
     </div>
 
     <!-- 五行三元引擎 (带版本防缓存) -->
-    <script src="wuxing.js?v=20260804_v17"></script>
+    <script src="wuxing.js?v=20260804_v21"></script>
 </body>
 </html>

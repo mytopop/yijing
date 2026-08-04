@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》五行三元解构馆 - (wuxing.js)
-   特点：纯粹数理逻辑 3D 浑天坐标 + 地支数据动态脉冲运动 (Data Motion)
+   特点：纯粹数理逻辑 3D 浑天坐标 + 三合局文字动态更新 + 按钮与表格闪耀高亮与三向联动
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -299,7 +299,6 @@ class WuxingPureMath3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        // 光速数据粒子在三合三角形或五角星拓扑线上巡航游走
         if (this.activeCurve && this.dataPulseMesh) {
             this.pulseProgress += 0.004 * this.speedMultiplier;
             if (this.pulseProgress > 1.0) this.pulseProgress = 0;
@@ -340,6 +339,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.dataset.pos = num;
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
+                cell.addEventListener("click", () => {
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                    cell.classList.add("active-pos");
+
+                    const rem12 = num % 12 === 0 ? 12 : num % 12;
+                    engine.renderSanheTriangle([(rem12 - 1) % 12, (rem12 + 3) % 12, (rem12 + 7) % 12], 0xffe066);
+                });
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -357,6 +363,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const wuxingBadgeTitle = document.getElementById("wuxing-badge-title");
     const wuxingBadgeDesc = document.getElementById("wuxing-badge-desc");
+    const sanheDetailCard = document.getElementById("sanhe-detail-card");
+
+    // 4 大三合局详尽文本与数据字典
+    const SANHE_MAP = {
+        water: {
+            name: "申子辰 (水局)",
+            color: "#4dabf7",
+            branches: [8, 0, 4],
+            title: "🌙 申子辰水局与农历出落时辰预报 (原书 P246)",
+            desc: `• <strong>生于申</strong>：初一至初七，月出在申位（西南），初三上弦月出。<br>
+                   • <strong>旺于子</strong>：十五月圆（望），子时居于正北夜空最高点。<br>
+                   • <strong>墓于辰</strong>：二十二日后，残月（下弦）在辰位（东南）没入。`
+        },
+        metal: {
+            name: "巳酉丑 (金局)",
+            color: "#dee2e6",
+            branches: [5, 9, 1],
+            title: "⚔️ 巳酉丑金局与九宫金气运化 (原书 P248)",
+            desc: `• <strong>生于巳</strong>：巳位（东南）为金气长生之始，地户天门互通。<br>
+                   • <strong>旺于酉</strong>：酉位（正西）帝旺，日落西山而金气最为充盈肃杀。<br>
+                   • <strong>墓于丑</strong>：丑位（东北）归墓收敛，金气入库藏于严冬寒土。`
+        },
+        wood: {
+            name: "亥卯未 (木局)",
+            color: "#40c057",
+            branches: [11, 3, 7],
+            title: "🌿 亥卯未木局与东天万物生发 (原书 P250)",
+            desc: `• <strong>生于亥</strong>：亥位（天门）长生，木德受气于北天极受德之筐。<br>
+                   • <strong>旺于卯</strong>：卯位（正东）帝旺，旭日东升而万物滋荣生长。<br>
+                   • <strong>墓于未</strong>：未位（西南）归墓收敛，夏末木气归藏于坤土。`
+        },
+        fire: {
+            name: "寅午戌 (火局)",
+            color: "#ff5252",
+            branches: [2, 6, 10],
+            title: "🔥 寅午戌火局与太阳中天运化 (原书 P252)",
+            desc: `• <strong>生于寅</strong>：寅位（东北）长生，黎明三阳开泰生发火德。<br>
+                   • <strong>旺于午</strong>：午位（正南）帝旺，正午烈日当空发辉至极。<br>
+                   • <strong>墓于戌</strong>：戌位（西北）归墓收敛，夕阳西下火气落于乾宫。`
+        }
+    };
+
+    function updateSanheDetail(key) {
+        const data = SANHE_MAP[key] || SANHE_MAP.water;
+
+        if (sanheDetailCard) {
+            sanheDetailCard.innerHTML = `
+                <div style="font-size: 13px; font-weight: 800; color: ${data.color}; margin-bottom: 4px;">
+                    ${data.title}
+                </div>
+                <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.6; font-family: var(--font-sans);">
+                    ${data.desc}
+                </div>
+                <div style="margin-top: 6px; font-size: 11px; color: #ffe066; background: rgba(77,171,247,0.15); padding: 4px 8px; border-radius: 4px;">
+                    实时响应：左侧 3D 脉冲球已在 ${data.name} 能量三角形上巡航，中间阵图对应地支宫高亮！
+                </div>
+            `;
+        }
+
+        engine.renderSanheTriangle(data.branches, parseInt(data.color.replace('#', '0x'), 16));
+        highlightMatrixByBranches(data.branches);
+
+        if (wuxingBadgeTitle) wuxingBadgeTitle.innerText = `地支三合局 · ${data.name} 3D 三角形`;
+        if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = `数据脉冲球在 ${data.name} 能量边线上实时游走 (文字解析已同步更新)`;
+    }
 
     function switchModule(modKey) {
         [moduleCardSanhe, moduleCardTiangan, moduleCardShengke, moduleCardSanyuan].forEach(el => {
@@ -367,14 +438,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (modKey === "sanhe") {
             if (moduleCardSanhe) moduleCardSanhe.style.display = "block";
-            if (wuxingBadgeTitle) wuxingBadgeTitle.innerText = "地支三合局 3D 三角形数据运动";
-            if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = "数据粒子在申子辰水局等 3D 三角形边线上巡航游走";
-            engine.renderSanheTriangle([8, 0, 4], 0x4dabf7);
-            highlightMatrixByBranches([8, 0, 4]);
+            const activeSanheBtn = document.querySelector(".sanhe-btn.active");
+            const key = activeSanheBtn ? activeSanheBtn.dataset.sanhe : "water";
+            updateSanheDetail(key);
         } else if (modKey === "tiangan") {
             if (moduleCardTiangan) moduleCardTiangan.style.display = "block";
             if (wuxingBadgeTitle) wuxingBadgeTitle.innerText = "天干五合化气律数据运动";
-            if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = "甲己合化土、乙庚合化金等化气律数据流动";
+            if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = "点击右侧表格行，高亮合化五行在太乙 81 宫阵图上的归属";
             engine.clearWuxing3DGroup();
         } else if (modKey === "shengke") {
             if (moduleCardShengke) moduleCardShengke.style.display = "block";
@@ -384,7 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (modKey === "sanyuan") {
             if (moduleCardSanyuan) moduleCardSanyuan.style.display = "block";
             if (wuxingBadgeTitle) wuxingBadgeTitle.innerText = "180 年甲子三元九运数据运动";
-            if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = "解构三元九运历法天道运化81宫数据归属";
+            if (wuxingBadgeDesc) wuxingBadgeDesc.innerText = "点击右侧历表行，高亮三元九运对应 81 宫归属与 3D 天极位";
             engine.clearWuxing3DGroup();
         }
     }
@@ -407,24 +477,50 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    const SANHE_MAP = {
-        wood:  { name: "亥卯未 (木局)", color: "#40c057", branches: [11, 3, 7] },
-        fire:  { name: "寅午戌 (火局)", color: "#ff5252", branches: [2, 6, 10] },
-        metal: { name: "巳酉丑 (金局)", color: "#dee2e6", branches: [5, 9, 1] },
-        water: { name: "申子辰 (水局)", color: "#4dabf7", branches: [8, 0, 4] }
-    };
-
+    // 绑定 4 大三合局按钮点击 (更新文字 + 高亮右侧按钮闪烁 + 3D/81宫联动)
     document.querySelectorAll(".sanhe-btn").forEach(btn => {
         btn.addEventListener("click", function() {
             document.querySelectorAll(".sanhe-btn").forEach(b => b.classList.remove("active"));
             this.classList.add("active");
 
-            const key = this.dataset.sanhe;
-            const data = SANHE_MAP[key];
-            if (!data) return;
+            // 右侧按钮闪光冲击动画
+            this.classList.add("row-click-flash");
+            setTimeout(() => this.classList.remove("row-click-flash"), 400);
 
-            engine.renderSanheTriangle(data.branches, parseInt(data.color.replace('#', '0x'), 16));
-            highlightMatrixByBranches(data.branches);
+            const key = this.dataset.sanhe;
+            updateSanheDetail(key);
+        });
+    });
+
+    // 天干五合与三元九运表格行点击高亮动画与三向联动
+    document.querySelectorAll(".interactive-row").forEach(row => {
+        row.addEventListener("click", function() {
+            document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+            this.classList.add("active-row");
+
+            // 闪光冲击视觉动画
+            this.classList.add("row-click-flash");
+            setTimeout(() => this.classList.remove("row-click-flash"), 400);
+
+            if (this.dataset.tg) {
+                const tgId = parseInt(this.dataset.tg, 10);
+                const palaceTargetMap = { 1: [5, 2, 8], 2: [6, 7], 3: [1], 4: [3, 4], 5: [9] };
+                const palaces = palaceTargetMap[tgId] || [1];
+
+                document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+                    const p = parseInt(cell.dataset.pos, 10);
+                    const rem81 = p % 9 === 0 ? 9 : p % 9;
+                    cell.classList.toggle("active-pos", palaces.includes(rem81));
+                });
+            } else if (this.dataset.yun) {
+                const yunId = parseInt(this.dataset.yun, 10);
+                document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+                    const p = parseInt(cell.dataset.pos, 10);
+                    const rem9 = p % 9 === 0 ? 9 : p % 9;
+                    cell.classList.toggle("active-pos", rem9 === yunId);
+                });
+                engine.renderSanheTriangle([(yunId - 1) % 12, (yunId + 3) % 12, (yunId + 7) % 12], 0xffe066);
+            }
         });
     });
 
@@ -478,18 +574,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     switchModule("sanhe");
-});
-
-/* 全局屏幕点击金彩粒子波纹火花特效 (Click Visual Spark Listener) */
-document.addEventListener("click", (e) => {
-    const spark = document.createElement("div");
-    spark.className = "click-spark-efx";
-    spark.style.left = `${e.clientX}px`;
-    spark.style.top = `${e.clientY}px`;
-    document.body.appendChild(spark);
-    setTimeout(() => {
-        if (spark.parentNode) {
-            spark.parentNode.removeChild(spark);
-        }
-    }, 450);
 });

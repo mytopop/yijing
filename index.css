@@ -739,97 +739,83 @@ input[type="number"] {
 }
 
 /* ==========================================================================
-   全新显眼点击视觉特效 (Click Visual Effects & Micro-Animations)
+   全新右侧栏显眼点击位置高亮与闪耀动画 (Right Panel Click Highlights)
    ========================================================================== */
 
-/* 1. 表格行/六爻行点击高亮态闪耀微动画 */
-.interactive-row, .interactive-yao-row {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+/* 1. 表格行/六爻行/卡片点击高亮态闪耀微动画 */
+.interactive-row, .interactive-yao-row, .sanhe-btn, .wuxing-btn, .power-quick-btn, .split-quick-btn, .palace-tab-btn, .sys-filter-btn {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     cursor: pointer;
     position: relative;
 }
 
 .interactive-row:hover, .interactive-yao-row:hover {
-    background: rgba(77, 171, 247, 0.12) !important;
-    transform: translateX(3px);
+    background: rgba(77, 171, 247, 0.15) !important;
+    transform: translateX(4px) !important;
+}
+
+/* 点击刹那间的闪光冲击动画 */
+.row-click-flash {
+    animation: rowFlashSpark 0.4s ease-out !important;
+}
+
+@keyframes rowFlashSpark {
+    0% {
+        background: rgba(255, 255, 255, 0.6) !important;
+        box-shadow: 0 0 30px #ffffff, 0 0 50px #ffe066 !important;
+    }
+    100% {
+        background: inherit;
+    }
 }
 
 .interactive-row.active-row, .interactive-yao-row.active-yao-row {
-    background: linear-gradient(90deg, rgba(255, 224, 102, 0.28), rgba(77, 171, 247, 0.18)) !important;
-    border-left: 4px solid #ffe066 !important;
-    box-shadow: 0 0 16px rgba(255, 224, 102, 0.45), inset 0 0 12px rgba(77, 171, 247, 0.25) !important;
-    transform: translateX(6px) !important;
-    animation: activeRowPulse 1.8s infinite alternate !important;
+    background: linear-gradient(90deg, rgba(255, 224, 102, 0.35), rgba(77, 171, 247, 0.25)) !important;
+    border-left: 6px solid #ffe066 !important;
+    box-shadow: 0 0 20px rgba(255, 224, 102, 0.5), inset 0 0 14px rgba(77, 171, 247, 0.3) !important;
+    transform: translateX(8px) !important;
+    font-weight: 700 !important;
+    animation: activeRowGlowPulse 1.6s infinite alternate !important;
 }
 
-@keyframes activeRowPulse {
+@keyframes activeRowGlowPulse {
     0% {
-        box-shadow: 0 0 12px rgba(255, 224, 102, 0.35), inset 0 0 8px rgba(77, 171, 247, 0.15);
+        box-shadow: 0 0 15px rgba(255, 224, 102, 0.4), inset 0 0 10px rgba(77, 171, 247, 0.2);
     }
     100% {
-        box-shadow: 0 0 22px rgba(255, 224, 102, 0.65), inset 0 0 16px rgba(77, 171, 247, 0.35);
+        box-shadow: 0 0 25px rgba(255, 224, 102, 0.75), inset 0 0 18px rgba(77, 171, 247, 0.45);
     }
 }
 
-/* 2. 81 宫单元格点击高亮金光冲击波 */
+/* 2. 右侧按钮激活态强化高亮 */
+.sanhe-btn.active, .wuxing-btn.active, .power-quick-btn.active, .split-quick-btn.active, .palace-tab-btn.active, .sys-filter-btn.active {
+    border-color: #ffe066 !important;
+    color: #ffe066 !important;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.35) 0%, rgba(77, 171, 247, 0.25) 100%) !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 16px rgba(255, 224, 102, 0.6) !important;
+    transform: scale(1.04) !important;
+}
+
+/* 3. 81 宫单元格点击高亮金光冲击波 */
 .taiyi-81-cell {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .taiyi-81-cell.active-pos {
-    background: radial-gradient(circle, rgba(255, 224, 102, 0.9) 0%, rgba(255, 82, 82, 0.7) 100%) !important;
+    background: radial-gradient(circle, rgba(255, 224, 102, 0.95) 0%, rgba(255, 82, 82, 0.8) 100%) !important;
     color: #000000 !important;
     font-weight: 900 !important;
-    transform: scale(1.18) !important;
+    transform: scale(1.2) !important;
     border-color: #ffffff !important;
-    box-shadow: 0 0 20px rgba(255, 224, 102, 0.9), 0 0 35px rgba(255, 82, 82, 0.7) !important;
+    box-shadow: 0 0 22px rgba(255, 224, 102, 0.95), 0 0 38px rgba(255, 82, 82, 0.8) !important;
     z-index: 10 !important;
     animation: cellClickGlow 1.2s infinite alternate !important;
 }
 
 @keyframes cellClickGlow {
-    0% { transform: scale(1.14); box-shadow: 0 0 15px rgba(255, 224, 102, 0.7); }
-    100% { transform: scale(1.22); box-shadow: 0 0 26px rgba(255, 224, 102, 1), 0 0 40px rgba(77, 171, 247, 0.8); }
+    0% { transform: scale(1.15); box-shadow: 0 0 15px rgba(255, 224, 102, 0.7); }
+    100% { transform: scale(1.24); box-shadow: 0 0 28px rgba(255, 224, 102, 1), 0 0 42px rgba(77, 171, 247, 0.85); }
 }
 
-/* 3. 按钮点击水波纹反馈 */
-button, .action-btn, .sanhe-btn, .power-quick-btn, .split-quick-btn, .palace-tab-btn, .nav-tab {
-    position: relative;
-    overflow: hidden;
-}
-
-button:active, .action-btn:active, .sanhe-btn:active, .power-quick-btn:active, .split-quick-btn:active, .palace-tab-btn:active, .nav-tab:active {
-    transform: scale(0.95) !important;
-    box-shadow: 0 0 15px rgba(255, 224, 102, 0.6) !important;
-}
-
-/* 4. 全局屏幕点击金彩粒子波纹火花特效 (.click-spark-efx) */
-.click-spark-efx {
-    position: fixed;
-    pointer-events: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 2px solid #ffe066;
-    background: radial-gradient(circle, rgba(255,224,102,0.8) 0%, rgba(77,171,247,0.4) 60%, transparent 100%);
-    box-shadow: 0 0 15px #ffe066, 0 0 25px #4dabf7;
-    transform: translate(-50%, -50%) scale(0.2);
-    opacity: 1;
-    z-index: 99999;
-    animation: clickSparkExpand 0.45s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-}
-
-@keyframes clickSparkExpand {
-    0% {
-        transform: translate(-50%, -50%) scale(0.2);
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.9;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(2.4);
-        opacity: 0;
-    }
-}
 
