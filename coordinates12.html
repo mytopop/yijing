@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易经数理秘笈 - 12 方位三个坐标按周纪次解构馆</title>
+    <!-- 引入 Google 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- 引入 Three.js 核心库与 OrbitControls 轨道控制器 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
+    <link rel="stylesheet" href="index.css?v=20260804_v6">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 统一 100% 结构固定 Header 顶栏 -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="logo-icon">☯</div>
+                <div class="brand-text">
+                    <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
+                    <span class="subtitle">根据梁致堂原著解构 · 12 方位三个坐标按周纪次解构馆</span>
+                </div>
+            </div>
+            
+            <nav class="header-nav-tabs">
+                <a href="index.html" class="nav-tab">🏠 首页</a>
+                <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
+                <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab">✨ 5大定律</a>
+                <a href="wuxing.html" class="nav-tab">☯ 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab">📜 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab">🌀 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab active">🌌 12方位3坐标</a>
+            </nav>
+        </header>
+
+        <!-- 三栏并行主容器 -->
+        <main class="main-three-split-container">
+            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <section class="col-left-3d">
+                <div class="panel-header-bar">
+                    <div class="panel-title">
+                        <span>🌌</span> 3D 浑天天象坐标仪
+                    </div>
+                    <div class="orbit-legend">
+                        <span class="legend-item equator">● 赤道(天)</span>
+                        <span class="legend-item ecliptic">● 黄道(地)</span>
+                        <span class="legend-item lunar">● 白道(万物)</span>
+                    </div>
+                </div>
+
+                <div class="canvas-wrapper">
+                    <!-- 浮动控制覆盖层 -->
+                    <div class="canvas-overlay-controls">
+                        <button id="btn-toggle-equator" class="control-toggle-btn active" title="显示/隐藏赤道环 (0°)">
+                            <span class="dot red"></span> 赤道
+                        </button>
+                        <button id="btn-toggle-ecliptic" class="control-toggle-btn active" title="显示/隐藏黄道环 (23.5°)">
+                            <span class="dot green"></span> 黄道
+                        </button>
+                        <button id="btn-toggle-lunar" class="control-toggle-btn active" title="显示/隐藏白道环 (-15°)">
+                            <span class="dot blue"></span> 白道
+                        </button>
+                        <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
+                            ⚡ 速度: <span id="speed-val">1x</span>
+                        </button>
+                        <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
+                            🎯 复位视角
+                        </button>
+                        <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
+                            🔄 旋转
+                        </button>
+                    </div>
+
+                    <!-- Three.js 渲染画布 -->
+                    <div id="three-canvas-coord" style="width:100%; height:100%;"></div>
+
+                    <!-- 动态状态标签 -->
+                    <div class="trajectory-badge">
+                        <div class="badge-title">12 方位 3 坐标 3D 系统</div>
+                        <div class="badge-desc">呈现赤道(1,4,7,10)、黄道(2,5,8,11)与白道(3,6,9,12)的三轨投影</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 栏二：太乙九宫八十一宫阵图 (全页 100% 绝对统一) (33%) -->
+            <section class="col-middle-taiyi">
+                <div class="glass-panel">
+                    <div class="card-title">
+                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                    </div>
+                    <div class="law-desc-text">
+                        根据右侧筛选的坐标系统与周次，太乙 81 宫阵图中对应的降维宫位同步亮起！
+                    </div>
+                </div>
+
+                <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
+            </section>
+
+            <!-- 栏三：12 方位 3 坐标控制台 (33%) -->
+            <section class="col-right-controls">
+                <div class="glass-panel">
+                    <div class="card-title">
+                        <span>🌌</span> 原著《12 方位三个坐标按周纪次》解构
+                    </div>
+                    <div class="law-desc-text">
+                        原著补充材料之三：12 地支划分为三才三大坐标系统，按周次（1~12, 13~24, 25~36...）滚动递进。
+                    </div>
+                </div>
+
+                <!-- 筛选菜单 -->
+                <div class="glass-panel" style="margin-top: 6px;">
+                    <div class="card-title">
+                        <span>🔍</span> 选择坐标系统筛选
+                    </div>
+                    <select id="coord-filter-select" class="custom-select" style="margin-top: 4px;">
+                        <option value="all">🌐 显示全部 12 方位 (赤黄白全景)</option>
+                        <option value="赤道">🔴 赤道坐标 (子、卯、午、酉)</option>
+                        <option value="黄道">🟢 黄道坐标 (丑、辰、未、戌)</option>
+                        <option value="白道">🔵 白道坐标 (寅、巳、申、亥)</option>
+                    </select>
+                </div>
+
+                <!-- 数据表格 -->
+                <div class="glass-panel" style="margin-top: 6px;">
+                    <div class="card-title">
+                        <span>📋</span> 按周纪次数据罗列明细
+                    </div>
+                    
+                    <div class="sequence-table-container" style="max-height: 220px;">
+                        <table class="seq-table">
+                            <thead>
+                                <tr>
+                                    <th>周次</th>
+                                    <th>地支</th>
+                                    <th>坐标系统</th>
+                                    <th>原数</th>
+                                    <th>81宫落点</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coord-table-body">
+                                <!-- 动态插入 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="coord-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                    <!-- 动态渲染 -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 12坐标引擎 (带版本防缓存) -->
+    <script src="coordinates12.js?v=20260804_v6"></script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易经数理秘笈 - 天象数理五大规律演示馆</title>
+    <!-- 引入 Google 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- 引入 Three.js 核心库与 OrbitControls 轨道控制器 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
+    <link rel="stylesheet" href="index.css?v=20260804_v9">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 统一 100% 结构固定 Header 顶栏 -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="logo-icon">☯</div>
+                <div class="brand-text">
+                    <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
+                    <span class="subtitle">根据梁致堂原著解构 · 天象数理五大规律演示馆</span>
+                </div>
+            </div>
+            
+            <nav class="header-nav-tabs">
+                <a href="index.html" class="nav-tab">🏠 首页</a>
+                <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
+                <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab active">✨ 5大定律</a>
+                <a href="wuxing.html" class="nav-tab">☯ 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab">📜 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab">🌀 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab">🌌 12方位3坐标</a>
+            </nav>
+        </header>
+
+        <!-- 三栏并行主容器 -->
+        <main class="main-three-split-container">
+            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <section class="col-left-3d">
+                <div class="panel-header-bar">
+                    <div class="panel-title">
+                        <span>🌌</span> 3D 浑天天象坐标仪
+                    </div>
+                    <div class="orbit-legend">
+                        <span class="legend-item equator">● 赤道(天)</span>
+                        <span class="legend-item ecliptic">● 黄道(地)</span>
+                        <span class="legend-item lunar">● 白道(万物)</span>
+                    </div>
+                </div>
+
+                <div class="canvas-wrapper">
+                    <!-- 浮动控制覆盖层 -->
+                    <div class="canvas-overlay-controls">
+                        <button id="btn-toggle-equator" class="control-toggle-btn active" title="显示/隐藏赤道环 (0°)">
+                            <span class="dot red"></span> 赤道
+                        </button>
+                        <button id="btn-toggle-ecliptic" class="control-toggle-btn active" title="显示/隐藏黄道环 (23.5°)">
+                            <span class="dot green"></span> 黄道
+                        </button>
+                        <button id="btn-toggle-lunar" class="control-toggle-btn active" title="显示/隐藏白道环 (-15°)">
+                            <span class="dot blue"></span> 白道
+                        </button>
+                        <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
+                            ⚡ 速度: <span id="speed-val">1x</span>
+                        </button>
+                        <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
+                            🎯 复位视角
+                        </button>
+                        <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
+                            🔄 旋转
+                        </button>
+                    </div>
+
+                    <!-- Three.js 渲染画布 -->
+                    <div id="three-canvas-laws" style="width:100%; height:100%;"></div>
+
+                    <!-- 动态状态标签 -->
+                    <div class="trajectory-badge">
+                        <div id="law-badge-title" class="badge-title">☀️ 10^n 太阳赤道守恒律试炼场</div>
+                        <div id="law-badge-desc" class="badge-desc">太阳能量 10^n 经 81 降维后再模 12，余数 100% 恒落在赤道正位 (子/卯/午/酉)</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 栏二：太乙九宫八十一宫阵图 (全页 100% 绝对统一) (33%) -->
+            <section class="col-middle-taiyi">
+                <div class="glass-panel">
+                    <div class="card-title">
+                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                    </div>
+                    <div class="law-desc-text">
+                        拖动右侧【太阳指数 10^n】滑块，太乙 81 宫阵图中对应的赤道降维宫数（10, 19, 28, 37, 46, 55, 64, 73 号位）同步闪耀！
+                    </div>
+                </div>
+
+                <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
+            </section>
+
+            <!-- 栏三：天象五大规律控制台 (33%) -->
+            <section class="col-right-controls">
+                <!-- 重点突出：规律一：10^n 太阳赤道守恒律 -->
+                <div class="glass-panel" style="border-color: rgba(255, 82, 82, 0.6); background: rgba(255, 82, 82, 0.08);">
+                    <div class="card-title" style="color: #ff5252;">
+                        <span>☀️</span> 【重点展示】规律一：10^n 太阳赤道守恒律
+                    </div>
+                    <div class="law-desc-text">
+                        梁致堂先生原著核心观点：太阳能量以 $10^n$ 指数爆发，经矩 81 降维后再模 12 地支，余数 **100% 严格恒定落入赤道四正位（子、卯、午、酉）**！
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <label style="font-size: 11px; color: #ffe066; font-weight: 700;">🎛️ 请拖动选择太阳指数 n (10^n):</label>
+                        <input type="range" id="power-slider" min="1" max="10" value="3" style="width: 100%; margin-top: 4px;">
+                        <div id="power-val-label" style="text-align: right; font-size: 13px; color: #ffe066; font-weight: 800; font-family: var(--font-times);">
+                            10^3 = 1,000
+                        </div>
+                    </div>
+                    <div id="law1-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                        <!-- 动态渲染 10^n 演算明细 -->
+                    </div>
+                </div>
+
+                <!-- 规律二：数 7 · 北斗七星芒星律 -->
+                <div class="glass-panel" style="margin-top: 6px;">
+                    <div class="card-title">
+                        <span>✨</span> 规律二：数 7 · 北斗七星芒星律
+                    </div>
+                    <div class="law-desc-text">
+                        按 7 × n 顺次经过 12 地支方位，在 3D 天球上勾勒出北斗七星十二芒星阵图。
+                    </div>
+                    <button id="btn-demo-star7" class="action-btn-gold" style="margin-top: 6px;">
+                        🌌 开启/取消 3D 北斗芒星阵
+                    </button>
+                </div>
+
+                <!-- 规律三：360° 周天对半分割归九律 -->
+                <div class="glass-panel" style="margin-top: 6px;">
+                    <div class="card-title">
+                        <span>🌀</span> 规律三：360° 周天分割归九律
+                    </div>
+                    <div class="law-desc-text">
+                        将周天 360° 连续对半分割（180°, 90°, 45°...），数值众和数恒收敛于极数 9。
+                    </div>
+                    <div style="margin-top: 6px;">
+                        <input type="range" id="split-slider" min="0" max="6" value="0" style="width: 100%;">
+                        <div id="split-val-label" style="text-align: right; font-size: 12px; color: #ffe066; font-weight: 700;">1 份 (360°)</div>
+                    </div>
+                    <div id="law3-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                        <!-- 动态渲染 -->
+                    </div>
+                    <button id="btn-demo-law3" class="action-btn-gold" style="margin-top: 6px;">
+                        🎯 演示/取消 归九律
+                    </button>
+                </div>
+
+                <!-- 规律四：地支三合局 3D 几何 -->
+                <div class="glass-panel" style="margin-top: 6px;">
+                    <div class="card-title">
+                        <span>🔺</span> 规律四：地支三合局 3D 能量三角形
+                    </div>
+                    <div class="sanhe-btn-grid" style="margin-top: 6px;">
+                        <button class="sanhe-btn" data-sanhe="wood">亥卯未 (木局)</button>
+                        <button class="sanhe-btn" data-sanhe="fire">寅午戌 (火局)</button>
+                        <button class="sanhe-btn" data-sanhe="metal">巳酉丑 (金局)</button>
+                        <button class="sanhe-btn" data-sanhe="water">申子辰 (水局)</button>
+                    </div>
+                </div>
+
+                <!-- 规律五：永静数 6 天地门轴线 -->
+                <div class="glass-panel" style="margin-top: 6px;">
+                    <div class="card-title">
+                        <span>🚪</span> 规律五：永静数 6 天地门轴线
+                    </div>
+                    <div class="law-desc-text">
+                        数 6 乘奇数必落巳位 (地户)，乘偶数必落亥位 (天门)，构成天地对冲轴线。
+                    </div>
+                    <button id="btn-demo-yongjing" class="action-btn-gold" style="margin-top: 6px;">
+                        🚪 演示/取消 天地门轴线
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 规律引擎 (带版本防缓存) -->
+    <script src="laws.js?v=20260804_v9"></script>
+</body>
+</html>

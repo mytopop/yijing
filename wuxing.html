@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易经数理秘笈 - 五行与三元周天全景馆</title>
+    <!-- 引入 Google 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- 引入 Three.js 核心库与 OrbitControls 轨道控制器 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
+    <link rel="stylesheet" href="index.css?v=20260804_v6">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 统一 100% 结构固定 Header 顶栏 -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="logo-icon">☯</div>
+                <div class="brand-text">
+                    <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
+                    <span class="subtitle">根据梁致堂原著解构 · 五行与三元周天全景馆</span>
+                </div>
+            </div>
+            
+            <nav class="header-nav-tabs">
+                <a href="index.html" class="nav-tab">🏠 首页</a>
+                <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
+                <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab">✨ 5大定律</a>
+                <a href="wuxing.html" class="nav-tab active">☯ 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab">📜 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab">🌀 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab">🌌 12方位3坐标</a>
+            </nav>
+        </header>
+
+        <!-- 三栏并行主容器 -->
+        <main class="main-three-split-container">
+            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <section class="col-left-3d">
+                <div class="panel-header-bar">
+                    <div class="panel-title">
+                        <span>🌌</span> 3D 浑天天象坐标仪
+                    </div>
+                    <div class="orbit-legend">
+                        <span class="legend-item equator">● 赤道(天)</span>
+                        <span class="legend-item ecliptic">● 黄道(地)</span>
+                        <span class="legend-item lunar">● 白道(万物)</span>
+                    </div>
+                </div>
+
+                <div class="canvas-wrapper">
+                    <!-- 浮动控制覆盖层 -->
+                    <div class="canvas-overlay-controls">
+                        <button id="btn-toggle-equator" class="control-toggle-btn active" title="显示/隐藏赤道环 (0°)">
+                            <span class="dot red"></span> 赤道
+                        </button>
+                        <button id="btn-toggle-ecliptic" class="control-toggle-btn active" title="显示/隐藏黄道环 (23.5°)">
+                            <span class="dot green"></span> 黄道
+                        </button>
+                        <button id="btn-toggle-lunar" class="control-toggle-btn active" title="显示/隐藏白道环 (-15°)">
+                            <span class="dot blue"></span> 白道
+                        </button>
+                        <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
+                            ⚡ 速度: <span id="speed-val">1x</span>
+                        </button>
+                        <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
+                            🎯 复位视角
+                        </button>
+                        <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
+                            🔄 旋转
+                        </button>
+                    </div>
+
+                    <!-- Three.js 渲染画布 -->
+                    <div id="three-canvas-wuxing" style="width:100%; height:100%;"></div>
+
+                    <!-- 动态状态标签 -->
+                    <div class="trajectory-badge">
+                        <div id="wuxing-badge-title" class="badge-title">地支三合局 3D 能量三角形</div>
+                        <div id="wuxing-badge-desc" class="badge-desc">包含地支三合局数理解构与原书 P246 月相预测算法</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 栏二：太乙九宫八十一宫阵图 (全页 100% 绝对统一) (33%) -->
+            <section class="col-middle-taiyi">
+                <div class="glass-panel">
+                    <div class="card-title">
+                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                    </div>
+                    <div class="law-desc-text">
+                        宏观按洛书 9 宫分块，微观 9 数按原书《太乙九宫图》精确定准。点击单元格可联动态象。
+                    </div>
+                </div>
+
+                <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
+            </section>
+
+            <!-- 栏三：三合局与月相预测控制台 (33%) -->
+            <section class="col-right-controls">
+                <div class="glass-panel">
+                    <div class="card-title">
+                        <span>🔺</span> 地支三合局 3D 能量三角形与月相算法
+                    </div>
+                    <div class="law-desc-text">
+                        梁致堂先生原著中指出：地支三合局（申子辰、巳酉丑、寅午戌、亥卯未）对应天体日月位置与月相出落时间预测！
+                    </div>
+                </div>
+
+                <div class="sanhe-btn-grid" style="margin-top: 6px;">
+                    <button class="sanhe-btn sanhe-detail-btn active" data-sanhe="water">申子辰 (水局·润下)</button>
+                    <button class="sanhe-btn sanhe-detail-btn" data-sanhe="metal">巳酉丑 (金局·从革)</button>
+                    <button class="sanhe-btn sanhe-detail-btn" data-sanhe="fire">寅午戌 (火局·炎上)</button>
+                    <button class="sanhe-btn sanhe-detail-btn" data-sanhe="wood">亥卯未 (木局·发生)</button>
+                </div>
+
+                <div id="sanhe-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                    <!-- 动态渲染 -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 五行引擎 (带版本防缓存) -->
+    <script src="wuxing.js?v=20260804_v6"></script>
+</body>
+</html>

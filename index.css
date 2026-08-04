@@ -1,0 +1,739 @@
+/* ==========================================================================
+   《易经数理秘笈》全局精美样式表 (index.css)
+   特点：右上角导航栏 100% 绝对镜像固定为 9 个专业 Tab，首页包含 9 大门户卡片
+   ========================================================================== */
+
+:root {
+    --bg-dark: #0a0e17;
+    --bg-panel: rgba(16, 24, 40, 0.75);
+    --bg-panel-hover: rgba(22, 34, 56, 0.85);
+    --border-gold: rgba(212, 175, 55, 0.35);
+    --border-gold-bright: rgba(255, 224, 102, 0.8);
+    
+    --color-chihdao: #ff5252;
+    --color-huangdao: #40c057;
+    --color-baidao: #4dabf7;
+    --color-gold: #ffe066;
+    
+    --font-serif: "Noto Serif SC", "Ma Shan Zheng", "KaiTi", serif;
+    --font-sans: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-times: "Times New Roman", Times, Georgia, serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(30, 41, 67, 0.5) 0%, transparent 75%),
+        radial-gradient(circle at 10% 90%, rgba(255, 82, 82, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(77, 171, 247, 0.08) 0%, transparent 40%);
+    color: #f1f5f9;
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* 顶栏 Header 100% 结构固定与像素级统一 */
+.app-header {
+    height: 60px;
+    background: rgba(10, 14, 23, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-gold);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.logo-icon {
+    font-size: 22px;
+    color: var(--color-gold);
+    text-shadow: 0 0 12px rgba(255, 224, 102, 0.6);
+}
+
+.brand-text h1 {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #ffffff 0%, #ffe066 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+}
+
+.brand-text .subtitle {
+    font-size: 10px;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* 右上角多页导航 Navigation Tabs (100% 精确对齐截图样式) */
+.header-nav-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 2px 0;
+}
+
+.header-nav-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-tab {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+    border: 1.5px solid transparent;
+}
+
+.nav-tab:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-tab.active {
+    color: #ffe066;
+    background: rgba(212, 175, 55, 0.18);
+    border: 1.5px solid #ffe066;
+    font-weight: 700;
+    box-shadow: 0 0 12px rgba(255, 224, 102, 0.35);
+}
+
+/* 三栏并行主容器 Layout Frame */
+.main-three-split-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 34% 33% 33%;
+    gap: 10px;
+    padding: 10px;
+    height: calc(100vh - 60px);
+    overflow: hidden;
+}
+
+/* 栏一：3D 浑天时空仪 (34%) */
+.col-left-3d {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-gold);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.panel-header-bar {
+    padding: 10px 14px;
+    background: rgba(10, 14, 23, 0.6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-serif);
+    font-size: 13px;
+    color: var(--color-gold);
+    font-weight: 700;
+}
+
+.orbit-legend {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.legend-item.equator { color: var(--color-chihdao); }
+.legend-item.ecliptic { color: var(--color-huangdao); }
+.legend-item.lunar { color: var(--color-baidao); }
+
+.canvas-wrapper {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.canvas-overlay-controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.control-toggle-btn, .control-icon-btn {
+    background: rgba(16, 24, 40, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #cbd5e1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.control-toggle-btn.active {
+    border-color: var(--border-gold-bright);
+    color: #ffffff;
+    background: rgba(212, 175, 55, 0.2);
+}
+
+.control-toggle-btn .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.control-toggle-btn .dot.red { background: var(--color-chihdao); }
+.control-toggle-btn .dot.green { background: var(--color-huangdao); }
+.control-toggle-btn .dot.blue { background: var(--color-baidao); }
+
+.trajectory-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    background: rgba(10, 14, 23, 0.85);
+    border: 1px solid var(--border-gold);
+    border-radius: 8px;
+    padding: 8px 12px;
+    backdrop-filter: blur(8px);
+}
+
+.badge-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-gold);
+    margin-bottom: 2px;
+}
+
+.badge-desc {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* 栏二：洛书太乙九宫八十一数阵 (33%) - 独立 9 宫卡片 + Times New Roman 数字 */
+.col-middle-taiyi {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-gold);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    overflow-y: auto;
+}
+
+.glass-panel {
+    background: rgba(22, 34, 56, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+}
+
+.card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-gold);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+.law-desc-text {
+    font-size: 11px;
+    color: #cbd5e1;
+    line-height: 1.3;
+}
+
+/* 精美 9 宫独立卡片容器 (宏观 3x3 洛书排布) */
+.luoshu-taiyi-9x9-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+    flex: 1;
+    width: 100%;
+}
+
+.palace-block {
+    background: rgba(16, 24, 40, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.25s ease;
+}
+
+.palace-block-title {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--color-gold);
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    margin-bottom: 4px;
+}
+
+.palace-grid-3x3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    flex: 1;
+}
+
+/* 单元格与 Times New Roman 新罗马数字 (加粗大字号) */
+.taiyi-81-cell {
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-times);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    background: rgba(29, 41, 57, 0.7);
+}
+
+.taiyi-81-cell:hover {
+    transform: scale(1.15);
+    z-index: 10;
+    box-shadow: 0 0 12px rgba(255, 224, 102, 0.9);
+    border-color: #ffe066;
+}
+
+.taiyi-81-cell.active-pos {
+    background: #ffd54f !important;
+    color: #0a0e17 !important;
+    font-family: var(--font-times) !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 0 18px rgba(255, 213, 79, 0.95) !important;
+    border-color: #ffffff !important;
+    transform: scale(1.18);
+    z-index: 20;
+}
+
+/* 洛书 9 宫九色柔和底层 */
+.palace-xun  { background: rgba(32, 201, 151, 0.18); border-color: rgba(32, 201, 151, 0.5); } /* 巽四木 青绿 */
+.palace-li   { background: rgba(255, 82, 82, 0.18); border-color: rgba(255, 82, 82, 0.5); }   /* 离九火 赤红 */
+.palace-kun  { background: rgba(230, 119, 0, 0.18); border-color: rgba(230, 119, 0, 0.5); }   /* 坤二土 黄褐 */
+.palace-zhen { background: rgba(64, 192, 87, 0.18); border-color: rgba(64, 192, 87, 0.5); }   /* 震三木 碧绿 */
+.palace-zhong{ background: rgba(255, 224, 102, 0.2); border-color: rgba(255, 224, 102, 0.6); }  /* 中五土 辉金 */
+.palace-dui  { background: rgba(222, 226, 230, 0.18); border-color: rgba(222, 226, 230, 0.5); } /* 兑七金 银白 */
+.palace-gen  { background: rgba(212, 175, 55, 0.18); border-color: rgba(212, 175, 55, 0.5); }   /* 艮八土 琥珀 */
+.palace-kan  { background: rgba(77, 171, 247, 0.18); border-color: rgba(77, 171, 247, 0.5); }   /* 坎一水 深蓝 */
+.palace-qian { background: rgba(248, 249, 250, 0.18); border-color: rgba(248, 249, 250, 0.5); } /* 乾六金 亮白 */
+
+/* 栏三：控制台 (33%) */
+.col-right-controls {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-gold);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* 卦象详情盒 Hexagram details */
+.hexagram-detail-box {
+    background: rgba(10, 14, 23, 0.85);
+    border: 1px solid rgba(255, 224, 102, 0.4);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 6px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+.hex-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 1px solid rgba(255, 224, 102, 0.3);
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+}
+
+.hex-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--color-gold);
+}
+
+.hex-sum {
+    font-size: 12px;
+    color: #f1f5f9;
+    font-weight: 600;
+}
+
+.hex-lines-grid {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 5px;
+}
+
+/* 六爻 5 栏网格布局 - 像素级精准对齐 */
+.yao-row {
+    display: grid;
+    grid-template-columns: 42px 65px 105px 42px 1fr;
+    align-items: center;
+    gap: 6px;
+    background: rgba(22, 34, 56, 0.8);
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yao-name {
+    font-weight: 700;
+    color: var(--color-gold);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.yao-symbol {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.yao-line-yang {
+    width: 54px;
+    height: 6px;
+    background: #ffe066;
+    border-radius: 2px;
+}
+
+.yao-line-yin {
+    width: 54px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.yao-line-yin span {
+    width: 24px;
+    height: 6px;
+    background: #4dabf7;
+    border-radius: 2px;
+}
+
+.yao-math-calc {
+    font-family: var(--font-times);
+    font-weight: 700;
+    color: #ffffff;
+    text-align: right;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+.yao-math-rem {
+    font-family: var(--font-times);
+    font-weight: 700;
+    color: #cbd5e1;
+    text-align: right;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+.yao-math-branch {
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+    padding-left: 4px;
+    font-size: 12px;
+}
+
+/* 下拉菜单 Select */
+.custom-select {
+    width: 100%;
+    background: rgba(10, 14, 23, 0.85);
+    border: 1px solid var(--border-gold);
+    color: #ffffff;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+/* 输入框与按钮 Input & Buttons */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    font-size: 11px;
+    color: #cbd5e1;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+input[type="number"] {
+    flex: 1;
+    background: rgba(10, 14, 23, 0.8);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: #ffffff;
+    font-size: 13px;
+    outline: none;
+    font-family: var(--font-times);
+}
+
+.action-btn, .action-btn-gold {
+    background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+    color: #0a0e17;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+}
+
+.action-btn:hover, .action-btn-gold:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 12px rgba(255, 224, 102, 0.5);
+}
+
+/* 五步流水线卡片 Steps */
+.pipeline-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.pipe-step {
+    background: rgba(10, 14, 23, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+}
+
+.pipe-step.active {
+    border-color: var(--border-gold-bright);
+    background: rgba(212, 175, 55, 0.12);
+}
+
+.step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--border-gold);
+    color: #0a0e17;
+    font-weight: 800;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-name {
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+.step-val {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    font-family: var(--font-times);
+}
+
+.step-val.badge-red { color: var(--color-chihdao); }
+.step-val.badge-green { color: var(--color-huangdao); }
+.step-val.badge-blue { color: var(--color-baidao); }
+
+/* 映射表格 Table */
+.sequence-table-container {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.seq-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-family: var(--font-times);
+}
+
+.seq-table th, .seq-table td {
+    padding: 5px 6px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.seq-table th {
+    background: rgba(10, 14, 23, 0.8);
+    color: var(--color-gold);
+    position: sticky;
+    top: 0;
+    font-family: var(--font-sans);
+}
+
+/* 首页 9 大门户卡片 Portal Cards */
+.home-portal-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+
+.portal-card {
+    background: rgba(16, 24, 40, 0.75);
+    border: 1px solid var(--border-gold);
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+}
+
+.portal-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-gold-bright);
+    box-shadow: 0 0 12px rgba(255, 224, 102, 0.25);
+    background: rgba(22, 34, 56, 0.9);
+}
+
+.portal-icon {
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.portal-icon.red { background: rgba(255, 82, 82, 0.2); color: var(--color-chihdao); }
+.portal-icon.gold { background: rgba(255, 224, 102, 0.2); color: var(--color-gold); }
+.portal-icon.green { background: rgba(64, 192, 87, 0.2); color: var(--color-huangdao); }
+.portal-icon.blue { background: rgba(77, 171, 247, 0.2); color: var(--color-baidao); }
+
+.portal-info {
+    flex: 1;
+}
+
+.portal-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.portal-desc {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-top: 1px;
+}
+
+.portal-arrow {
+    color: var(--color-gold);
+    font-size: 12px;
+}
+
+/* 按钮组 */
+.sanhe-btn-grid, .wuxing-btn-group, .yuan-card-btn-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.sanhe-btn, .wuxing-btn, .yuan-card-btn {
+    background: rgba(10, 14, 23, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #cbd5e1;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.sanhe-btn.active, .wuxing-btn.active, .yuan-card-btn.active {
+    border-color: var(--border-gold-bright);
+    color: var(--color-gold);
+    background: rgba(212, 175, 55, 0.2);
+    font-weight: 700;
+}

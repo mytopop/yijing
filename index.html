@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易经数理秘笈 - 太乙九宫与 3D 浑天天象拓扑系统</title>
+    <!-- 引入 Google 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- 引入 Three.js 核心库与 OrbitControls 轨道控制器 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
+    <link rel="stylesheet" href="index.css?v=20260804_v9">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 统一 100% 结构固定 Header 顶栏 -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="logo-icon">☯</div>
+                <div class="brand-text">
+                    <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
+                    <span class="subtitle">根据梁致堂原著解构 · 3D 浑天时空与洛书 81 宫综合解构</span>
+                </div>
+            </div>
+            
+            <nav class="header-nav-tabs">
+                <a href="index.html" class="nav-tab active">🏠 首页</a>
+                <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
+                <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab">✨ 5大定律</a>
+                <a href="wuxing.html" class="nav-tab">☯ 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab">📜 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab">🌀 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab">🌌 12方位3坐标</a>
+            </nav>
+        </header>
+
+        <!-- 三栏并行主容器 -->
+        <main class="main-three-split-container">
+            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <section class="col-left-3d">
+                <div class="panel-header-bar">
+                    <div class="panel-title">
+                        <span>🌌</span> 3D 浑天天象坐标仪
+                    </div>
+                    <div class="orbit-legend">
+                        <span class="legend-item equator">● 赤道(天)</span>
+                        <span class="legend-item ecliptic">● 黄道(地)</span>
+                        <span class="legend-item lunar">● 白道(万物)</span>
+                    </div>
+                </div>
+
+                <div class="canvas-wrapper">
+                    <!-- 浮动控制覆盖层 -->
+                    <div class="canvas-overlay-controls">
+                        <button id="btn-toggle-equator" class="control-toggle-btn active" title="显示/隐藏赤道环 (0°)">
+                            <span class="dot red"></span> 赤道
+                        </button>
+                        <button id="btn-toggle-ecliptic" class="control-toggle-btn active" title="显示/隐藏黄道环 (23.5°)">
+                            <span class="dot green"></span> 黄道
+                        </button>
+                        <button id="btn-toggle-lunar" class="control-toggle-btn active" title="显示/隐藏白道环 (-15°)">
+                            <span class="dot blue"></span> 白道
+                        </button>
+                        <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
+                            ⚡ 速度: <span id="speed-val">1x</span>
+                        </button>
+                        <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
+                            🎯 复位视角
+                        </button>
+                        <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
+                            🔄 旋转
+                        </button>
+                    </div>
+
+                    <!-- Three.js 渲染画布 -->
+                    <div id="three-canvas-home" style="width:100%; height:100%;"></div>
+
+                    <!-- 动态状态标签 -->
+                    <div class="trajectory-badge">
+                        <div class="badge-title">3D 浑天三元轨迹系统</div>
+                        <div class="badge-desc">12 地支均匀分布于赤道/黄道/白道坐标环，直观呈现天体运动拓扑</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 栏二：太乙九宫八十一宫阵图 (全页 100% 绝对统一) (33%) -->
+            <section class="col-middle-taiyi">
+                <div class="glass-panel">
+                    <div class="card-title">
+                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                    </div>
+                    <div class="law-desc-text">
+                        宏观按洛书 9 宫分块，微观 9 数按原书《太乙九宫图》精确定准。点击单元格可联动态象。
+                    </div>
+                </div>
+
+                <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
+            </section>
+
+            <!-- 栏三：9 大功能模块门户目录与 10^n 太阳指数试炼场 (33%) -->
+            <section class="col-right-controls">
+                <!-- 太阳指数 10^n 快捷试验模块 -->
+                <div class="glass-panel" style="border-color: rgba(255, 82, 82, 0.6); background: rgba(255, 82, 82, 0.08);">
+                    <div class="card-title" style="color: #ff5252;">
+                        <span>☀️</span> 太阳指数 10^n 赤道守恒律试验台
+                    </div>
+                    <div class="law-desc-text">
+                        拖动滑块测试太阳指数 $10^n$（10, 100, 1000...），验证其余数 **100% 恒归赤道正位 (子/卯/午/酉)**！
+                    </div>
+                    <div style="margin-top: 6px;">
+                        <input type="range" id="home-power-slider" min="1" max="10" value="3" style="width: 100%;">
+                        <div id="home-power-val" style="font-size: 11px; color: #ffe066; font-weight: 700; text-align: right; font-family: var(--font-times);">
+                            10^3 = 1,000 ➔ 模81余 28 ➔ 模12余 4 (卯位·赤道)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="margin-top: 6px;">
+                    <div class="card-title">
+                        <span>🚀</span> 《易经数理秘笈》9 大核心解构模块目录
+                    </div>
+                    <div class="law-desc-text">
+                        与右上角 9 大功能导航 100% 对应，点击下方任意卡片探索梁致堂先生原著数理。
+                    </div>
+                </div>
+
+                <div class="home-portal-grid">
+                    <a href="index.html" class="portal-card">
+                        <div class="portal-icon gold">🏠</div>
+                        <div class="portal-info">
+                            <div class="portal-title">1. 太乙九宫与 3D 浑天总控台</div>
+                            <div class="portal-desc">3D 浑天天象坐标仪与太乙 81 宫阵图联动总揽。</div>
+                        </div>
+                        <div class="portal-arrow">➔</div>
+                    </a>
+
+                    <a href="pipeline.html" class="portal-card">
+                        <div class="portal-icon gold">⚡</div>
+                        <div class="portal-info">
+                            <div class="portal-title">2. 任意数值 12 步推演流水线</div>
+                            <div class="portal-desc">输入任意自然数 N，解构模 81 降维、模 12 地支及赤黄白三道流转。</div>
+                        </div>
+                        <div class="portal-arrow">➔</div>
+                    </a>
+
+                    <a href="hexagrams.html" class="portal-card">
+                        <div class="portal-icon red">☰</div>
+                        <div class="portal-info">
+                            <div class="portal-title">3. 六十四卦 3D 拓扑解构馆</div>
+                            <div class="portal-desc">初爻为卦序 N，结合初爻至上爻 1~6 递进算式，勾勒 64 卦 3D 闭环。</div>
+                        </div>
+                        <div class="portal-arrow">➔</div>
+                    </a>
+
+                    <a href="laws.html" class="portal-card">
+                        <div class="portal-icon green">✨</div>
+                        <div class="portal-info">
+                            <div class="portal-title">4. 天象数理五大定律演示馆</div>
+                            <div class="portal-desc">10^n 太阳赤道守恒、北斗七星芒星律、360° 分割归九律与地支三合局。</div>
+                        </div>
+                        <div class="portal-arrow">➔</div>
+                    </a>
+
+                    <a href="wuxing.html" class="portal-card">
+                        <div class="portal-icon blue">☯</div>
+                        <div class="portal-info">
+                            <div class="portal-title">5. 五行三元与地支三合月相算法</div>
+                            <div class="portal-desc">五行生克、天干合化、180年三元周天与原书 P246 月相预测算式。</div>
+                        </div>
+                        <div class="portal-arrow">➔</div>
+                    </a>
+
+                    <a href="jiugong_qi.html" class="portal-card">
+                        <div class="portal-icon gold">📜</div>
+                        <div class="portal-info">
+                            <div class="portal-title">6. 九宫纪·七输入一览表解构馆</div>
+                            <div class="portal-desc">解构以 7 为工具数的 7 行递算，揭示九宫范畴对周天气数的控制。</div>
+                        </div>
+                        <div class="portal-arrow">➔</div>
+                    </a>
+
+                    <a href="zhoutian360.html" class="portal-card">
+                        <div class="portal-icon blue">🌀</div>
+                        <div class="portal-info">
+                            <div class="portal-title">7. 周天 360° 气数全景解构馆</div>
+                            <div class="portal-desc">包含原书 4 大表格：4象90°质变表、6×60°节卦表、81矩表与归九表。</div>
+                        </div>
+                        <div class="portal-arrow">➔</div>
+                    </a>
+
+                    <a href="qishu939697.html" class="portal-card">
+                        <div class="portal-icon red">🔢</div>
+                        <div class="portal-info">
+                            <div class="portal-title">8. 939697 计七数一览表解构馆</div>
+                            <div class="portal-desc">拆解白道 243 矩(93)、巳亥天地门 54 九归妹(96)与乘 7 子午颠倒律(97)。</div>
+                        </div>
+                        <div class="portal-arrow">➔</div>
+                    </a>
+
+                    <a href="coordinates12.html" class="portal-card">
+                        <div class="portal-icon green">🌌</div>
+                        <div class="portal-info">
+                            <div class="portal-title">9. 12 方位三个坐标按周纪次馆</div>
+                            <div class="portal-desc">12 地支划分为赤道、黄道与白道 3 大坐标系，解构按周次推演的 81 宫投影。</div>
+                        </div>
+                        <div class="portal-arrow">➔</div>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 首页引擎 (带版本防缓存) -->
+    <script src="home.js?v=20260804_v9"></script>
+</body>
+</html>
