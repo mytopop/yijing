@@ -728,7 +728,9 @@ input[type="number"] {
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
-    /* ==========================================================================
+}
+
+/* ==========================================================================
    全站 11 个页面统一 100% 媲美 64 卦六爻行金胶囊显眼高亮特效
    ========================================================================== */
 
@@ -746,36 +748,47 @@ input[type="number"] {
     border-color: rgba(255, 224, 102, 0.4) !important;
 }
 
-/* 点击刹那间的闪光冲击动画 */
+/* 点击刹那间的平移晃动与弹簧冲击动画 (rowBounceShake & rowFlashSpark) */
 .row-click-flash {
-    animation: rowFlashSpark 0.4s ease-out !important;
+    animation: rowBounceShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
 }
 
-@keyframes rowFlashSpark {
+@keyframes rowBounceShake {
     0% {
-        background: rgba(255, 255, 255, 0.6) !important;
+        transform: translateX(0px) scale(1.0);
         box-shadow: 0 0 30px #ffffff, 0 0 50px #ffe066 !important;
+        background: rgba(255, 255, 255, 0.5) !important;
+    }
+    25% {
+        transform: translateX(14px) scale(1.02); /* 侧向弹性震荡晃动 */
+        box-shadow: 0 0 35px #ffe066, 0 0 55px #4dabf7 !important;
+    }
+    50% {
+        transform: translateX(-3px) scale(0.99); /* 回弹震荡 */
+    }
+    75% {
+        transform: translateX(9px) scale(1.01); /* 再次平滑晃动 */
     }
     100% {
-        background: inherit;
+        transform: translateX(6px) scale(1.0);
     }
 }
 
-/* 媲美 64 卦六爻行的 100% 金胶囊边框 + 渐变金蓝光晕 + 6px 右移脉冲 */
+/* 媲美 64 卦六爻行的 100% 金胶囊边框 + 晃动归位 + 渐变金蓝光晕 */
 .interactive-row.active-row, 
 .interactive-yao-row.active-yao-row, 
 tr.interactive-row.active-row,
 .portal-card.active,
 .pipeline-step-item.active {
-    background: linear-gradient(90deg, rgba(212, 175, 55, 0.35) 0%, rgba(77, 171, 247, 0.22) 100%) !important;
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.38) 0%, rgba(77, 171, 247, 0.25) 100%) !important;
     border-left: 6px solid #ffe066 !important;
     border-top: 1px solid rgba(255, 224, 102, 0.5) !important;
     border-right: 1px solid rgba(255, 224, 102, 0.5) !important;
     border-bottom: 1px solid rgba(255, 224, 102, 0.5) !important;
-    box-shadow: 0 0 20px rgba(255, 224, 102, 0.55), inset 0 0 14px rgba(77, 171, 247, 0.28) !important;
+    box-shadow: 0 0 22px rgba(255, 224, 102, 0.6), inset 0 0 14px rgba(77, 171, 247, 0.3) !important;
     transform: translateX(6px) !important;
     font-weight: 700 !important;
-    animation: activeYaoRowGlowPulse 1.8s infinite alternate !important;
+    animation: rowBounceShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) 1, activeYaoRowGlowPulse 1.8s infinite alternate 0.45s !important;
 }
 
 @keyframes activeYaoRowGlowPulse {
@@ -783,7 +796,7 @@ tr.interactive-row.active-row,
         box-shadow: 0 0 14px rgba(255, 224, 102, 0.45), inset 0 0 10px rgba(77, 171, 247, 0.2);
     }
     100% {
-        box-shadow: 0 0 24px rgba(255, 224, 102, 0.75), inset 0 0 18px rgba(77, 171, 247, 0.45);
+        box-shadow: 0 0 25px rgba(255, 224, 102, 0.75), inset 0 0 18px rgba(77, 171, 247, 0.45);
     }
 }
 
