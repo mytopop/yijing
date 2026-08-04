@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》原书九宫纪气数一览表全景馆引擎 - (jiugong_tables.js)
-   特点：还原原书 P342-350 9 张 9x9 纪气数倍积大表 + 侧向平移晃动微动画 + 三向联动
+   特点：还原原书 P342-350 9 张 9x9 纪气数倍积大表 + 单格精准点击 + 81 宫标注位号角标 + 三向联动
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -30,62 +30,29 @@ const LUOSHU_PALACES_EXACT = [
     { num: 6, name: "乾六宫 (金)", numbers: [33, 78, 15, 24, 42, 60, 69, 6, 51], class: "palace-qian", color: "#dee2e6" },
 ];
 
-// 原书 9 大宫 9 张大表权威描述 (P342 ~ P350)
+// 太乙 81 宫全量角标位号字典 (匹配原书图片格式 宫_位)
+const TAIYI_81_SUB_LABELS = {
+    31: "(四₄)", 76: "(四₉)", 13: "(四₂)", 22: "(四₃)", 40: "(四₅)", 58: "(四₇)", 67: "(四₈)", 4: "(四₁)", 49: "(四₆)",
+    36: "(九₄)", 81: "(九₉)", 18: "(九₂)", 27: "(九₃)", 45: "(九₅)", 63: "(九₇)", 72: "(九₈)", 9: "(九₁)", 54: "(九₆)",
+    29: "(二₄)", 74: "(二₉)", 11: "(二₂)", 20: "(二₃)", 38: "(二₅)", 56: "(二₇)", 65: "(二₈)", 2: "(二₁)", 47: "(二₆)",
+    30: "(三₄)", 75: "(三₉)", 12: "(三₂)", 21: "(三₃)", 39: "(三₅)", 57: "(三₇)", 66: "(三₈)", 3: "(三₁)", 48: "(三₆)",
+    32: "(五₄)", 77: "(五₉)", 14: "(五₂)", 23: "(五₃)", 41: "(五₅)", 59: "(五₇)", 68: "(五₈)", 5: "(五₁)", 50: "(五₆)",
+    34: "(七₄)", 79: "(七₉)", 16: "(七₂)", 25: "(七₃)", 43: "(七₅)", 61: "(七₇)", 70: "(七₈)", 7: "(七₁)", 52: "(七₆)",
+    35: "(八₄)", 80: "(八₉)", 17: "(八₂)", 26: "(八₃)", 44: "(八₅)", 62: "(八₇)", 71: "(八₈)", 8: "(八₁)", 53: "(八₆)",
+    28: "(一₄)", 73: "(一₉)", 10: "(一₂)", 19: "(一₃)", 37: "(一₅)", 55: "(一₇)", 64: "(一₈)", 1: "(一₁)", 46: "(一₆)",
+    33: "(六₄)", 78: "(六₉)", 15: "(六₂)", 24: "(六₃)", 42: "(六₅)", 60: "(六₇)", 69: "(六₈)", 6: "(六₁)", 51: "(六₆)"
+};
+
 const ORIGINAL_9_TABLES_INFO = {
-    1: {
-        name: "一宫表 (坎一水宫)",
-        page: "原书 P342 (第34页上表)",
-        baseSeq: [1, 10, 19, 28, 37, 46, 55, 64, 73],
-        desc: "原书 P342 【一宫表】：首行基数为 1, 10, 19, 28, 37, 46, 55, 64, 73，公差为 9。延伸 9 级倍积后进位数为 9, 90, 171, 252, 333, 414, 495, 576, 657，主坎水阳气初萌。"
-    },
-    2: {
-        name: "二宫表 (坤二土宫)",
-        page: "原书 P343 (第34页下表)",
-        baseSeq: [2, 11, 20, 29, 38, 47, 56, 65, 74],
-        desc: "原书 P343 【二宫表】：首行基数为 2, 11, 20, 29, 38, 47, 56, 65, 74，公差为 9。进位数为 18, 99, 180, 261, 342, 423, 504, 585, 666，主阴阳包容怀藏。"
-    },
-    3: {
-        name: "三宫表 (震三木宫)",
-        page: "原书 P344 (第35页上表)",
-        baseSeq: [3, 12, 21, 30, 39, 48, 57, 66, 75],
-        desc: "原书 P344 【三宫表】：首行基数为 3, 12, 21, 30, 39, 48, 57, 66, 75，公差为 9。进位数为 27, 108, 189, 270, 351, 432, 513, 594, 675，主震木万物生发。"
-    },
-    4: {
-        name: "四宫表 (巽四木宫)",
-        page: "原书 P345 (第35页下表)",
-        baseSeq: [4, 13, 22, 31, 40, 49, 58, 67, 76],
-        desc: "原书 P345 【四宫表】：首行基数为 4, 13, 22, 31, 40, 49, 58, 67, 76，公差为 9。进位数为 36, 117, 198, 279, 360, 441, 522, 603, 684，主巽风申布齐洁。"
-    },
-    5: {
-        name: "五宫表 (中五土宫)",
-        page: "原书 P346 (第36页上表)",
-        baseSeq: [5, 14, 23, 32, 41, 50, 59, 68, 77],
-        desc: "原书 P346 【五宫表】：首行基数为 5, 14, 23, 32, 41, 50, 59, 68, 77，公差为 9。进位数为 45, 126, 207, 288, 369, 450, 531, 612, 693，主皇极太极中枢。"
-    },
-    6: {
-        name: "六宫表 (乾六金宫)",
-        page: "原书 P347 (第36页下表)",
-        baseSeq: [6, 15, 24, 33, 42, 51, 60, 69, 78],
-        desc: "原书 P347 【六宫表】：首行基数为 6, 15, 24, 33, 42, 51, 60, 69, 78，公差为 9。进位数为 54, 135, 216, 297, 378, 459, 540, 621, 702，主天金刚健刚大。"
-    },
-    7: {
-        name: "七宫表 (兑七金宫)",
-        page: "原书 P348 (第37页上表)",
-        baseSeq: [7, 16, 25, 34, 43, 52, 61, 70, 79],
-        desc: "原书 P348 【七宫表】：首行基数为 7, 16, 25, 34, 43, 52, 61, 70, 79，公差为 9。进位数为 63, 144, 225, 306, 387, 468, 549, 630, 711，主兑泽说怿和乐。"
-    },
-    8: {
-        name: "八宫表 (艮八土宫)",
-        page: "原书 P349 (第37页下表)",
-        baseSeq: [8, 17, 26, 35, 44, 53, 62, 71, 80],
-        desc: "原书 P349 【八宫表】：首行基数为 8, 17, 26, 35, 44, 53, 62, 71, 80，公差为 9。进位数为 72, 153, 234, 315, 396, 477, 558, 639, 720，主艮山止藏归结。"
-    },
-    9: {
-        name: "九宫表 (离九火宫)",
-        page: "原书 P350 (附件终表)",
-        baseSeq: [9, 18, 27, 36, 45, 54, 63, 72, 81],
-        desc: "原书 P350 【九宫表】：首行基数为 9, 18, 27, 36, 45, 54, 63, 72, 81，公差为 9。进位数为 81, 162, 243, 324, 405, 486, 567, 648, 729，主离火光明发辉、众和收敛归于 9。"
-    }
+    1: { name: "一宫表 (坎一水宫)", page: "原书 P342 (第34页上表)", baseSeq: [1, 10, 19, 28, 37, 46, 55, 64, 73], desc: "原书 P342 【一宫表】：首行基数为 1, 10, 19, 28, 37, 46, 55, 64, 73，公差为 9。延伸 9 级倍积后进位数为 9, 90, 171, 252, 333, 414, 495, 576, 657，主坎水阳气初萌。" },
+    2: { name: "二宫表 (坤二土宫)", page: "原书 P343 (第34页下表)", baseSeq: [2, 11, 20, 29, 38, 47, 56, 65, 74], desc: "原书 P343 【二宫表】：首行基数为 2, 11, 20, 29, 38, 47, 56, 65, 74，公差为 9。进位数为 18, 99, 180, 261, 342, 423, 504, 585, 666，主阴阳包容怀藏。" },
+    3: { name: "三宫表 (震三木宫)", page: "原书 P344 (第35页上表)", baseSeq: [3, 12, 21, 30, 39, 48, 57, 66, 75], desc: "原书 P344 【三宫表】：首行基数为 3, 12, 21, 30, 39, 48, 57, 66, 75，公差为 9。进位数为 27, 108, 189, 270, 351, 432, 513, 594, 675，主震木万物生发。" },
+    4: { name: "四宫表 (巽四木宫)", page: "原书 P345 (第35页下表)", baseSeq: [4, 13, 22, 31, 40, 49, 58, 67, 76], desc: "原书 P345 【四宫表】：首行基数为 4, 13, 22, 31, 40, 49, 58, 67, 76，公差为 9。进位数为 36, 117, 198, 279, 360, 441, 522, 603, 684，主巽风申布齐洁。" },
+    5: { name: "五宫表 (中五土宫)", page: "原书 P346 (第36页上表)", baseSeq: [5, 14, 23, 32, 41, 50, 59, 68, 77], desc: "原书 P346 【五宫表】：首行基数为 5, 14, 23, 32, 41, 50, 59, 68, 77，公差为 9。进位数为 45, 126, 207, 288, 369, 450, 531, 612, 693，主皇极太极中枢。" },
+    6: { name: "六宫表 (乾六金宫)", page: "原书 P347 (第36页下表)", baseSeq: [6, 15, 24, 33, 42, 51, 60, 69, 78], desc: "原书 P347 【六宫表】：首行基数为 6, 15, 24, 33, 42, 51, 60, 69, 78，公差为 9。进位数为 54, 135, 216, 297, 378, 459, 540, 621, 702，主天金刚健刚大。" },
+    7: { name: "七宫表 (兑七金宫)", page: "原书 P348 (第37页上表)", baseSeq: [7, 16, 25, 34, 43, 52, 61, 70, 79], desc: "原书 P348 【七宫表】：首行基数为 7, 16, 25, 34, 43, 52, 61, 70, 79，公差为 9。进位数为 63, 144, 225, 306, 387, 468, 549, 630, 711，主兑泽说怿和乐。" },
+    8: { name: "八宫表 (艮八土宫)", page: "原书 P349 (第37页下表)", baseSeq: [8, 17, 26, 35, 44, 53, 62, 71, 80], desc: "原书 P349 【八宫表】：首行基数为 8, 17, 26, 35, 44, 53, 62, 71, 80，公差为 9。进位数为 72, 153, 234, 315, 396, 477, 558, 639, 720，主艮山止藏归结。" },
+    9: { name: "九宫表 (离九火宫)", page: "原书 P350 (附件终表)", baseSeq: [9, 18, 27, 36, 45, 54, 63, 72, 81], desc: "原书 P350 【九宫表】：首行基数为 9, 18, 27, 36, 45, 54, 63, 72, 81，公差为 9。进位数为 81, 162, 243, 324, 405, 486, 567, 648, 729，主离火光明发辉、众和收敛归于 9。" }
 };
 
 const HEXAGRAM_NAMES_MAP = {
@@ -356,8 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const badgeTitle = document.getElementById("jgt-badge-title");
     const badgeDesc = document.getElementById("jgt-badge-desc");
 
-    let currentDisplayMode = "matrix"; // "matrix" 原书 9x9 倍积大表模式，"list" 极速名录表模式
-
+    // 渲染太乙 81 宫阵图 (带有数字 + 角标位号，与原书图片 100% 一致)
     function initLuoshuTaiyi9x9Matrix() {
         if (!matrixContainer) return;
         matrixContainer.className = "luoshu-taiyi-9x9-container";
@@ -379,14 +345,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 const cell = document.createElement("div");
                 cell.className = "taiyi-81-cell";
                 cell.dataset.pos = num;
-                cell.title = `数值 ${num} (${palace.name})`;
-                cell.innerText = num;
-                cell.addEventListener("click", () => {
-                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
-                    cell.classList.add("active-pos");
+                
+                const subTag = TAIYI_81_SUB_LABELS[num] || "";
+                cell.title = `数值 ${num} (${palace.name} ${subTag})`;
+                cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-sub">${subTag}</div>`;
 
-                    const rem12 = num % 12 === 0 ? 12 : num % 12;
-                    engine.highlightBranchPos(rem12 - 1);
+                cell.addEventListener("click", () => {
+                    const isAlreadyActive = cell.classList.contains("active-pos");
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+
+                    if (!isAlreadyActive) {
+                        cell.classList.add("active-pos");
+                        const rem12 = num % 12 === 0 ? 12 : num % 12;
+                        engine.highlightBranchPos(rem12 - 1);
+                    }
                 });
                 grid3x3.appendChild(cell);
             });
@@ -405,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     📜 原著《九宫纪气数一览表》9大表合集全景
                 </div>
                 <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px;">
-                    梁致堂原著 P342-350（对应 PPT 第34~37页）共 9 张 9x9 纪气数倍积大表，完美呈现每一宫从 1 级至 9 级倍积与进位数。
+                    梁致堂原著 P342-350（对应 PPT 第34~37页）共 9 张 9x9 纪气数倍积大表，完美呈现每一宫从 1 级至 9 级倍积与进位数。点击每个单格可精准定位单格算式与 81 宫位号！
                 </div>
             `;
         } else {
@@ -415,13 +387,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     📜 原著【${pInfo.name}】原表解构 (${pInfo.page})
                 </div>
                 <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px; line-height:1.4;">
-                    ${pInfo.desc}
+                    ${pInfo.desc} (支持点击单格 ×1~×9 精准计算及点击行首全行高亮)
                 </div>
             `;
         }
     }
 
-    // 渲染原书 9x9 纪气数倍积大表 (Original 9x9 Master Matrix Table)
+    // 渲染原书 9x9 纪气数倍积大表 (支持行选择与单格精准选择)
     function renderOriginal9x9Table(palaceKey = "1", searchText = "") {
         if (!tableHead || !tableBody) return;
         tableHead.innerHTML = "";
@@ -436,7 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
             tableTitle.innerText = `📜 原书【${pInfo.name}】9x9 纪气数倍积大表 (${pInfo.page})`;
         }
 
-        // 构建原书表头: 基数 | ×1 | ×2 | ×3 | ×4 | ×5 | ×6 | ×7 | ×8 | ×9 | 进位数(N×9) | 地支
+        // 构建原书表头
         const trHead = document.createElement("tr");
         trHead.innerHTML = `
             <th style="color:#ffe066;">基数 N</th>
@@ -460,10 +432,13 @@ document.addEventListener("DOMContentLoaded", () => {
             tr.className = "interactive-row";
             tr.dataset.num = baseNum;
 
-            let cellsHtml = `<td style="font-weight:800; color:#ffe066; font-family:var(--font-times);">${baseNum}</td>`;
+            // 基数单元格
+            let cellsHtml = `<td class="interactive-cell base-num-cell" data-val="${baseNum}" style="font-weight:800; color:#ffe066; font-family:var(--font-times);">${baseNum}</td>`;
+            
+            // ×1 ~ ×9 单格
             for (let k = 1; k <= 9; k++) {
                 const prod = baseNum * k;
-                cellsHtml += `<td style="font-family:var(--font-times);">${prod}</td>`;
+                cellsHtml += `<td class="interactive-cell prod-cell" data-base="${baseNum}" data-k="${k}" data-val="${prod}" style="font-family:var(--font-times);">${prod}</td>`;
             }
 
             const carry = baseNum * 9;
@@ -471,57 +446,87 @@ document.addEventListener("DOMContentLoaded", () => {
             const rem12 = baseNum % 12 === 0 ? 12 : baseNum % 12;
             const branch = EARTHLY_BRANCHES[rem12 - 1];
 
-            cellsHtml += `<td style="font-weight:800; color:#ff5252; font-family:var(--font-times);">${carry}</td>`;
+            cellsHtml += `<td class="interactive-cell carry-cell" data-val="${carry}" style="font-weight:800; color:#ff5252; font-family:var(--font-times);">${carry}</td>`;
             cellsHtml += `<td style="font-family:var(--font-times);">${rem81}宫</td>`;
             cellsHtml += `<td style="color:${branch.color}; font-weight:800;">${branch.name}位</td>`;
 
             tr.innerHTML = cellsHtml;
 
-            tr.addEventListener("click", () => {
+            // 行级别点击 (全行高亮)
+            tr.addEventListener("click", (e) => {
+                // 如果点击的是具体单元格，由单元格事件处理
+                if (e.target.classList.contains("interactive-cell")) {
+                    return;
+                }
+
                 const isAlreadyActive = tr.classList.contains("active-row");
                 document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+                document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
 
                 if (isAlreadyActive) {
-                    // 取消高亮
                     document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
-                    if (detailCard) {
-                        detailCard.innerHTML = `
-                            <div style="font-size: 13px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
-                                📜 原著【${pInfo ? pInfo.name : '九宫'}】九级倍积大表全景 (P342-350)
-                            </div>
-                            <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
-                                点击表中任意行查看该数倍积、进位数与 12 地支落点；再次点击可【取消选中】恢复全表概览。
-                            </div>
-                        `;
-                    }
                     return;
                 }
 
                 tr.classList.add("active-row");
-
-                // 点击瞬间平移晃动震荡与闪光
                 tr.classList.add("row-click-flash");
                 setTimeout(() => tr.classList.remove("row-click-flash"), 450);
 
-                highlightRowAnd3D(baseNum, pInfo);
+                highlightCellAnd3D(baseNum, baseNum, 1, pInfo);
+            });
+
+            // 给每一个单格绑定精准点击事件 (Exact Cell Clicking)
+            tr.querySelectorAll(".interactive-cell").forEach(cellTd => {
+                cellTd.addEventListener("click", (e) => {
+                    e.stopPropagation();
+
+                    const isCellActive = cellTd.classList.contains("active-cell");
+                    document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+                    document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+
+                    if (isCellActive) {
+                        document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+                        if (detailCard) {
+                            detailCard.innerHTML = `
+                                <div style="font-size: 13px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
+                                    📜 原书【${pInfo ? pInfo.name : '九宫'}】九级倍积大表全景 (P342-350)
+                                </div>
+                                <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
+                                    点击大表中任意单元格查看该格单项算式、倍积与 81 宫位号；再次点击可【取消选中】。
+                                </div>
+                            `;
+                        }
+                        return;
+                    }
+
+                    cellTd.classList.add("active-cell");
+                    tr.classList.add("active-row");
+
+                    const val = parseInt(cellTd.dataset.val, 10);
+                    const bNum = parseInt(cellTd.dataset.base || baseNum, 10);
+                    const multiplier = parseInt(cellTd.dataset.k || 1, 10);
+
+                    highlightCellAnd3D(val, bNum, multiplier, pInfo);
+                });
             });
 
             tableBody.appendChild(tr);
         });
 
         if (pInfo.baseSeq.length > 0) {
-            highlightRowAnd3D(pInfo.baseSeq[0], pInfo);
+            highlightCellAnd3D(pInfo.baseSeq[0], pInfo.baseSeq[0], 1, pInfo);
         }
     }
 
-    function highlightRowAnd3D(num, pInfo) {
-        const rem81 = num % 81 === 0 ? 81 : num % 81;
-        const rem12 = num % 12 === 0 ? 12 : num % 12;
+    function highlightCellAnd3D(val, baseNum, multiplier, pInfo) {
+        const rem81 = val % 81 === 0 ? 81 : val % 81;
+        const rem12 = val % 12 === 0 ? 12 : val % 12;
         const branch = EARTHLY_BRANCHES[rem12 - 1];
         const hexName = HEXAGRAM_NAMES_MAP[rem81] || (rem81 <= 64 ? `第${rem81}卦` : `宫数 ${rem81}`);
-        const deg = (num * 4.4444).toFixed(1) + "°";
+        const deg = (val * 4.4444).toFixed(1) + "°";
+        const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
 
-        // 高亮中间太乙 81 宫 (清爽平整无重叠遮挡)
+        // 高亮太乙 81 宫 (双行角标位号匹配原图)
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
             cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === rem81);
         });
@@ -532,23 +537,23 @@ document.addEventListener("DOMContentLoaded", () => {
         if (detailCard) {
             detailCard.innerHTML = `
                 <div style="font-size: 14px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
-                    📊 原书【${pInfo ? pInfo.name : '九宫'}】 · 数 ${num} 倍积三向联动解析
+                    🎯 【${pInfo ? pInfo.name : '九宫'}】单格精准算式: ${baseNum} × ${multiplier} = <span style="font-size:16px;">${val}</span>
                 </div>
                 <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
-                    • 对应易卦: <strong>${hexName}</strong> | 9级进位数: ${num} × 9 = <strong>${num * 9}</strong><br>
-                    • 周天角度: <strong>${deg}</strong> | 81 宫归属: 第 ${rem81} 宫 | 12地支: <span style="color:${branch.color}; font-weight:800;">${branch.name}位 (${branch.system})</span>
+                    • 单格计算值: <strong>${val}</strong> | 归太乙 81 阵图: <strong style="color:#ffe066;">第 ${rem81} 宫 ${subTag}</strong> | 对应易卦: <strong>${hexName}</strong><br>
+                    • 周天角度: <strong>${deg}</strong> | 12地支余数: 余 ${rem12} | 坐标系: <span style="color:${branch.color}; font-weight:800;">${branch.name}位 (${branch.system})</span>
                 </div>
                 <div style="margin-top: 6px; font-size: 11px; color: #ffffff; background: rgba(77,171,247,0.18); padding: 4px 8px; border-radius: 4px;">
-                    原书引注：基数 ${num} 在 ${pInfo ? pInfo.name : '九宫'} 延伸 9 级，数据脉冲已定位至【${branch.name}位】！
+                    数理学术解析：单格乘积 ${baseNum}×${multiplier}=${val} 降维归入【第 ${rem81} 宫 ${subTag}】，3D 脉冲定位至【${branch.name}位】！
                 </div>
             `;
         }
 
-        if (badgeTitle) badgeTitle.innerText = `${pInfo ? pInfo.name : '九宫'} · 数 ${num} (${branch.name}位) 3D 节点`;
-        if (badgeDesc) badgeDesc.innerText = `${hexName} · 进位数 ${num * 9}，太乙 81 阵图与 3D 浑天坐标系同步闪耀`;
+        if (badgeTitle) badgeTitle.innerText = `单格 ${baseNum}×${multiplier}=${val} ➔ 第 ${rem81} 宫 ${subTag} (${branch.name}位)`;
+        if (badgeDesc) badgeDesc.innerText = `对应 ${hexName} · ${deg}，太乙 81 阵图 ${subTag} 位与 3D 坐标系同步高亮`;
     }
 
-    // 绑定 9 大张表格切选按钮 (一宫表 ~ 九宫表)
+    // 绑定 9 大张表格切选按钮
     document.querySelectorAll(".palace-tab-btn").forEach(btn => {
         btn.addEventListener("click", function() {
             document.querySelectorAll(".palace-tab-btn").forEach(b => b.classList.remove("active"));
@@ -563,7 +568,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 搜索输入框过滤
     const searchInput = document.getElementById("jgt-search-input");
     if (searchInput) {
         searchInput.addEventListener("input", (e) => {

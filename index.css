@@ -811,22 +811,67 @@ tr.interactive-row.active-row,
     transform: scale(1.04) !important;
 }
 
-/* 太乙 81 宫单元格高亮：干净清晰，无缩放震荡，严禁重叠遮挡 */
+/* 太乙 81 宫单元格高亮与角标：干净清晰，双行匹配原图 (数字 + 宫位位号)，严禁重叠遮挡 */
 .taiyi-81-cell {
     transition: background 0.15s ease, border-color 0.15s ease;
     box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2px 0 !important;
+}
+
+.taiyi-81-cell .cell-num {
+    font-family: var(--font-times) !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+}
+
+.taiyi-81-cell .cell-sub {
+    font-family: var(--font-serif) !important;
+    font-size: 9.5px !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+    line-height: 1.0 !important;
+    margin-top: 1px !important;
 }
 
 .taiyi-81-cell.active-pos {
     background: #ffe066 !important;
     color: #000000 !important;
-    font-weight: 900 !important;
     border: 1.5px solid #ffffff !important;
-    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4), 0 0 6px rgba(255, 224, 102, 0.6) !important;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 224, 102, 0.7) !important;
     transform: none !important;
     animation: none !important;
     z-index: 2 !important;
 }
 
+.taiyi-81-cell.active-pos .cell-num {
+    color: #000000 !important;
+    font-weight: 900 !important;
+}
 
+.taiyi-81-cell.active-pos .cell-sub {
+    color: #1a1a1a !important;
+    font-weight: 800 !important;
+}
 
+/* 9x9 大表单格精准点击高亮 (interactive-cell & active-cell) */
+.interactive-cell {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.interactive-cell:hover {
+    background: rgba(255, 224, 102, 0.25) !important;
+    color: #ffe066 !important;
+}
+
+.interactive-cell.active-cell {
+    background: #ffe066 !important;
+    color: #000000 !important;
+    font-weight: 900 !important;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 224, 102, 0.8) !important;
+    animation: rowBounceShake 0.45s ease-out 1 !important;
+}
