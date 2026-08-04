@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v9">
+    <link rel="stylesheet" href="index.css?v=20260804_v12">
 </head>
 <body>
     <div class="app-container">
@@ -43,16 +43,16 @@
 
         <!-- 三栏并行主容器 -->
         <main class="main-three-split-container">
-            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <!-- 栏一：全新形象化 3D 浑天天象坐标仪 (34%) -->
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪
+                        <span>🌌</span> 3D 浑天天象坐标仪 (日月极星全息模型)
                     </div>
                     <div class="orbit-legend">
-                        <span class="legend-item equator">● 赤道(天)</span>
-                        <span class="legend-item ecliptic">● 黄道(地)</span>
-                        <span class="legend-item lunar">● 白道(万物)</span>
+                        <span class="legend-item equator">● 赤道(0°)</span>
+                        <span class="legend-item ecliptic">● 黄道(+23.5°)</span>
+                        <span class="legend-item lunar">● 白道(-15°)</span>
                     </div>
                 </div>
 
@@ -84,8 +84,8 @@
 
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
-                        <div class="badge-title">3D 浑天三元轨迹系统</div>
-                        <div class="badge-desc">12 地支均匀分布于赤道/黄道/白道坐标环，直观呈现天体运动拓扑</div>
+                        <div class="badge-title">3D 浑天日月极星全息坐标体系</div>
+                        <div class="badge-desc">包含天极中轴、日月轨道流光、北极极星与 12 地支全息天珠</div>
                     </div>
                 </div>
             </section>
@@ -104,30 +104,14 @@
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：9 大功能模块门户目录与 10^n 太阳指数试炼场 (33%) -->
+            <!-- 栏三：方案 B 纯粹 9 大功能模块门户目录 (33%) -->
             <section class="col-right-controls">
-                <!-- 太阳指数 10^n 快捷试验模块 -->
-                <div class="glass-panel" style="border-color: rgba(255, 82, 82, 0.6); background: rgba(255, 82, 82, 0.08);">
-                    <div class="card-title" style="color: #ff5252;">
-                        <span>☀️</span> 太阳指数 10^n 赤道守恒律试验台
-                    </div>
-                    <div class="law-desc-text">
-                        拖动滑块测试太阳指数 $10^n$（10, 100, 1000...），验证其余数 **100% 恒归赤道正位 (子/卯/午/酉)**！
-                    </div>
-                    <div style="margin-top: 6px;">
-                        <input type="range" id="home-power-slider" min="1" max="10" value="3" style="width: 100%;">
-                        <div id="home-power-val" style="font-size: 11px; color: #ffe066; font-weight: 700; text-align: right; font-family: var(--font-times);">
-                            10^3 = 1,000 ➔ 模81余 28 ➔ 模12余 4 (卯位·赤道)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-panel" style="margin-top: 6px;">
+                <div class="glass-panel">
                     <div class="card-title">
                         <span>🚀</span> 《易经数理秘笈》9 大核心解构模块目录
                     </div>
                     <div class="law-desc-text">
-                        与右上角 9 大功能导航 100% 对应，点击下方任意卡片探索梁致堂先生原著数理。
+                        与右上角 9 大功能导航 100% 一一对应，点击下方任意卡片探索梁致堂先生原著数理。
                     </div>
                 </div>
 
@@ -136,7 +120,7 @@
                         <div class="portal-icon gold">🏠</div>
                         <div class="portal-info">
                             <div class="portal-title">1. 太乙九宫与 3D 浑天总控台</div>
-                            <div class="portal-desc">3D 浑天天象坐标仪与太乙 81 宫阵图联动总揽。</div>
+                            <div class="portal-desc">3D 浑天天象坐标仪与太乙 81 宫阵图联动总缆。</div>
                         </div>
                         <div class="portal-arrow">➔</div>
                     </a>
@@ -218,6 +202,6 @@
     </div>
 
     <!-- 首页引擎 (带版本防缓存) -->
-    <script src="home.js?v=20260804_v9"></script>
+    <script src="home.js?v=20260804_v12"></script>
 </body>
 </html>

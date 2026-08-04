@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》首页 3D 浑天天象与太乙 81 宫阵图 - 核心逻辑 (home.js)
-   特点：无中间大球 + 12地支三分坐标环 + 81宫全矩阵高亮 + 太阳指数10^n 试炼台
+   《易经数理秘笈》全新形象化 3D 浑天天象与太乙 81 宫阵图引擎 (home.js)
+   特点：天极中轴 + 全息天球经纬网 + 日月星三体动态游走 + 12地支 3D 天珠
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,7 +43,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class Home3DEngine {
+class HomeVivid3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.width = this.container.clientWidth || 400;
@@ -57,12 +57,20 @@ class Home3DEngine {
         this.equatorGroup = new THREE.Group();
         this.eclipticGroup = new THREE.Group();
         this.lunarGroup = new THREE.Group();
-        this.highlightGroup = new THREE.Group();
+        this.celestialGridGroup = new THREE.Group();
+        this.orbsGroup = new THREE.Group();
+
+        this.sunMesh = null;
+        this.moonMesh = null;
+        this.sunAngle = 0;
+        this.moonAngle = 0;
 
         this.autoRotate = true;
 
         this.initScene();
         this.createArmillaryRings();
+        this.createCelestialGridAndPoles();
+        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -90,7 +98,8 @@ class Home3DEngine {
         this.scene.add(this.equatorGroup);
         this.scene.add(this.eclipticGroup);
         this.scene.add(this.lunarGroup);
-        this.scene.add(this.highlightGroup);
+        this.scene.add(this.celestialGridGroup);
+        this.scene.add(this.orbsGroup);
     }
 
     adjustCameraFit() {
@@ -122,39 +131,105 @@ class Home3DEngine {
         const goldLight = new THREE.PointLight(0xffe066, 2.5, 60);
         goldLight.position.set(0, 0, 15);
         this.scene.add(goldLight);
+
+        const blueLight = new THREE.PointLight(0x4dabf7, 2.0, 60);
+        blueLight.position.set(0, 15, -10);
+        this.scene.add(blueLight);
+    }
+
+    createCelestialGridAndPoles() {
+        const radius = 6.0;
+
+        // 1. 全息天球经纬网格 (Wireframe Sphere Grid)
+        const gridGeom = new THREE.SphereGeometry(radius * 1.02, 24, 18);
+        const gridMat = new THREE.MeshBasicMaterial({
+            color: 0x4dabf7,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.08
+        });
+        const gridMesh = new THREE.Mesh(gridGeom, gridMat);
+        this.celestialGridGroup.add(gridMesh);
+
+        // 2. 贯穿南北极的【天北极 / 天南极天轴】(Gold Pole Line)
+        const polePoints = [new THREE.Vector3(0, 0, -8.5), new THREE.Vector3(0, 0, 8.5)];
+        const poleGeom = new THREE.BufferGeometry().setFromPoints(polePoints);
+        const poleMat = new THREE.LineDashedMaterial({ color: 0xffe066, dashSize: 0.4, gapSize: 0.2, linewidth: 2 });
+        const poleLine = new THREE.Line(poleGeom, poleMat);
+        poleLine.computeLineDistances();
+        this.celestialGridGroup.add(poleLine);
+
+        // 3. 北极星 (North Star) 顶端辉光
+        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
+        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        const northStar = new THREE.Mesh(northStarGeom, northStarMat);
+        northStar.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northStar);
+
+        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.8);
+        this.celestialGridGroup.add(northSprite);
     }
 
     createArmillaryRings() {
         const radius = 6.0;
 
-        const equatorGeom = new THREE.TorusGeometry(radius, 0.05, 16, 120);
-        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x660000 });
+        // 赤道环 (Red Tube)
+        const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
+        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
-        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x004400 });
+        // 黄道环 (Green Tube)
+        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
-        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x002266 });
+        // 白道环 (Blue Tube)
+        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
 
+        // 12 地支全息天珠 (Holographic Branch Orbs)
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const nodeGeom = new THREE.SphereGeometry(0.28, 16, 16);
-            const nodeMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1 });
-            const nodeMesh = new THREE.Mesh(nodeGeom, nodeMat);
-            nodeMesh.position.copy(pos);
-            this.scene.add(nodeMesh);
+            // 天珠球
+            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
+            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
+            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
+            orbMesh.position.copy(pos);
+            this.orbsGroup.add(orbMesh);
 
+            // 天珠金环
+            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
+            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+            ringMesh.position.copy(pos);
+            ringMesh.rotation.x = Math.PI / 2;
+            this.orbsGroup.add(ringMesh);
+
+            // 全息文本标签
             const sprite = this.createTextSprite(b.name, b.color);
             sprite.position.copy(pos.clone().multiplyScalar(1.18));
-            this.scene.add(sprite);
+            this.orbsGroup.add(sprite);
         });
+    }
+
+    createSunAndMoonObjects() {
+        // ☀️ 3D 动态太阳 (Sun Sphere)
+        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
+        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0, metalness: 0.8 });
+        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
+        this.scene.add(this.sunMesh);
+
+        // 🌙 3D 动态太阴 (Moon Sphere)
+        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8, metalness: 0.9 });
+        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
+        this.scene.add(this.moonMesh);
     }
 
     createTextSprite(text, colorHex) {
@@ -163,7 +238,7 @@ class Home3DEngine {
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(16, 22, 40, 0.92)";
+        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
         ctx.beginPath();
         ctx.arc(64, 64, 52, 0, Math.PI * 2);
         ctx.fill();
@@ -185,23 +260,8 @@ class Home3DEngine {
     }
 
     highlightBranchPos(branchIdx, colorHex = 0xff5252) {
-        while (this.highlightGroup.children.length > 0) {
-            const obj = this.highlightGroup.children.pop();
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
-        }
-
         const pos = getBranch3DPos(branchIdx, 6.0);
-        const sphereGeom = new THREE.SphereGeometry(0.55, 32, 32);
-        const sphereMat = new THREE.MeshStandardMaterial({
-            color: colorHex,
-            emissive: colorHex,
-            emissiveIntensity: 0.8,
-            metalness: 0.9
-        });
-        const mesh = new THREE.Mesh(sphereGeom, sphereMat);
-        mesh.position.copy(pos);
-        this.highlightGroup.add(mesh);
+        this.sunMesh.position.copy(pos);
     }
 
     animate() {
@@ -211,13 +271,26 @@ class Home3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
+        // ☀️ 太阳沿赤道/黄道动态游走
+        this.sunAngle += 0.008;
+        const sunRadius = 6.0;
+        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
+        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
+        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
+
+        // 🌙 太阴沿白道动态游走
+        this.moonAngle -= 0.012;
+        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
+        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
+        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
+
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Home3DEngine("three-canvas-home");
+    const engine = new HomeVivid3DEngine("three-canvas-home");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -258,38 +331,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     initLuoshuTaiyi9x9Matrix();
-
-    // 首页太阳指数 10^n 快捷交互
-    const homeSlider = document.getElementById("home-power-slider");
-    const homePowerVal = document.getElementById("home-power-val");
-
-    function updateHomePower(n) {
-        const bigVal = BigInt(10) ** BigInt(n);
-        const rem81Big = bigVal % 81n;
-        const rem81 = Number(rem81Big === 0n ? 81n : rem81Big);
-        const rem12 = rem81 % 12 === 0 ? 12 : rem81 % 12;
-        const branch = EARTHLY_BRANCHES[rem12 - 1];
-
-        if (homePowerVal) {
-            homePowerVal.innerText = `10^${n} = ${Math.pow(10, n).toLocaleString()} ➔ 模81余 ${rem81} ➔ 模12余 ${rem12} (${branch.name}位·${branch.system})`;
-        }
-
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            const p = parseInt(cell.dataset.pos, 10);
-            if (p === rem81) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
-        });
-
-        engine.highlightBranchPos(branch.idx, 0xff5252);
-    }
-
-    if (homeSlider) {
-        homeSlider.addEventListener("input", (e) => {
-            updateHomePower(parseInt(e.target.value, 10));
-        });
-        updateHomePower(3); // 默认 10^3
-    }
 });
