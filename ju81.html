@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易经数理秘笈 - 用矩法·一矩至十二矩运动规律解构馆</title>
+    <!-- 引入 Google 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- 引入 Three.js 核心库与 OrbitControls 轨道控制器 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
+    <link rel="stylesheet" href="index.css?v=20260804_v13">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="logo-icon">☯</div>
+                <div class="brand-text">
+                    <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
+                    <span class="subtitle">根据梁致堂原著解构 · 用矩法·一矩至十二矩运动规律解构馆</span>
+                </div>
+            </div>
+            
+            <nav class="header-nav-tabs">
+                <a href="index.html" class="nav-tab">🏠 首页</a>
+                <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
+                <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab">✨ 5大定律</a>
+                <a href="wuxing.html" class="nav-tab">☯ 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab">📜 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab">🌀 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab">🌌 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab active">📐 用矩81</a>
+            </nav>
+        </header>
+
+        <!-- 三栏并行主容器 -->
+        <main class="main-three-split-container">
+            <!-- 栏一：3D 浑天与矩数螺旋运动仪 (34%) -->
+            <section class="col-left-3d">
+                <div class="panel-header-bar">
+                    <div class="panel-title">
+                        <span>🌌</span> 3D 矩数螺旋运动轨迹仪
+                    </div>
+                    <div class="orbit-legend">
+                        <span class="legend-item equator">● 赤道(0°)</span>
+                        <span class="legend-item ecliptic">● 黄道(+23.5°)</span>
+                        <span class="legend-item lunar">● 白道(-15°)</span>
+                    </div>
+                </div>
+
+                <div class="canvas-wrapper">
+                    <!-- 浮动控制覆盖层 -->
+                    <div class="canvas-overlay-controls">
+                        <button id="btn-toggle-equator" class="control-toggle-btn active" title="显示/隐藏赤道环 (0°)">
+                            <span class="dot red"></span> 赤道
+                        </button>
+                        <button id="btn-toggle-ecliptic" class="control-toggle-btn active" title="显示/隐藏黄道环 (23.5°)">
+                            <span class="dot green"></span> 黄道
+                        </button>
+                        <button id="btn-toggle-lunar" class="control-toggle-btn active" title="显示/隐藏白道环 (-15°)">
+                            <span class="dot blue"></span> 白道
+                        </button>
+                        <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
+                            ⚡ 速度: <span id="speed-val">1x</span>
+                        </button>
+                        <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
+                            🎯 复位视角
+                        </button>
+                        <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
+                            🔄 旋转
+                        </button>
+                    </div>
+
+                    <!-- Three.js 渲染画布 -->
+                    <div id="three-canvas-ju" style="width:100%; height:100%;"></div>
+
+                    <!-- 动态状态标签 -->
+                    <div class="trajectory-badge">
+                        <div id="ju-badge-title" class="badge-title">一矩至十二矩 3D 螺旋运动拓扑</div>
+                        <div id="ju-badge-desc" class="badge-desc">选择下方矩数（1矩 81 ~ 12矩 972），解构其在天体坐标上的递进周转</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 栏二：太乙九宫八十一宫阵图 (全页 100% 绝对统一) (33%) -->
+            <section class="col-middle-taiyi">
+                <div class="glass-panel">
+                    <div class="card-title">
+                        <span>📜</span> 太乙九宫八十一宫阵图 (用矩法降维投影)
+                    </div>
+                    <div class="law-desc-text">
+                        点击右侧矩数按钮，太乙 81 宫阵图中对应的模 81 降维落点与 3D 螺旋轨迹同步闪耀！
+                    </div>
+                </div>
+
+                <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
+            </section>
+
+            <!-- 栏三：用矩法一矩至十二矩运动规律控制台 (33%) -->
+            <section class="col-right-controls">
+                <div class="glass-panel">
+                    <div class="card-title">
+                        <span>📐</span> 原著《用矩法·矩的运动规律》权威解构
+                    </div>
+                    <div class="law-desc-text">
+                        梁致堂先生在原著中写道：“以用矩法纪天体运行。1 矩 = 81 为地气单元，4 矩 324 为下际，8 矩 648 为中际，12 矩 972 为上际天周。”
+                    </div>
+                </div>
+
+                <!-- 矩数选择按钮组 -->
+                <div class="sanhe-btn-grid" style="margin-top: 6px;">
+                    <button class="sanhe-btn ju-btn active" data-ju="1">1 矩 (81·基本矩)</button>
+                    <button class="sanhe-btn ju-btn" data-ju="2">2 矩 (162·蛊卦已位)</button>
+                    <button class="sanhe-btn ju-btn" data-ju="3">3 矩 (243·白道颐卦)</button>
+                    <button class="sanhe-btn ju-btn" data-ju="4">4 矩 (324·下际天周)</button>
+                    <button class="sanhe-btn ju-btn" data-ju="8">8 矩 (648·中际归妹)</button>
+                    <button class="sanhe-btn ju-btn" data-ju="12">12 矩 (972·上际大圆满)</button>
+                </div>
+
+                <!-- 矩数计算明细盒 -->
+                <div id="ju-detail-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                    <!-- 动态渲染 -->
+                </div>
+
+                <!-- 矩数运动规律表格 -->
+                <div class="glass-panel" style="margin-top: 6px;">
+                    <div class="card-title"><span>📋</span> 原著 1~12 矩天际行数与归属大表</div>
+                    <div class="sequence-table-container" style="max-height: 200px;">
+                        <table class="seq-table">
+                            <thead>
+                                <tr>
+                                    <th>矩数</th>
+                                    <th>气数算式</th>
+                                    <th>数值</th>
+                                    <th>所在行次</th>
+                                    <th>对应序卦</th>
+                                    <th>三际周天归属</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1 矩</td><td>81 × 1</td><td>81</td><td>第 9 行</td><td>81九 (太乙矩)</td><td>基本方阵单元</td></tr>
+                                <tr><td>2 矩</td><td>81 × 2</td><td>162</td><td>第 18 行</td><td>18九2 (蛊卦)</td><td>巳亥地户天门交会</td></tr>
+                                <tr><td>3 矩</td><td>81 × 3</td><td>243</td><td>第 27 行</td><td>27九3 (颐卦)</td><td>白道坐标系主轴</td></tr>
+                                <tr><td>4 矩</td><td>81 × 4</td><td>324</td><td>第 27 行下</td><td>36九4 (明夷卦)</td><td style="color:#40c057; font-weight:700;">下际天周 (324+36=360°)</td></tr>
+                                <tr><td>8 矩</td><td>81 × 8</td><td>648</td><td>第 54 行中</td><td>54九6 (归妹卦)</td><td style="color:#ffe066; font-weight:700;">中际天周 (天地大义)</td></tr>
+                                <tr><td>12 矩</td><td>81 × 12</td><td>972</td><td>第 81 行上</td><td>81九9 (大矩)</td><td style="color:#ff5252; font-weight:700;">上际天周 (12矩大圆满)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 用矩法引擎 (带版本防缓存) -->
+    <script src="ju81.js?v=20260804_v13"></script>
+</body>
+</html>

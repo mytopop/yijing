@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》全局精美样式表 (index.css)
-   特点：右上角导航栏 100% 绝对镜像固定为 9 个专业 Tab，首页包含 9 大门户卡片
+   特点：右上角导航栏 100% 绝对镜像固定为 10 个专业 Tab，首页包含 10 大门户卡片
    ========================================================================== */
 
 :root {
@@ -91,11 +91,11 @@ body {
     white-space: nowrap;
 }
 
-/* 右上角多页导航 Navigation Tabs (100% 精确对齐截图样式) */
+/* 右上角多页导航 Navigation Tabs (100% 精确对齐 10 大 Tab 样式) */
 .header-nav-tabs {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: nowrap;
     overflow-x: auto;
     padding: 2px 0;
@@ -108,12 +108,12 @@ body {
 .nav-tab {
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding: 6px 12px;
+    gap: 4px;
+    padding: 5px 10px;
     border-radius: 8px;
     color: #cbd5e1;
     text-decoration: none;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
     transition: all 0.25s ease;
@@ -648,7 +648,7 @@ input[type="number"] {
     font-family: var(--font-sans);
 }
 
-/* 首页 9 大门户卡片 Portal Cards */
+/* 首页 10 大门户卡片 Portal Cards */
 .home-portal-grid {
     display: grid;
     grid-template-columns: 1fr;
