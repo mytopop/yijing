@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》天象五大定律与太阳指数 10^n 核心算法 - (laws.js)
-   特点：包含 10^n 太阳赤道守恒律、北斗芒星阵、360°归九律、地支三合局与天地门轴线
+   《易经数理秘笈》天象五大定律核心引擎 (laws.js)
+   特点：全量绑定五大定律所有交互按钮 (10^n滑块、芒星阵、周天归九、三合局、天地门轴线)
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -61,6 +61,7 @@ class Laws3DEngine {
         this.nodesGroup = new THREE.Group();
 
         this.autoRotate = true;
+        this.pulseSpeedMultiplier = 1.0;
 
         this.initScene();
         this.createArmillaryRings();
@@ -209,6 +210,73 @@ class Laws3DEngine {
         this.laws3DGroup.add(mesh);
     }
 
+    renderStar7Line() {
+        this.clearLaws3DGroup();
+        const points = [];
+        for (let k = 1; k <= 12; k++) {
+            const val = 7 * k;
+            const rem12 = val % 12 === 0 ? 12 : val % 12;
+            points.push(getBranch3DPos(rem12 - 1));
+        }
+        points.push(points[0]);
+
+        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
+        const line = new THREE.Line(geom, mat);
+        this.laws3DGroup.add(line);
+
+        points.forEach(p => {
+            const sGeom = new THREE.SphereGeometry(0.35, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xaa7c11 });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.laws3DGroup.add(sMesh);
+        });
+    }
+
+    renderSanheTriangle(branchIndices, colorHex) {
+        this.clearLaws3DGroup();
+        const p1 = getBranch3DPos(branchIndices[0]);
+        const p2 = getBranch3DPos(branchIndices[1]);
+        const p3 = getBranch3DPos(branchIndices[2]);
+        const points = [p1, p2, p3, p1];
+
+        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 3 });
+        const line = new THREE.Line(geom, mat);
+        this.laws3DGroup.add(line);
+
+        points.slice(0, 3).forEach(p => {
+            const sGeom = new THREE.SphereGeometry(0.45, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: colorHex, emissive: colorHex });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.laws3DGroup.add(sMesh);
+        });
+    }
+
+    renderYongjingAxis() {
+        this.clearLaws3DGroup();
+        const pSi = getBranch3DPos(5);  // 巳位 (5)
+        const pHai = getBranch3DPos(11); // 亥位 (11)
+
+        const points = [pSi, pHai];
+        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = new THREE.LineDashedMaterial({ color: 0x4dabf7, dashSize: 0.3, gapSize: 0.1, linewidth: 3 });
+        const line = new THREE.Line(geom, mat);
+        line.computeLineDistances();
+        this.laws3DGroup.add(line);
+
+        [pSi, pHai].forEach((p, idx) => {
+            const color = idx === 0 ? 0x4dabf7 : 0xff5252;
+            const sGeom = new THREE.SphereGeometry(0.5, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: color, emissive: color });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.laws3DGroup.add(sMesh);
+        });
+    }
+
     animate() {
         requestAnimationFrame(() => this.animate());
 
@@ -258,7 +326,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
+    const lawBadgeTitle = document.getElementById("law-badge-title");
+    const lawBadgeDesc = document.getElementById("law-badge-desc");
+
+    // -------------------------------------------------------------
     // 规律一：10^n 太阳赤道守恒律
+    // -------------------------------------------------------------
     const powerSlider = document.getElementById("power-slider");
     const powerValLabel = document.getElementById("power-val-label");
     const law1ResultBox = document.getElementById("law1-result-box");
@@ -273,20 +346,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const rem12 = rem81 % 12 === 0 ? 12 : rem81 % 12;
         const branch = EARTHLY_BRANCHES[rem12 - 1];
 
-        law1ResultBox.innerHTML = `
-            <div style="font-size: 13px; font-weight: 700; color: #ff5252; margin-bottom: 4px;">
-                ☀️ 10^${n} 算式降维结果：
-            </div>
-            <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
-                • 原始数据: <strong>10^${n}</strong><br>
-                • 太乙 81 降维: 10^${n} % 81 = <strong>${rem81} 号宫</strong><br>
-                • 地支 12 位映射: ${rem81} % 12 = <strong>余 ${rem12}</strong><br>
-                • 对应地支与坐标: <span style="color:${branch.color}; font-weight:800;">${branch.name}位 · ${branch.system}</span>
-            </div>
-            <div style="margin-top: 6px; font-size: 11px; color: #ffe066; background: rgba(255,82,82,0.15); padding: 4px 8px; border-radius: 4px;">
-                必杀结论：余数 ${rem12} 属于【${branch.name}】位，100% 严格恒落在<strong>赤道(天)坐标系</strong>！
-            </div>
-        `;
+        if (law1ResultBox) {
+            law1ResultBox.innerHTML = `
+                <div style="font-size: 13px; font-weight: 700; color: #ff5252; margin-bottom: 4px;">
+                    ☀️ 10^${n} 算式降维结果：
+                </div>
+                <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
+                    • 原始数据: <strong>10^${n}</strong><br>
+                    • 太乙 81 降维: 10^${n} % 81 = <strong>${rem81} 号宫</strong><br>
+                    • 地支 12 位映射: ${rem81} % 12 = <strong>余 ${rem12}</strong><br>
+                    • 对应地支与坐标: <span style="color:${branch.color}; font-weight:800;">${branch.name}位 · ${branch.system}</span>
+                </div>
+                <div style="margin-top: 6px; font-size: 11px; color: #ffe066; background: rgba(255,82,82,0.15); padding: 4px 8px; border-radius: 4px;">
+                    必杀结论：余数 ${rem12} 属于【${branch.name}】位，100% 严格恒落在<strong>赤道(天)坐标系</strong>！
+                </div>
+            `;
+        }
 
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
             const p = parseInt(cell.dataset.pos, 10);
@@ -298,6 +373,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         engine.highlightBranchPos(branch.idx, 0xff5252);
+        if (lawBadgeTitle) lawBadgeTitle.innerText = `☀️ 10^${n} 太阳赤道守恒律`;
+        if (lawBadgeDesc) lawBadgeDesc.innerText = `余数 ${rem12} 对应【${branch.name}】位，属于赤道(天)正位！`;
     }
 
     if (powerSlider) {
@@ -306,5 +383,196 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    updateLaw1(3); // 默认展示 10^3
+    // -------------------------------------------------------------
+    // 规律二：数 7 · 北斗七星芒星律 (绑定 btn-demo-star7)
+    // -------------------------------------------------------------
+    const btnDemoStar7 = document.getElementById("btn-demo-star7");
+    let isStar7Active = false;
+
+    if (btnDemoStar7) {
+        btnDemoStar7.addEventListener("click", () => {
+            isStar7Active = !isStar7Active;
+            if (isStar7Active) {
+                btnDemoStar7.classList.add("active");
+                engine.renderStar7Line();
+
+                document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.add("active-pos"));
+                if (lawBadgeTitle) lawBadgeTitle.innerText = "✨ 数 7 · 北斗七星芒星律 3D 轨迹";
+                if (lawBadgeDesc) lawBadgeDesc.innerText = "按 7 × k 顺次环绕 12 地支，赤黄白三道连成 12 芒星阵";
+            } else {
+                btnDemoStar7.classList.remove("active");
+                engine.clearLaws3DGroup();
+                document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+                updateLaw1(powerSlider ? parseInt(powerSlider.value, 10) : 3);
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // 规律三：360° 周天分割归九律 (绑定 split-slider & btn-demo-law3)
+    // -------------------------------------------------------------
+    const splitSlider = document.getElementById("split-slider");
+    const splitValLabel = document.getElementById("split-val-label");
+    const law3ResultBox = document.getElementById("law3-result-box");
+    const btnDemoLaw3 = document.getElementById("btn-demo-law3");
+
+    const splitValues = [
+        { parts: 1, deg: "360°", expr: "3 + 6 + 0", sum: "9" },
+        { parts: 2, deg: "180°", expr: "1 + 8 + 0", sum: "9" },
+        { parts: 4, deg: "90°",  expr: "9 + 0",     sum: "9" },
+        { parts: 8, deg: "45°",  expr: "4 + 5",     sum: "9" },
+        { parts: 16, deg: "22.5°", expr: "2 + 2 + 5", sum: "9" },
+        { parts: 32, deg: "11.25°", expr: "1 + 1 + 2 + 5", sum: "9" },
+        { parts: 64, deg: "5.625°", expr: "5 + 6 + 2 + 5 = 18 ➔ 1 + 8", sum: "9" }
+    ];
+
+    function updateLaw3(idx) {
+        const item = splitValues[idx] || splitValues[0];
+        if (splitValLabel) splitValLabel.innerText = `${item.parts} 份 (${item.deg})`;
+
+        if (law3ResultBox) {
+            law3ResultBox.innerHTML = `
+                <div style="font-size: 13px; font-weight: 700; color: #ffe066; margin-bottom: 4px;">
+                    🌀 ${item.deg} 众和归九演算：
+                </div>
+                <div style="font-size: 12px; color: #cbd5e1; font-family: var(--font-times);">
+                    • 数值算式: ${item.expr}<br>
+                    • 众和极数: <strong style="color:#ffe066; font-size:14px;">${item.sum}</strong> (归于离九宫)
+                </div>
+            `;
+        }
+
+        const targetNinePositions = [9, 18, 27, 36, 45, 54, 63, 72, 81];
+        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+            const p = parseInt(cell.dataset.pos, 10);
+            if (targetNinePositions.includes(p)) {
+                cell.classList.add("active-pos");
+            } else {
+                cell.classList.remove("active-pos");
+            }
+        });
+
+        if (lawBadgeTitle) lawBadgeTitle.innerText = `🌀 周天 ${item.deg} 切割归九律`;
+        if (lawBadgeDesc) lawBadgeDesc.innerText = `数位众和数 ${item.expr} 恒无条件收敛归于 9！`;
+    }
+
+    if (splitSlider) {
+        splitSlider.addEventListener("input", (e) => {
+            updateLaw3(parseInt(e.target.value, 10));
+        });
+    }
+
+    if (btnDemoLaw3) {
+        btnDemoLaw3.addEventListener("click", () => {
+            const currentIdx = splitSlider ? parseInt(splitSlider.value, 10) : 0;
+            updateLaw3(currentIdx);
+        });
+    }
+
+    // -------------------------------------------------------------
+    // 规律四：地支三合局 3D 能量三角形 (绑定 .sanhe-btn)
+    // -------------------------------------------------------------
+    const SANHE_MAP = {
+        wood:  { name: "亥卯未 (木局)", color: "#40c057", branches: [11, 3, 7] },
+        fire:  { name: "寅午戌 (火局)", color: "#ff5252", branches: [2, 6, 10] },
+        metal: { name: "巳酉丑 (金局)", color: "#dee2e6", branches: [5, 9, 1] },
+        water: { name: "申子辰 (水局)", color: "#4dabf7", branches: [8, 0, 4] }
+    };
+
+    document.querySelectorAll(".sanhe-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(".sanhe-btn").forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+
+            const key = this.dataset.sanhe;
+            const data = SANHE_MAP[key];
+            if (!data) return;
+
+            engine.renderSanheTriangle(data.branches, parseInt(data.color.replace('#', '0x'), 16));
+
+            document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+                const p = parseInt(cell.dataset.pos, 10);
+                const rem12 = p % 12 === 0 ? 12 : p % 12;
+                if (data.branches.includes(rem12 - 1)) {
+                    cell.classList.add("active-pos");
+                } else {
+                    cell.classList.remove("active-pos");
+                }
+            });
+
+            if (lawBadgeTitle) lawBadgeTitle.innerText = `🔺 地支三合局 · ${data.name}`;
+            if (lawBadgeDesc) lawBadgeDesc.innerText = `在 3D 浑天坐标球上构建稳固的 ${data.name} 能量三角形`;
+        });
+    });
+
+    // -------------------------------------------------------------
+    // 规律五：永静数 6 天地门轴线 (绑定 btn-demo-yongjing)
+    // -------------------------------------------------------------
+    const btnDemoYongjing = document.getElementById("btn-demo-yongjing");
+    let isYongjingActive = false;
+
+    if (btnDemoYongjing) {
+        btnDemoYongjing.addEventListener("click", () => {
+            isYongjingActive = !isYongjingActive;
+            if (isYongjingActive) {
+                btnDemoYongjing.classList.add("active");
+                engine.renderYongjingAxis();
+
+                const yongjingPos = [6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78];
+                document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+                    const p = parseInt(cell.dataset.pos, 10);
+                    if (yongjingPos.includes(p)) {
+                        cell.classList.add("active-pos");
+                    } else {
+                        cell.classList.remove("active-pos");
+                    }
+                });
+
+                if (lawBadgeTitle) lawBadgeTitle.innerText = "🚪 永静数 6 天地门轴线";
+                if (lawBadgeDesc) lawBadgeDesc.innerText = "6 × 奇数落巳位 (地户)，6 × 偶数落亥位 (天门)，贯穿天地门轴线";
+            } else {
+                btnDemoYongjing.classList.remove("active");
+                engine.clearLaws3DGroup();
+                document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+                updateLaw1(powerSlider ? parseInt(powerSlider.value, 10) : 3);
+            }
+        });
+    }
+
+    // 顶部通用控件
+    const btnSpeed = document.getElementById("btn-speed-control");
+    const speedVal = document.getElementById("speed-val");
+    const speedLevels = [0.5, 1.0, 2.0, 4.0];
+    let currentSpeedIdx = 1;
+
+    if (btnSpeed) {
+        btnSpeed.addEventListener("click", () => {
+            currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
+            const level = speedLevels[currentSpeedIdx];
+            engine.pulseSpeedMultiplier = level;
+            if (speedVal) speedVal.innerText = `${level}x`;
+        });
+    }
+
+    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.equatorGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.eclipticGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.lunarGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-reset-view").addEventListener("click", () => {
+        engine.adjustCameraFit();
+    });
+    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.autoRotate = this.classList.contains("active");
+    });
+
+    updateLaw1(3); // 默认初始化规律一 (10^3)
 });

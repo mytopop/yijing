@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v9">
+    <link rel="stylesheet" href="index.css?v=20260804_v11">
 </head>
 <body>
     <div class="app-container">
@@ -84,8 +84,8 @@
 
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
-                        <div id="law-badge-title" class="badge-title">☀️ 10^n 太阳赤道守恒律试炼场</div>
-                        <div id="law-badge-desc" class="badge-desc">太阳能量 10^n 经 81 降维后再模 12，余数 100% 恒落在赤道正位 (子/卯/午/酉)</div>
+                        <div id="law-badge-title" class="badge-title">天象数理五大定律演示</div>
+                        <div id="law-badge-desc" class="badge-desc">点击下方规律按钮，查看天体运动与数理律动的 3D 映射</div>
                     </div>
                 </div>
             </section>
@@ -97,7 +97,7 @@
                         <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
                     </div>
                     <div class="law-desc-text">
-                        拖动右侧【太阳指数 10^n】滑块，太乙 81 宫阵图中对应的赤道降维宫数（10, 19, 28, 37, 46, 55, 64, 73 号位）同步闪耀！
+                        点击右侧五大定律控制按钮，太乙 81 宫阵图中对应的宫数同步亮起！
                     </div>
                 </div>
 
@@ -106,16 +106,16 @@
 
             <!-- 栏三：天象五大规律控制台 (33%) -->
             <section class="col-right-controls">
-                <!-- 重点突出：规律一：10^n 太阳赤道守恒律 -->
+                <!-- 规律一：10^n 太阳赤道守恒律 -->
                 <div class="glass-panel" style="border-color: rgba(255, 82, 82, 0.6); background: rgba(255, 82, 82, 0.08);">
                     <div class="card-title" style="color: #ff5252;">
-                        <span>☀️</span> 【重点展示】规律一：10^n 太阳赤道守恒律
+                        <span>☀️</span> 规律一：10^n 太阳赤道守恒律
                     </div>
                     <div class="law-desc-text">
-                        梁致堂先生原著核心观点：太阳能量以 $10^n$ 指数爆发，经矩 81 降维后再模 12 地支，余数 **100% 严格恒定落入赤道四正位（子、卯、午、酉）**！
+                        太阳能量 $10^n$ 经矩 81 降维后再模 12 地支，余数 **100% 严格恒落赤道四正位（子、卯、午、酉）**！
                     </div>
                     <div style="margin-top: 8px;">
-                        <label style="font-size: 11px; color: #ffe066; font-weight: 700;">🎛️ 请拖动选择太阳指数 n (10^n):</label>
+                        <label style="font-size: 11px; color: #ffe066; font-weight: 700;">🎛️ 拖动选择太阳指数 n (10^n):</label>
                         <input type="range" id="power-slider" min="1" max="10" value="3" style="width: 100%; margin-top: 4px;">
                         <div id="power-val-label" style="text-align: right; font-size: 13px; color: #ffe066; font-weight: 800; font-family: var(--font-times);">
                             10^3 = 1,000
@@ -132,7 +132,7 @@
                         <span>✨</span> 规律二：数 7 · 北斗七星芒星律
                     </div>
                     <div class="law-desc-text">
-                        按 7 × n 顺次经过 12 地支方位，在 3D 天球上勾勒出北斗七星十二芒星阵图。
+                        按 7 × k 顺次经过 12 地支方位，在 3D 天球上勾勒出北斗七星十二芒星阵图。
                     </div>
                     <button id="btn-demo-star7" class="action-btn-gold" style="margin-top: 6px;">
                         🌌 开启/取消 3D 北斗芒星阵
@@ -189,6 +189,6 @@
     </div>
 
     <!-- 规律引擎 (带版本防缓存) -->
-    <script src="laws.js?v=20260804_v9"></script>
+    <script src="laws.js?v=20260804_v11"></script>
 </body>
 </html>
