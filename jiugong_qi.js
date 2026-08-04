@@ -539,6 +539,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // 实时监听七行参数输入框改变，自动实时更新大表与 3D 降维
+    for (let i = 1; i <= 7; i++) {
+        const inputEl = document.getElementById(`qi7-input-${i}`);
+        if (inputEl) {
+            inputEl.addEventListener("input", () => {
+                run7ValuesCalculation();
+            });
+        }
+    }
+
     if (btnCalculate) {
         btnCalculate.addEventListener("click", () => {
             run7ValuesCalculation();

@@ -513,6 +513,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 450);
     }
 
+    // 实时监听输入更改 (手动输入数字时自动实时更新推演与 3D 轨迹)
+    if (numInput) {
+        numInput.addEventListener("input", function() {
+            const val = parseInt(this.value, 10);
+            if (!isNaN(val) && val > 0) {
+                calculatePipeline(val);
+            }
+        });
+        numInput.addEventListener("keyup", function(e) {
+            if (e.key === "Enter") {
+                calculatePipeline(this.value);
+                animate5StepsDeduction();
+            }
+        });
+    }
+
     // 按钮点击：推演数理 / 再次点击取消 (Toggle Off)
     if (btnCalculate) {
         btnCalculate.addEventListener("click", () => {
