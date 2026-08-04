@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>易经数理秘笈 - 九宫纪·七输入一览表解构馆</title>
+    <title>易经数理秘笈 - 九宫七输入通用推演解构馆</title>
     <!-- 引入 Google 字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,13 +18,13 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 统一 100% 结构固定 Header 顶栏 -->
+        <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
                 <div class="logo-icon">☯</div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
-                    <span class="subtitle">根据梁致堂原著解构 · 九宫纪·七输入一览表解构馆</span>
+                    <span class="subtitle">根据梁致堂原著解构 · 九宫七输入通用推演解构馆</span>
                 </div>
             </div>
             
@@ -44,16 +44,16 @@
 
         <!-- 三栏并行主容器 -->
         <main class="main-three-split-container">
-            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <!-- 栏一：纯粹数理逻辑 3D 浑天天象坐标仪 (34%) -->
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪
+                        <span>🌌</span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
-                        <span class="legend-item equator">● 赤道(天)</span>
-                        <span class="legend-item ecliptic">● 黄道(地)</span>
-                        <span class="legend-item lunar">● 白道(万物)</span>
+                        <span class="legend-item equator">● 赤道(0°)</span>
+                        <span class="legend-item ecliptic">● 黄道(+23.5°)</span>
+                        <span class="legend-item lunar">● 白道(-15°)</span>
                     </div>
                 </div>
 
@@ -81,12 +81,12 @@
                     </div>
 
                     <!-- Three.js 渲染画布 -->
-                    <div id="three-canvas-qi" style="width:100%; height:100%;"></div>
+                    <div id="three-canvas-jiugong_qi" style="width:100%; height:100%;"></div>
 
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
-                        <div class="badge-title">七输入 3D 天球落点系统</div>
-                        <div class="badge-desc">呈现七输入算式在 12 地支与赤黄白三轨上的映射</div>
+                        <div id="jiugong-qi-badge-title" class="badge-title">七输入 3D 天体推演轨迹</div>
+                        <div id="jiugong-qi-badge-desc" class="badge-desc">输入 7 行任意参数，算法自动生成 3D 空间闭环与太乙 81 宫矩阵投影</div>
                     </div>
                 </div>
             </section>
@@ -98,57 +98,64 @@
                         <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
                     </div>
                     <div class="law-desc-text">
-                        点击任意数字单元格，在右侧可即时解构原书《七输入一览表》的 7 行递进演算！
+                        七行参数经太乙 81 降维后，对应的宫位在太乙 81 宫阵图中同步点亮。
                     </div>
                 </div>
 
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：七输入一览表解构控制台 (33%) -->
+            <!-- 栏三：九宫七输入算法控制台 (33%) -->
             <section class="col-right-controls">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>📜</span> 什么是《九宫纪·七输入一览表》？
+                        <span>✍️</span> 九宫 7 行通用参数输入面板
                     </div>
-                    <div class="law-desc-text">
-                        梁致堂先生在原著中指出：<strong>“七”是圆周分割与子午律的特殊工具数</strong>。七输入即以任意宫位数 N 为首行，顺次按 $N + (k-1) \times 81$ 延伸 7 行，揭示天体气数在 12 地支间的严密循环。
+                    <div style="font-size: 11.5px; color: #94a3b8; margin-bottom: 6px;">
+                        原书 P334 论述：“凡一切人事天道，皆可归纳为 7 行进退算法”。请输入 7 个正整数：
                     </div>
+
+                    <div class="sanhe-btn-grid" style="grid-template-columns: repeat(4, 1fr); gap: 4px;">
+                        <input type="number" id="qi7-input-1" class="custom-input" value="9" placeholder="行1">
+                        <input type="number" id="qi7-input-2" class="custom-input" value="18" placeholder="行2">
+                        <input type="number" id="qi7-input-3" class="custom-input" value="27" placeholder="行3">
+                        <input type="number" id="qi7-input-4" class="custom-input" value="36" placeholder="行4">
+                        <input type="number" id="qi7-input-5" class="custom-input" value="45" placeholder="行5">
+                        <input type="number" id="qi7-input-6" class="custom-input" value="54" placeholder="行6">
+                        <input type="number" id="qi7-input-7" class="custom-input" value="63" placeholder="行7">
+                    </div>
+
+                    <button id="btn-qi7-calculate" class="action-btn" style="margin-top: 8px; width: 100%;">
+                        🚀 执行七行算法 3D 降维推演
+                    </button>
                 </div>
 
-                <!-- 7 行算式表格 -->
+                <!-- 七行算式推演结果大表 -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title">
-                        <span>📋</span> 所选数值的 7 行输入拆解明细
-                    </div>
-                    
-                    <div class="sequence-table-container" style="max-height: 250px;">
+                    <div class="card-title"><span>📊</span> 七行参数太乙 81 降维明细表</div>
+                    <div class="sequence-table-container" style="max-height: 260px;">
                         <table class="seq-table">
                             <thead>
                                 <tr>
                                     <th>行次</th>
-                                    <th>算式</th>
-                                    <th>数值</th>
-                                    <th>模12</th>
+                                    <th>输入值</th>
+                                    <th>太乙81宫</th>
                                     <th>地支</th>
-                                    <th>三元轨道</th>
+                                    <th>坐标系</th>
+                                    <th>极数</th>
                                 </tr>
                             </thead>
-                            <tbody id="qi-table-body">
-                                <!-- 动态插入 -->
+                            <tbody id="qi7-table-body">
+                                <!-- JS 动态渲染 -->
                             </tbody>
                         </table>
                     </div>
-                </div>
-
-                <div id="qi-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
-                    <!-- 动态渲染 -->
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- 七输入引擎 (带版本防缓存) -->
-    <script src="jiugong_qi.js?v=20260804_v6"></script>
+    <!-- 九宫七输入引擎 (带版本防缓存) -->
+    <script src="jiugong_qi.js?v=20260804_v17"></script>
 </body>
 </html>

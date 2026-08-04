@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》周天 360° 气数全景解构馆 - (zhoutian360.js)
-   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 原书 4 大表格解构
+   特点：纯粹数理逻辑 3D 浑天坐标体系 + 4 大原书表格交互与防崩防御逻辑
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,9 +43,11 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class Zhoutian360Vivid3DEngine {
+class ZhoutianPureMath3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        if (!this.container) return;
+
         this.width = this.container.clientWidth || 400;
         this.height = this.container.clientHeight || 500;
 
@@ -59,17 +61,13 @@ class Zhoutian360Vivid3DEngine {
         this.lunarGroup = new THREE.Group();
         this.celestialGridGroup = new THREE.Group();
         this.orbsGroup = new THREE.Group();
+        this.trajectoryGroup = new THREE.Group();
 
-        this.sunMesh = null;
-        this.moonMesh = null;
-        this.sunAngle = 0;
-        this.moonAngle = 0;
         this.autoRotate = true;
 
         this.initScene();
         this.createArmillaryRings();
         this.createCelestialGridAndPoles();
-        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -99,6 +97,7 @@ class Zhoutian360Vivid3DEngine {
         this.scene.add(this.lunarGroup);
         this.scene.add(this.celestialGridGroup);
         this.scene.add(this.orbsGroup);
+        this.scene.add(this.trajectoryGroup);
     }
 
     adjustCameraFit() {
@@ -198,18 +197,6 @@ class Zhoutian360Vivid3DEngine {
         });
     }
 
-    createSunAndMoonObjects() {
-        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
-        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
-        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
-        this.scene.add(this.sunMesh);
-
-        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
-        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
-        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
-        this.scene.add(this.moonMesh);
-    }
-
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
@@ -237,6 +224,52 @@ class Zhoutian360Vivid3DEngine {
         return sprite;
     }
 
+    clearTrajectoryGroup() {
+        while (this.trajectoryGroup.children.length > 0) {
+            const obj = this.trajectoryGroup.children.pop();
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) obj.material.dispose();
+        }
+    }
+
+    render4XiangSquare() {
+        this.clearTrajectoryGroup();
+        const branchIndices = [5, 6, 9, 11, 5]; // 巳(5), 午(6), 酉(9), 亥(11)
+        const points = branchIndices.map(idx => getBranch3DPos(idx));
+
+        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
+        const line = new THREE.Line(geom, mat);
+        this.trajectoryGroup.add(line);
+
+        points.slice(0, 4).forEach(p => {
+            const sGeom = new THREE.SphereGeometry(0.45, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: 0xff5252, emissive: 0xff5252 });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.trajectoryGroup.add(sMesh);
+        });
+    }
+
+    render60JieHexagon() {
+        this.clearTrajectoryGroup();
+        const hexIndices = [0, 2, 4, 6, 8, 10, 0]; // 子, 寅, 辰, 午, 申, 戌
+        const points = hexIndices.map(idx => getBranch3DPos(idx));
+
+        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = new THREE.LineBasicMaterial({ color: 0x40c057, linewidth: 3 });
+        const line = new THREE.Line(geom, mat);
+        this.trajectoryGroup.add(line);
+
+        points.slice(0, 6).forEach(p => {
+            const sGeom = new THREE.SphereGeometry(0.4, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: 0x40c057, emissive: 0x006600 });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.trajectoryGroup.add(sMesh);
+        });
+    }
+
     animate() {
         requestAnimationFrame(() => this.animate());
 
@@ -244,24 +277,13 @@ class Zhoutian360Vivid3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        this.sunAngle += 0.008;
-        const sunRadius = 6.0;
-        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
-        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
-        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
-
-        this.moonAngle -= 0.012;
-        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
-        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
-        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
-
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
+        if (this.controls) this.controls.update();
+        if (this.renderer) this.renderer.render(this.scene, this.camera);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Zhoutian360Vivid3DEngine("three-canvas-zhoutian360");
+    const engine = new ZhoutianPureMath3DEngine("three-canvas-zhoutian360");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -297,32 +319,61 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
-    const tabBtns = document.querySelectorAll(".zhoutian-tab-btn");
-    const contentPanels = document.querySelectorAll(".zhoutian-content-panel");
     const badgeTitle = document.getElementById("zhoutian-badge-title");
     const badgeDesc = document.getElementById("zhoutian-badge-desc");
 
-    const BADGE_INFO = {
-        "panel-table-1": { title: "4 象 90° 质变与 4 个 81 矩映射表", desc: "解构 90° 质变节点在太乙 81 宫的阵图投影" },
-        "panel-table-2": { title: "6 × 60° 节卦六步周转与 60 花甲子表", desc: "节卦 6 律周转，每步 60°，6 步完成 360° 周天大循环" },
-        "panel-table-3": { title: "九宫范畴对 12 方位 3 大坐标系 81 矩表", desc: "展现坎水一宫、离火九宫等在赤黄白三道的气数控制" },
-        "panel-table-4": { title: "周天 360° 连续对半分割归九收敛表", desc: "从 360° 到 0.703125° 连续 9 次对半分割，众和极数恒为 9" }
-    };
+    const tabBtns = document.querySelectorAll(".zhoutian-tab-btn");
+    const panels = document.querySelectorAll(".zhoutian-content-panel");
+
+    function switchTablePanel(targetId) {
+        panels.forEach(p => p.style.display = "none");
+        tabBtns.forEach(b => b.classList.remove("active"));
+
+        const activeBtn = document.querySelector(`.zhoutian-tab-btn[data-target="${targetId}"]`);
+        if (activeBtn) activeBtn.classList.add("active");
+
+        const targetPanel = document.getElementById(targetId);
+        if (targetPanel) targetPanel.style.display = "block";
+
+        document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+
+        if (targetId === "panel-table-1") {
+            if (badgeTitle) badgeTitle.innerText = "表1 · 4 象 90° 质变与 4 个 81 矩映射";
+            if (badgeDesc) badgeDesc.innerText = "90° 巳位(地户)、180° 午/未位、270° 酉位、360° 亥位(天门)";
+            engine.render4XiangSquare();
+            highlightPositions([81]);
+        } else if (targetId === "panel-table-2") {
+            if (badgeTitle) badgeTitle.innerText = "表2 · 6 × 60° 节卦六步周转表";
+            if (badgeDesc) badgeDesc.innerText = "按黄钟(子)、太簇(寅)、姑洗(辰)、蕤宾(午)、夷则(申)、无射(戌)六步构成 360° 等角大周天";
+            engine.render60JieHexagon();
+            highlightPositions([60, 81]);
+        } else if (targetId === "panel-table-3") {
+            if (badgeTitle) badgeTitle.innerText = "表3 · 81 矩九宫分属完整表";
+            if (badgeDesc) badgeDesc.innerText = "12 方位 3 大坐标系全部 81 矩气数在太乙 9 宫完美落位";
+            engine.clearTrajectoryGroup();
+            highlightPositions([1, 9, 81]);
+        } else if (targetId === "panel-table-4") {
+            if (badgeTitle) badgeTitle.innerText = "表4 · 360° 连续对半分割归九表";
+            if (badgeDesc) badgeDesc.innerText = "360° ➔ 180° ➔ 90° ➔ 45° ➔ 22.5° ➔ 11.25° ➔ 5.625° 众和数恒无条件收敛归于 9！";
+            engine.clearTrajectoryGroup();
+            highlightPositions([9, 18, 27, 36, 45, 54, 63, 72, 81]);
+        }
+    }
+
+    function highlightPositions(posList) {
+        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+            const p = parseInt(cell.dataset.pos, 10);
+            if (posList.includes(p)) {
+                cell.classList.add("active-pos");
+            } else {
+                cell.classList.remove("active-pos");
+            }
+        });
+    }
 
     tabBtns.forEach(btn => {
         btn.addEventListener("click", function() {
-            tabBtns.forEach(b => b.classList.remove("active"));
-            this.classList.add("active");
-
-            const targetId = this.dataset.target;
-            contentPanels.forEach(panel => {
-                panel.style.display = (panel.id === targetId) ? "block" : "none";
-            });
-
-            if (BADGE_INFO[targetId]) {
-                badgeTitle.innerText = BADGE_INFO[targetId].title;
-                badgeDesc.innerText = BADGE_INFO[targetId].desc;
-            }
+            switchTablePanel(this.dataset.target);
         });
     });
 
@@ -339,23 +390,40 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.equatorGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.eclipticGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.lunarGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-reset-view").addEventListener("click", () => {
-        engine.adjustCameraFit();
-    });
-    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.autoRotate = this.classList.contains("active");
-    });
+    const btnEq = document.getElementById("btn-toggle-equator");
+    if (btnEq) {
+        btnEq.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.equatorGroup) engine.equatorGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnEc = document.getElementById("btn-toggle-ecliptic");
+    if (btnEc) {
+        btnEc.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.eclipticGroup) engine.eclipticGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnLu = document.getElementById("btn-toggle-lunar");
+    if (btnLu) {
+        btnLu.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.lunarGroup) engine.lunarGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnReset = document.getElementById("btn-reset-view");
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            engine.adjustCameraFit();
+        });
+    }
+    const btnRot = document.getElementById("btn-toggle-autorotate");
+    if (btnRot) {
+        btnRot.addEventListener("click", function() {
+            this.classList.toggle("active");
+            engine.autoRotate = this.classList.contains("active");
+        });
+    }
+
+    switchTablePanel("panel-table-1");
 });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>易经数理秘笈 - 周天 360° 气数与九宫范畴全景解构馆</title>
+    <title>易经数理秘笈 - 周天 360° 气数全景解构馆</title>
     <!-- 引入 Google 字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,13 +18,13 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 统一 100% 结构固定 Header 顶栏 -->
+        <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
                 <div class="logo-icon">☯</div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
-                    <span class="subtitle">根据梁致堂原著解构 · 周天 360° 气数与原书表格解构馆</span>
+                    <span class="subtitle">根据梁致堂原著解构 · 周天 360° 气数全景解构馆</span>
                 </div>
             </div>
             
@@ -44,16 +44,16 @@
 
         <!-- 三栏并行主容器 -->
         <main class="main-three-split-container">
-            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <!-- 栏一：纯粹数理逻辑 3D 浑天天象坐标仪 (34%) -->
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪
+                        <span>🌌</span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
-                        <span class="legend-item equator">● 赤道(天)</span>
-                        <span class="legend-item ecliptic">● 黄道(地)</span>
-                        <span class="legend-item lunar">● 白道(万物)</span>
+                        <span class="legend-item equator">● 赤道(0°)</span>
+                        <span class="legend-item ecliptic">● 黄道(+23.5°)</span>
+                        <span class="legend-item lunar">● 白道(-15°)</span>
                     </div>
                 </div>
 
@@ -81,12 +81,12 @@
                     </div>
 
                     <!-- Three.js 渲染画布 -->
-                    <div id="three-canvas-360" style="width:100%; height:100%;"></div>
+                    <div id="three-canvas-zhoutian360" style="width:100%; height:100%;"></div>
 
-                    <!-- 动态状态标签 -->
+                    <!-- 动态状态标签 (包含准确 ID) -->
                     <div class="trajectory-badge">
-                        <div class="badge-title">周天 360° 几何切割系统</div>
-                        <div class="badge-desc">将周天 360° 连续对半分割，验证其众和数恒收敛归于极数 9</div>
+                        <div id="zhoutian-badge-title" class="badge-title">周天 360° 4 大原书解构表格</div>
+                        <div id="zhoutian-badge-desc" class="badge-desc">包含 4 象 90° 质变表、6×60° 节卦周转表、81 矩表与归九收敛表</div>
                     </div>
                 </div>
             </section>
@@ -98,7 +98,7 @@
                         <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
                     </div>
                     <div class="law-desc-text">
-                        选中下表任一行，太乙 81 宫阵图中对应的降维宫位与 3D 浑天仪坐标同步高亮响应！
+                        宏观按洛书 9 宫分块，微观 9 数按原书《太乙九宫图》精确定准。点击单元格可联动态象。
                     </div>
                 </div>
 
@@ -109,47 +109,135 @@
             <section class="col-right-controls">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>🌀</span> 梁致堂原著《九宫纪周天 360° 气数》权威表格解构
+                        <span>🌀</span> 原著《周天 360°》4 大解构表格
                     </div>
-                    <div class="law-desc-text">
-                        梁致堂先生在原著第 24-26 页中指出：周天 360° 尽在四象 90° 质变、60 六节卦、4 个 81 矩与九宫范畴之中。请选择表格探索：
-                    </div>
-                </div>
-
-                <!-- 四大原书表格切换 Tab -->
-                <div class="sanhe-btn-grid" style="margin-top: 6px;">
-                    <button class="sanhe-btn tab-360-btn active" data-tab="tab1">表1: 4象90°与360°质变表</button>
-                    <button class="sanhe-btn tab-360-btn" data-tab="tab2">表2: 6×60°节卦六步周转表</button>
-                    <button class="sanhe-btn tab-360-btn" data-tab="tab3">表3: 9宫81矩12方位对照表</button>
-                    <button class="sanhe-btn tab-360-btn" data-tab="tab4">表4: 360°分割归九验证表</button>
-                </div>
-
-                <!-- 动态表格呈现容器 -->
-                <div class="glass-panel" style="margin-top: 6px; flex: 1; display: flex; flex-direction: column;">
-                    <div class="card-title" id="table-360-title">
-                        <span>📋</span> 表格名称
-                    </div>
-                    
-                    <div class="sequence-table-container" style="max-height: 320px; flex: 1;">
-                        <table class="seq-table">
-                            <thead id="table-360-thead">
-                                <!-- 动态插入 -->
-                            </thead>
-                            <tbody id="table-360-tbody">
-                                <!-- 动态插入 -->
-                            </tbody>
-                        </table>
+                    <div class="sanhe-btn-grid" style="margin-top: 6px;">
+                        <button class="sanhe-btn zhoutian-tab-btn active" data-target="panel-table-1">1. 4象90°质变表</button>
+                        <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-2">2. 6×60°节卦表</button>
+                        <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-3">3. 81矩归属表</button>
+                        <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-4">4. 归九收敛表</button>
                     </div>
                 </div>
 
-                <div id="table-360-summary" class="hexagram-detail-box" style="margin-top: 6px;">
-                    <!-- 动态渲染分析 -->
+                <!-- 表格 1：4 象 90° 质变与 4 个 81 矩映射表 -->
+                <div id="panel-table-1" class="zhoutian-content-panel" style="margin-top: 4px;">
+                    <div class="glass-panel">
+                        <div class="card-title"><span>表1</span> 4 象 90° 质变与 4 个 81 矩映射表</div>
+                        <div class="sequence-table-container">
+                            <table class="seq-table">
+                                <thead>
+                                    <tr>
+                                        <th>象次</th>
+                                        <th>角度</th>
+                                        <th>矩数</th>
+                                        <th>太乙宫位</th>
+                                        <th>地支</th>
+                                        <th>坐标系</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>第一象</td><td>90°</td><td>81 矩</td><td>81 号宫</td><td style="color:#ff5252; font-weight:700;">巳位</td><td>白道 (地户)</td></tr>
+                                    <tr><td>第二象</td><td>180°</td><td>162 矩</td><td>81 号宫</td><td style="color:#ff5252; font-weight:700;">午/未位</td><td>赤道/黄道</td></tr>
+                                    <tr><td>第三象</td><td>270°</td><td>243 矩</td><td>81 号宫</td><td style="color:#4dabf7; font-weight:700;">酉位</td><td>赤道 (正西)</td></tr>
+                                    <tr><td>第四象</td><td>360°</td><td>324 矩</td><td>81 号宫</td><td style="color:#40c057; font-weight:700;">亥位</td><td>白道 (天门)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 表格 2：6 × 60° 节卦六步周转表 -->
+                <div id="panel-table-2" class="zhoutian-content-panel" style="display:none; margin-top: 4px;">
+                    <div class="glass-panel">
+                        <div class="card-title"><span>表2</span> 6 × 60° 节卦六步周转表</div>
+                        <div class="sequence-table-container">
+                            <table class="seq-table">
+                                <thead>
+                                    <tr>
+                                        <th>步次</th>
+                                        <th>节度算式</th>
+                                        <th>干支纪年</th>
+                                        <th>对应律吕</th>
+                                        <th>周天收敛</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>第 1 步</td><td>60° × 1 = 60°</td><td>甲子 ~ 癸亥</td><td>黄钟 (子)</td><td>开局 60 花甲子</td></tr>
+                                    <tr><td>第 2 步</td><td>60° × 2 = 120°</td><td>甲戌 ~ 癸酉</td><td>太簇 (寅)</td><td>双甲子运转</td></tr>
+                                    <tr><td>第 3 步</td><td>60° × 3 = 180°</td><td>甲申 ~ 癸未</td><td>姑洗 (辰)</td><td>半周天 (阴阳交感)</td></tr>
+                                    <tr><td>第 4 步</td><td>60° × 4 = 240°</td><td>甲午 ~ 癸巳</td><td>蕤宾 (午)</td><td>四象进退</td></tr>
+                                    <tr><td>第 5 步</td><td>60° × 5 = 300°</td><td>甲辰 ~ 癸卯</td><td>夷则 (申)</td><td>五行环周</td></tr>
+                                    <tr><td>第 6 步</td><td>60° × 6 = 360°</td><td>甲寅 ~ 癸丑</td><td>无射 (戌)</td><td>360° 大圆满</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 表格 3：九宫范畴对 12 方位 3 大坐标系 81 矩表 -->
+                <div id="panel-table-3" class="zhoutian-content-panel" style="display:none; margin-top: 4px;">
+                    <div class="glass-panel">
+                        <div class="card-title"><span>表3</span> 81 矩完整归属大表</div>
+                        <div class="sequence-table-container">
+                            <table class="seq-table">
+                                <thead>
+                                    <tr>
+                                        <th>洛书宫位</th>
+                                        <th>宫数</th>
+                                        <th>包含矩数</th>
+                                        <th>地支方位</th>
+                                        <th>五行属性</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>坎一宫</td><td>1</td><td>1, 10, 19, 28, 37, 46, 55, 64, 73</td><td>子位</td><td style="color:#4dabf7;">水</td></tr>
+                                    <tr><td>坤二宫</td><td>2</td><td>2, 11, 20, 29, 38, 47, 56, 65, 74</td><td>未/申位</td><td style="color:#ffe066;">土</td></tr>
+                                    <tr><td>震三宫</td><td>3</td><td>3, 12, 21, 30, 39, 48, 57, 66, 75</td><td>卯位</td><td style="color:#40c057;">木</td></tr>
+                                    <tr><td>巽四宫</td><td>4</td><td>4, 13, 22, 31, 40, 49, 58, 67, 76</td><td>辰/巳位</td><td style="color:#40c057;">木</td></tr>
+                                    <tr><td>中五宫</td><td>5</td><td>5, 14, 23, 32, 41, 50, 59, 68, 77</td><td>中宫</td><td style="color:#ffe066;">土</td></tr>
+                                    <tr><td>乾六宫</td><td>6</td><td>6, 15, 24, 33, 42, 51, 60, 69, 78</td><td>戌/亥位</td><td style="color:#dee2e6;">金</td></tr>
+                                    <tr><td>兑七宫</td><td>7</td><td>7, 16, 25, 34, 43, 52, 61, 70, 79</td><td>酉位</td><td style="color:#dee2e6;">金</td></tr>
+                                    <tr><td>艮八宫</td><td>8</td><td>8, 17, 26, 35, 44, 53, 62, 71, 80</td><td>丑/寅位</td><td style="color:#ffe066;">土</td></tr>
+                                    <tr><td>离九宫</td><td>9</td><td>9, 18, 27, 36, 45, 54, 63, 72, 81</td><td>午位</td><td style="color:#ff5252;">火</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 表格 4：周天 360° 连续对半分割归九收敛验证表 -->
+                <div id="panel-table-4" class="zhoutian-content-panel" style="display:none; margin-top: 4px;">
+                    <div class="glass-panel">
+                        <div class="card-title"><span>表4</span> 360° 连续对半分割归九表</div>
+                        <div class="sequence-table-container">
+                            <table class="seq-table">
+                                <thead>
+                                    <tr>
+                                        <th>分割次</th>
+                                        <th>角度</th>
+                                        <th>数位加总算式</th>
+                                        <th>众和极数</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>初始</td><td>360°</td><td>3 + 6 + 0 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr><td>1 次</td><td>180°</td><td>1 + 8 + 0 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr><td>2 次</td><td>90°</td><td>9 + 0 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr><td>3 次</td><td>45°</td><td>4 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr><td>4 次</td><td>22.5°</td><td>2 + 2 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr><td>5 次</td><td>11.25°</td><td>1 + 1 + 2 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr><td>6 次</td><td>5.625°</td><td>5+6+2+5 = 18 ➔ 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr><td>7 次</td><td>2.8125°</td><td>2+8+1+2+5 = 18 ➔ 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- 周天360引擎 (带版本防缓存) -->
-    <script src="zhoutian360.js?v=20260804_v9"></script>
+    <!-- 周天 360° 引擎 (带版本防缓存) -->
+    <script src="zhoutian360.js?v=20260804_v17"></script>
 </body>
 </html>

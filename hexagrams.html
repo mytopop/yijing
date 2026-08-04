@@ -18,7 +18,7 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 统一 100% 结构固定 Header 顶栏 -->
+        <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
                 <div class="logo-icon">☯</div>
@@ -44,16 +44,16 @@
 
         <!-- 三栏并行主容器 -->
         <main class="main-three-split-container">
-            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <!-- 栏一：纯粹数理逻辑 3D 浑天天象坐标仪 (34%) -->
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪
+                        <span>🌌</span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
-                        <span class="legend-item equator">● 赤道(天)</span>
-                        <span class="legend-item ecliptic">● 黄道(地)</span>
-                        <span class="legend-item lunar">● 白道(万物)</span>
+                        <span class="legend-item equator">● 赤道(0°)</span>
+                        <span class="legend-item ecliptic">● 黄道(+23.5°)</span>
+                        <span class="legend-item lunar">● 白道(-15°)</span>
                     </div>
                 </div>
 
@@ -81,12 +81,12 @@
                     </div>
 
                     <!-- Three.js 渲染画布 -->
-                    <div id="three-canvas-hexagrams" style="width:100%; height:100%;"></div>
+                    <div id="three-canvas-hex" style="width:100%; height:100%;"></div>
 
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
-                        <div id="hex-badge-title" class="badge-title">卦象 3D 拓扑结构</div>
-                        <div id="hex-badge-desc" class="badge-desc">选择卦象解构其六爻在赤道/黄道/白道坐标环上的几何映射</div>
+                        <div id="hex-badge-title" class="badge-title">64 卦 3D 闭环图谱</div>
+                        <div id="hex-badge-desc" class="badge-desc">选择右侧卦象，观察六爻 1~6 在天体坐标系中的闭环连线</div>
                     </div>
                 </div>
             </section>
@@ -98,40 +98,33 @@
                         <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
                     </div>
                     <div class="law-desc-text">
-                        宏观按洛书 9 宫分块，微观 9 数按原书《太乙九宫图》精确定准。点击单元格可联动态象。
+                        选中卦象降维投影在太乙 81 宫阵图中同步高亮。点击宫位亦可选择卦象。
                     </div>
                 </div>
 
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：卦象选择与六爻解构控制台 (33%) -->
+            <!-- 栏三：64 卦六爻 5 栏网格解构控制台 (33%) -->
             <section class="col-right-controls">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>☰</span> 选择六十四卦进行数理拆解
+                        <span>☰</span> 六十四卦全景解构选择器
                     </div>
-                    
-                    <div class="input-group" style="margin-top: 8px;">
-                        <label>选择卦象（初爻为卦序 N，往上依次 N×2, N×3 ... N×6）:</label>
-                        <select id="hexagram-select" class="custom-select">
-                            <!-- 动态加载 64 卦 -->
-                        </select>
-                        <button id="btn-analyze-hex" class="action-btn-gold" style="margin-top: 6px;">
-                            🚀 解构卦象 3D 拓扑
-                        </button>
-                    </div>
+                    <select id="hex-select" class="custom-select" style="margin-top: 6px;">
+                        <!-- JS 动态填入 64 卦 -->
+                    </select>
                 </div>
 
-                <!-- 卦象详情盒 -->
-                <div id="hexagram-detail-box" class="hexagram-detail-box">
-                    <!-- 动态渲染 6 爻计算明细 -->
+                <!-- 六爻 5 栏直列网格展示框 -->
+                <div id="hex-detail-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                    <!-- JS 动态渲染 6 爻 5 栏网格 -->
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- 卦象解构引擎 (带版本防缓存) -->
-    <script src="hexagrams.js?v=20260804_v7"></script>
+    <!-- 64 卦引擎 (带版本防缓存) -->
+    <script src="hexagrams.js?v=20260804_v17"></script>
 </body>
 </html>
