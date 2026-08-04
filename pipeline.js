@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》任意数据流水线与 12 步拆解推演系统 - 核心逻辑 (pipeline.js)
-   特点：无中间大球 + 12地支三分坐标环 + 恢复原版 9 宫卡片 + 书中精确太乙81数
+   《易经数理秘笈》任意数据 12 步拆解推演流水线 - (pipeline.js)
+   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 12 步推演数据轨迹
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -30,10 +30,6 @@ const LUOSHU_PALACES_EXACT = [
     { num: 6, name: "乾六宫 (金)", numbers: [33, 78, 15, 24, 42, 60, 69, 6, 51], class: "palace-qian" },
 ];
 
-const CHIHDAO_REMS = [1, 4, 7, 10];
-const HUANGDAO_REMS = [2, 5, 8, 11];
-const BAIDAO_REMS = [3, 6, 9, 0];
-
 function getBranch3DPos(branchIdx, radius = 6.0) {
     const angle = THREE.MathUtils.degToRad(90 - branchIdx * 30);
     const baseVec = new THREE.Vector3(radius * Math.cos(angle), radius * Math.sin(angle), 0);
@@ -47,34 +43,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-function calcDigitRoot(n) {
-    let num = Math.abs(Math.round(n));
-    while (num >= 10) {
-        let sum = 0;
-        const str = num.toString();
-        for (let i = 0; i < str.length; i++) {
-            if (str[i] >= '0' && str[i] <= '9') {
-                sum += parseInt(str[i], 10);
-            }
-        }
-        num = sum;
-    }
-    return num;
-}
-
-function getSystemByRem(rem12) {
-    const r = rem12 % 12;
-    if (CHIHDAO_REMS.includes(r)) return { name: "赤道(天)", color: "#ff5252", class: "badge-red" };
-    if (HUANGDAO_REMS.includes(r)) return { name: "黄道(地)", color: "#40c057", class: "badge-green" };
-    return { name: "白道(万物)", color: "#4dabf7", class: "badge-blue" };
-}
-
-function remToBranchIdx(rem) {
-    const r = rem % 12;
-    return r === 0 ? 11 : r - 1;
-}
-
-class Pipeline3DEngine {
+class PipelineVivid3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.width = this.container.clientWidth || 400;
@@ -88,10 +57,16 @@ class Pipeline3DEngine {
         this.equatorGroup = new THREE.Group();
         this.eclipticGroup = new THREE.Group();
         this.lunarGroup = new THREE.Group();
-        this.trajectoryGroup = new THREE.Group();
-        this.nodesGroup = new THREE.Group();
+        this.celestialGridGroup = new THREE.Group();
+        this.orbsGroup = new THREE.Group();
+        this.pipe3DGroup = new THREE.Group();
 
+        this.sunMesh = null;
+        this.moonMesh = null;
+        this.sunAngle = 0;
+        this.moonAngle = 0;
         this.autoRotate = true;
+
         this.activeCurve = null;
         this.dataPulseMesh = null;
         this.pulseProgress = 0;
@@ -99,6 +74,8 @@ class Pipeline3DEngine {
 
         this.initScene();
         this.createArmillaryRings();
+        this.createCelestialGridAndPoles();
+        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -126,8 +103,9 @@ class Pipeline3DEngine {
         this.scene.add(this.equatorGroup);
         this.scene.add(this.eclipticGroup);
         this.scene.add(this.lunarGroup);
-        this.scene.add(this.trajectoryGroup);
-        this.scene.add(this.nodesGroup);
+        this.scene.add(this.celestialGridGroup);
+        this.scene.add(this.orbsGroup);
+        this.scene.add(this.pipe3DGroup);
     }
 
     adjustCameraFit() {
@@ -159,26 +137,48 @@ class Pipeline3DEngine {
         const goldLight = new THREE.PointLight(0xffe066, 2.5, 60);
         goldLight.position.set(0, 0, 15);
         this.scene.add(goldLight);
+    }
 
-        const blueLight = new THREE.PointLight(0x4dabf7, 1.8, 60);
-        blueLight.position.set(0, 15, -10);
-        this.scene.add(blueLight);
+    createCelestialGridAndPoles() {
+        const radius = 6.0;
+
+        const gridGeom = new THREE.SphereGeometry(radius * 1.02, 24, 18);
+        const gridMat = new THREE.MeshBasicMaterial({ color: 0x4dabf7, wireframe: true, transparent: true, opacity: 0.08 });
+        const gridMesh = new THREE.Mesh(gridGeom, gridMat);
+        this.celestialGridGroup.add(gridMesh);
+
+        const polePoints = [new THREE.Vector3(0, 0, -8.5), new THREE.Vector3(0, 0, 8.5)];
+        const poleGeom = new THREE.BufferGeometry().setFromPoints(polePoints);
+        const poleMat = new THREE.LineDashedMaterial({ color: 0xffe066, dashSize: 0.4, gapSize: 0.2, linewidth: 2 });
+        const poleLine = new THREE.Line(poleGeom, poleMat);
+        poleLine.computeLineDistances();
+        this.celestialGridGroup.add(poleLine);
+
+        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
+        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        const northStar = new THREE.Mesh(northStarGeom, northStarMat);
+        northStar.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northStar);
+
+        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.8);
+        this.celestialGridGroup.add(northSprite);
     }
 
     createArmillaryRings() {
         const radius = 6.0;
 
-        const equatorGeom = new THREE.TorusGeometry(radius, 0.05, 16, 120);
-        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x660000 });
+        const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
+        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
-        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x004400 });
+        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
-        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x002266 });
+        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
@@ -186,35 +186,35 @@ class Pipeline3DEngine {
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const nodeGeom = new THREE.SphereGeometry(0.28, 16, 16);
-            const nodeMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1 });
-            const nodeMesh = new THREE.Mesh(nodeGeom, nodeMat);
-            nodeMesh.position.copy(pos);
-            this.nodesGroup.add(nodeMesh);
+            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
+            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
+            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
+            orbMesh.position.copy(pos);
+            this.orbsGroup.add(orbMesh);
+
+            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
+            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+            ringMesh.position.copy(pos);
+            ringMesh.rotation.x = Math.PI / 2;
+            this.orbsGroup.add(ringMesh);
 
             const sprite = this.createTextSprite(b.name, b.color);
             sprite.position.copy(pos.clone().multiplyScalar(1.18));
-            this.nodesGroup.add(sprite);
+            this.orbsGroup.add(sprite);
         });
-
-        this.createStarfield();
     }
 
-    createStarfield() {
-        const starsGeom = new THREE.BufferGeometry();
-        const count = 250;
-        const positions = new Float32Array(count * 3);
+    createSunAndMoonObjects() {
+        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
+        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
+        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
+        this.scene.add(this.sunMesh);
 
-        for (let i = 0; i < count * 3; i += 3) {
-            positions[i] = (Math.random() - 0.5) * 60;
-            positions[i+1] = (Math.random() - 0.5) * 60;
-            positions[i+2] = (Math.random() - 0.5) * 60;
-        }
-
-        starsGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const starsMat = new THREE.PointsMaterial({ color: 0xffe066, size: 0.08, transparent: true, opacity: 0.4 });
-        const starfield = new THREE.Points(starsGeom, starsMat);
-        this.scene.add(starfield);
+        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
+        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
+        this.scene.add(this.moonMesh);
     }
 
     createTextSprite(text, colorHex) {
@@ -223,7 +223,7 @@ class Pipeline3DEngine {
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(16, 22, 40, 0.92)";
+        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
         ctx.beginPath();
         ctx.arc(64, 64, 52, 0, Math.PI * 2);
         ctx.fill();
@@ -244,9 +244,9 @@ class Pipeline3DEngine {
         return sprite;
     }
 
-    clearTrajectory() {
-        while (this.trajectoryGroup.children.length > 0) {
-            const obj = this.trajectoryGroup.children.pop();
+    clearPipe3DGroup() {
+        while (this.pipe3DGroup.children.length > 0) {
+            const obj = this.pipe3DGroup.children.pop();
             if (obj.geometry) obj.geometry.dispose();
             if (obj.material) obj.material.dispose();
         }
@@ -254,38 +254,38 @@ class Pipeline3DEngine {
         this.dataPulseMesh = null;
     }
 
-    updateTrajectory(k) {
-        this.clearTrajectory();
+    renderNumber12StepTrajectory(inputNum) {
+        this.clearPipe3DGroup();
         const radius = 6.0;
         const points = [];
 
-        for (let step = 1; step <= 12; step++) {
-            const prod = k * step;
-            const rem = prod % 12;
-            const branchIdx = remToBranchIdx(rem);
-            const pos = getBranch3DPos(branchIdx, radius);
-            points.push(pos);
+        for (let k = 1; k <= 12; k++) {
+            const val = inputNum * k;
+            const rem12 = val % 12 === 0 ? 12 : val % 12;
+            const bIdx = rem12 - 1;
+            points.push(getBranch3DPos(bIdx, radius));
         }
+
         points.push(points[0]);
 
         this.activeCurve = new THREE.CatmullRomCurve3(points, true, "catmullrom", 0.05);
-        const tubeGeom = new THREE.TubeGeometry(this.activeCurve, 120, 0.1, 8, true);
-        const tubeMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.95 });
+        const tubeGeom = new THREE.TubeGeometry(this.activeCurve, 100, 0.08, 8, true);
+        const tubeMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xaa7c11, transparent: true, opacity: 0.9 });
         const tubeMesh = new THREE.Mesh(tubeGeom, tubeMat);
-        this.trajectoryGroup.add(tubeMesh);
-
-        const pulseGeom = new THREE.SphereGeometry(0.38, 16, 16);
-        const pulseMat = new THREE.MeshBasicMaterial({ color: 0xff5252 });
-        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
-        this.trajectoryGroup.add(this.dataPulseMesh);
+        this.pipe3DGroup.add(tubeMesh);
 
         points.slice(0, 12).forEach((p) => {
-            const sphereMat = new THREE.MeshBasicMaterial({ color: 0xff5252 });
-            const sphereGeom = new THREE.SphereGeometry(0.24, 12, 12);
+            const sphereGeom = new THREE.SphereGeometry(0.3, 16, 16);
+            const sphereMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffe066 });
             const sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
             sphereMesh.position.copy(p);
-            this.trajectoryGroup.add(sphereMesh);
+            this.pipe3DGroup.add(sphereMesh);
         });
+
+        const pulseGeom = new THREE.SphereGeometry(0.42, 16, 16);
+        const pulseMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.pipe3DGroup.add(this.dataPulseMesh);
     }
 
     animate() {
@@ -294,6 +294,17 @@ class Pipeline3DEngine {
         if (this.autoRotate) {
             this.scene.rotation.z += 0.002;
         }
+
+        this.sunAngle += 0.008;
+        const sunRadius = 6.0;
+        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
+        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
+        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
+
+        this.moonAngle -= 0.012;
+        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
+        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
+        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
 
         if (this.activeCurve && this.dataPulseMesh) {
             this.pulseProgress += 0.004 * this.pulseSpeedMultiplier;
@@ -308,11 +319,12 @@ class Pipeline3DEngine {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Pipeline3DEngine("three-canvas-pipeline");
+    const engine = new PipelineVivid3DEngine("three-canvas-pipeline");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
     function initLuoshuTaiyi9x9Matrix() {
+        if (!matrixContainer) return;
         matrixContainer.className = "luoshu-taiyi-9x9-container";
         matrixContainer.innerHTML = "";
 
@@ -335,7 +347,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
                 cell.addEventListener("click", () => {
-                    toggleDataPipeline(num);
+                    document.getElementById("num-input").value = num;
+                    calculatePipeline(num);
                 });
                 grid3x3.appendChild(cell);
             });
@@ -344,119 +357,79 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function highlightTaiyi81Pos(targetPos) {
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            if (parseInt(cell.dataset.pos, 10) === targetPos) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
-        });
-    }
-
     initLuoshuTaiyi9x9Matrix();
 
     const numInput = document.getElementById("num-input");
     const btnCalculate = document.getElementById("btn-calculate");
     const seqTableBody = document.getElementById("seq-table-body");
+    const pipeBadgeTitle = document.getElementById("pipe-badge-title");
+    const pipeBadgeDesc = document.getElementById("pipe-badge-desc");
 
-    const valStep1 = document.getElementById("val-step-1");
-    const valStep2 = document.getElementById("val-step-2");
-    const valStep3 = document.getElementById("val-step-3");
-    const valStep4 = document.getElementById("val-step-4");
-    const valStep5 = document.getElementById("val-step-5");
-
-    const badgeTitle = document.getElementById("pipe-badge-title");
-    const badgeDesc = document.getElementById("pipe-badge-desc");
-
-    let currentActiveK = null;
-
-    function toggleDataPipeline(k) {
-        if (currentActiveK === k) {
-            currentActiveK = null;
-            engine.clearTrajectory();
-            highlightTaiyi81Pos(-1);
-            badgeTitle.innerText = "数据展示已取消 (3D 浑天仪与 81 宫干干净净)";
-            badgeDesc.innerText = "再次点击按钮或输入数值可开启数理轨迹与 81 宫高亮";
-
-            valStep1.innerText = "N = -";
-            valStep2.innerText = "-";
-            valStep3.innerText = "-";
-            valStep4.innerText = "-";
-            valStep5.innerText = "-";
-            seqTableBody.innerHTML = "";
-            document.querySelectorAll(".pipe-step").forEach(s => s.classList.remove("active"));
-            return;
+    function getDigitalRoot(n) {
+        let val = Math.abs(n);
+        while (val >= 10) {
+            val = val.toString().split('').reduce((sum, d) => sum + parseInt(d, 10), 0);
         }
-
-        currentActiveK = k;
-        numInput.value = k;
-
-        valStep1.innerText = `N = ${k}`;
-        let rem81 = k % 81;
-        if (rem81 === 0) rem81 = 81;
-
-        valStep2.innerText = `${k} % 81 = ${rem81}`;
-        const rem12 = k % 12;
-        const branchIdx = remToBranchIdx(rem12);
-        const branch = EARTHLY_BRANCHES[branchIdx];
-        valStep3.innerText = `余 ${rem12 === 0 ? 12 : rem12} ➔ ${branch.name}位`;
-
-        const sys = getSystemByRem(rem12);
-        valStep4.innerText = sys.name;
-        valStep4.className = `step-val ${sys.class}`;
-
-        const root = calcDigitRoot(k);
-        valStep5.innerText = `众和极数 = ${root}`;
-
-        engine.updateTrajectory(k);
-        highlightTaiyi81Pos(rem81);
-
-        badgeTitle.innerText = `数值 N = ${k} 12步跳跃数理连线`;
-        badgeDesc.innerText = `矩 81 削减得第 ${rem81} 宫位，落入 ${sys.name} ${branch.name}位 (点击可取消展示)`;
-
-        animatePipelineSteps();
-        renderSequenceTable(k);
+        return val;
     }
 
-    function renderSequenceTable(k) {
-        seqTableBody.innerHTML = "";
-        for (let step = 1; step <= 12; step++) {
-            const prod = k * step;
-            const rem = prod % 12;
-            const branchIdx = remToBranchIdx(rem);
-            const branch = EARTHLY_BRANCHES[branchIdx];
-            const sys = getSystemByRem(rem);
+    function calculatePipeline(n) {
+        const inputVal = parseInt(n, 10);
+        if (isNaN(inputVal) || inputVal <= 0) return;
 
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td><strong>${step}</strong></td>
-                <td>${k} × ${step}</td>
-                <td>${prod}</td>
-                <td>${rem === 0 ? 12 : rem}</td>
-                <td><strong style="color: ${branch.color}">${branch.name}</strong></td>
-                <td><span style="color: ${sys.color}">${sys.name}</span></td>
+        const rem81 = inputVal % 81 === 0 ? 81 : inputVal % 81;
+        const rem12 = inputVal % 12 === 0 ? 12 : inputVal % 12;
+        const branch = EARTHLY_BRANCHES[rem12 - 1];
+        const digRoot = getDigitalRoot(inputVal);
+
+        document.getElementById("val-step-1").innerText = `N = ${inputVal}`;
+        document.getElementById("val-step-2").innerText = `${inputVal} % 81 = ${rem81} 号宫`;
+        document.getElementById("val-step-3").innerText = `余 ${rem12} ➔ ${branch.name}位`;
+        
+        const step4El = document.getElementById("val-step-4");
+        step4El.innerText = `${branch.system}`;
+        step4El.className = "step-val " + (branch.rem % 3 === 1 ? "badge-red" : (branch.rem % 3 === 2 ? "badge-green" : "badge-blue"));
+
+        document.getElementById("val-step-5").innerText = `众和极数 = ${digRoot}`;
+
+        let tableHtml = "";
+        for (let k = 1; k <= 12; k++) {
+            const val = inputVal * k;
+            const r12 = val % 12 === 0 ? 12 : val % 12;
+            const b = EARTHLY_BRANCHES[r12 - 1];
+            tableHtml += `
+                <tr>
+                    <td>${k}</td>
+                    <td>${inputVal}×${k}</td>
+                    <td>${val}</td>
+                    <td>${r12}</td>
+                    <td style="color:${b.color}; font-weight:700;">${b.name}</td>
+                    <td>${b.system.split('(')[0]}</td>
+                </tr>
             `;
-            seqTableBody.appendChild(tr);
         }
+        seqTableBody.innerHTML = tableHtml;
+
+        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+            const p = parseInt(cell.dataset.pos, 10);
+            if (p === rem81) {
+                cell.classList.add("active-pos");
+            } else {
+                cell.classList.remove("active-pos");
+            }
+        });
+
+        engine.renderNumber12StepTrajectory(inputVal);
+
+        pipeBadgeTitle.innerText = `数值 ${inputVal} 3D 周天空间轨迹`;
+        pipeBadgeDesc.innerText = `模 81 降维落于第 ${rem81} 宫。地支属【${branch.name}】(${branch.system})`;
     }
 
-    function animatePipelineSteps() {
-        const steps = document.forEach ? document.querySelectorAll(".pipe-step") : [];
-        steps.forEach((step, idx) => {
-            step.classList.remove("active");
-            setTimeout(() => {
-                step.classList.add("active");
-            }, idx * 100);
+    if (btnCalculate) {
+        btnCalculate.addEventListener("click", () => {
+            calculatePipeline(numInput.value);
         });
     }
-
-    btnCalculate.addEventListener("click", () => {
-        const val = parseInt(numInput.value, 10);
-        if (!isNaN(val) && val > 0) {
-            toggleDataPipeline(val);
-        }
-    });
 
     const btnSpeed = document.getElementById("btn-speed-control");
     const speedVal = document.getElementById("speed-val");
@@ -492,5 +465,5 @@ document.addEventListener("DOMContentLoaded", () => {
         engine.autoRotate = this.classList.contains("active");
     });
 
-    toggleDataPipeline(7);
+    calculatePipeline(7); // 默认 7
 });

@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》周天 360° 气数与原书 4 大表格解构引擎 (zhoutian360.js)
-   特点：包含原书第 24-26 页 4 大权威表格与 3D 天极切割模型
+   《易经数理秘笈》周天 360° 气数全景解构馆 - (zhoutian360.js)
+   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 原书 4 大表格解构
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,7 +43,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class Zhoutian360Engine {
+class Zhoutian360Vivid3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.width = this.container.clientWidth || 400;
@@ -57,12 +57,19 @@ class Zhoutian360Engine {
         this.equatorGroup = new THREE.Group();
         this.eclipticGroup = new THREE.Group();
         this.lunarGroup = new THREE.Group();
-        this.sectorGroup = new THREE.Group();
+        this.celestialGridGroup = new THREE.Group();
+        this.orbsGroup = new THREE.Group();
 
+        this.sunMesh = null;
+        this.moonMesh = null;
+        this.sunAngle = 0;
+        this.moonAngle = 0;
         this.autoRotate = true;
 
         this.initScene();
         this.createArmillaryRings();
+        this.createCelestialGridAndPoles();
+        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -90,7 +97,8 @@ class Zhoutian360Engine {
         this.scene.add(this.equatorGroup);
         this.scene.add(this.eclipticGroup);
         this.scene.add(this.lunarGroup);
-        this.scene.add(this.sectorGroup);
+        this.scene.add(this.celestialGridGroup);
+        this.scene.add(this.orbsGroup);
     }
 
     adjustCameraFit() {
@@ -124,30 +132,82 @@ class Zhoutian360Engine {
         this.scene.add(goldLight);
     }
 
+    createCelestialGridAndPoles() {
+        const radius = 6.0;
+
+        const gridGeom = new THREE.SphereGeometry(radius * 1.02, 24, 18);
+        const gridMat = new THREE.MeshBasicMaterial({ color: 0x4dabf7, wireframe: true, transparent: true, opacity: 0.08 });
+        const gridMesh = new THREE.Mesh(gridGeom, gridMat);
+        this.celestialGridGroup.add(gridMesh);
+
+        const polePoints = [new THREE.Vector3(0, 0, -8.5), new THREE.Vector3(0, 0, 8.5)];
+        const poleGeom = new THREE.BufferGeometry().setFromPoints(polePoints);
+        const poleMat = new THREE.LineDashedMaterial({ color: 0xffe066, dashSize: 0.4, gapSize: 0.2, linewidth: 2 });
+        const poleLine = new THREE.Line(poleGeom, poleMat);
+        poleLine.computeLineDistances();
+        this.celestialGridGroup.add(poleLine);
+
+        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
+        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        const northStar = new THREE.Mesh(northStarGeom, northStarMat);
+        northStar.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northStar);
+
+        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.8);
+        this.celestialGridGroup.add(northSprite);
+    }
+
     createArmillaryRings() {
         const radius = 6.0;
 
-        const equatorGeom = new THREE.TorusGeometry(radius, 0.05, 16, 120);
-        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x660000 });
+        const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
+        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
-        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x004400 });
+        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
-        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x002266 });
+        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
 
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
+
+            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
+            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
+            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
+            orbMesh.position.copy(pos);
+            this.orbsGroup.add(orbMesh);
+
+            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
+            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+            ringMesh.position.copy(pos);
+            ringMesh.rotation.x = Math.PI / 2;
+            this.orbsGroup.add(ringMesh);
+
             const sprite = this.createTextSprite(b.name, b.color);
             sprite.position.copy(pos.clone().multiplyScalar(1.18));
-            this.scene.add(sprite);
+            this.orbsGroup.add(sprite);
         });
+    }
+
+    createSunAndMoonObjects() {
+        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
+        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
+        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
+        this.scene.add(this.sunMesh);
+
+        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
+        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
+        this.scene.add(this.moonMesh);
     }
 
     createTextSprite(text, colorHex) {
@@ -156,7 +216,7 @@ class Zhoutian360Engine {
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(16, 22, 40, 0.92)";
+        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
         ctx.beginPath();
         ctx.arc(64, 64, 52, 0, Math.PI * 2);
         ctx.fill();
@@ -177,38 +237,6 @@ class Zhoutian360Engine {
         return sprite;
     }
 
-    render360Sectors(count = 4) {
-        while (this.sectorGroup.children.length > 0) {
-            const obj = this.sectorGroup.children.pop();
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
-        }
-
-        const stepAngle = (2 * Math.PI) / count;
-        const radius = 6.0;
-
-        for (let i = 0; i < count; i++) {
-            const startA = i * stepAngle;
-            const endA = (i + 1) * stepAngle;
-
-            const shape = new THREE.Shape();
-            shape.moveTo(0, 0);
-            shape.arc(0, 0, radius, startA, endA, false);
-            shape.lineTo(0, 0);
-
-            const geom = new THREE.ShapeGeometry(shape);
-            const color = i % 2 === 0 ? 0xffe066 : 0x4dabf7;
-            const mat = new THREE.MeshBasicMaterial({
-                color: color,
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.15
-            });
-            const mesh = new THREE.Mesh(geom, mat);
-            this.sectorGroup.add(mesh);
-        }
-    }
-
     animate() {
         requestAnimationFrame(() => this.animate());
 
@@ -216,13 +244,24 @@ class Zhoutian360Engine {
             this.scene.rotation.z += 0.002;
         }
 
+        this.sunAngle += 0.008;
+        const sunRadius = 6.0;
+        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
+        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
+        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
+
+        this.moonAngle -= 0.012;
+        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
+        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
+        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
+
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Zhoutian360Engine("three-canvas-360");
+    const engine = new Zhoutian360Vivid3DEngine("three-canvas-zhoutian360");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -258,131 +297,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
-    // 4 大原书表格数据
-    const TABLES_DATA = {
-        tab1: {
-            title: "表1：原书四象 90° 质变与 4 个 81 矩 360° 周天映射表",
-            columns: ["四象区间", "角度", "81矩累计", "子午天地门", "核心卦象", "周天质变说明"],
-            rows: [
-                ["第一象 (春/太阳)", "0° ~ 90°", "1 个 81 矩 (81)", "18九2 (蛊卦·巳)", "45九萃卦 / 90已", "少阳发生，至 90° 已位起质变，引吉无咎"],
-                ["第二象 (夏/太阴)", "90° ~ 180°", "2 个 81 矩 (162)", "36九4 (明夷·亥)", "90小畜 / 180亥", "太阳升极，明夷生人地，亥位天门交会"],
-                ["第三象 (秋/少阳)", "180° ~ 270°", "3 个 81 矩 (243)", "54九 (归妹·巳)", "270已", "少阴肃杀，54九归妹巳位地户"],
-                ["第四象 (冬/少阴)", "270° ~ 360°", "4 个 81 矩 (324)", "72九 (节卦·亥)", "360周天归九", "太阴闭藏，72九节卦节制 360° 气数归九"]
-            ],
-            summary: "梁致堂原著指出：4 个 90° 为周天 360°，需 4 个 81 之矩 (324) 配合子午天门地户气数 (36)，全功达成 360° 周天大圆满！",
-            highlightPositions: [9, 18, 27, 36, 45, 54, 63, 72, 81],
-            sectorsCount: 4
-        },
-        tab2: {
-            title: "表2：原书 6 × 60° 节卦六步周转与 60 花甲子周天表",
-            columns: ["周转步次", "节卦角度", "花甲子纪时", "地支方位", "三元坐标", "周天节律说明"],
-            rows: [
-                ["第一步 (初爻)", "60°", "甲子 ~ 癸酉", "子 / 丑", "赤道 / 黄道", "60 六节卦第一步，起圆规内在联系"],
-                ["第二步 (二爻)", "120°", "甲戌 ~ 癸未", "寅 / 卯", "白道 / 赤道", "气数自天门地户推进，少阳通融"],
-                ["第三步 (三爻)", "180°", "甲申 ~ 癸巳", "辰 / 巳", "黄道 / 白道", "半周天 180°，阴阳分界质变点"],
-                ["第四步 (四爻)", "240°", "甲午 ~ 癸卯", "午 / 未", "赤道 / 黄道", "太阳转少阴，四象进阶"],
-                ["第五步 (五爻)", "300°", "甲辰 ~ 癸丑", "申 / 酉", "白道 / 赤道", "白道 243 矩交接，天地人感应"],
-                ["第六步 (上爻)", "360°", "甲寅 ~ 癸亥", "戌 / 亥", "黄道 / 白道", "完成 360° 大周转，六爻皆归于 9"]
-            ],
-            summary: "原著谓：“卦之六爻是描写六十花甲子纪时单元的六步周转，360° = 6 × 60° 节卦。”",
-            highlightPositions: [6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78, 81],
-            sectorsCount: 6
-        },
-        tab3: {
-            title: "表3：原书九宫范畴对 12 方位 3 大坐标系 81 矩完整归属表",
-            columns: ["宫位分类", "坐标系统", "包含地支", "包含宫数示例", "降维特征"],
-            rows: [
-                ["一、四、七宫", "🔴 赤道坐标 (天)", "子、午、卯、酉", "1, 4, 7, 10, 19, 28, 37, 46, 55, 64, 73", "子午为经，卯酉为纬，直承天德"],
-                ["二、五、八宫", "🟢 黄道坐标 (地)", "丑、辰、未、戌", "2, 5, 8, 11, 20, 29, 38, 47, 56, 65, 74", "春夏秋冬四季墓土，黄道运转"],
-                ["三、六、九宫", "🔵 白道坐标 (万物)", "寅、申、巳、亥", "3, 6, 9, 12, 21, 30, 39, 48, 57, 66, 75, 81", "四立四维，九宫矩数所集出入天门"]
-            ],
-            summary: "梁致堂先生强调：12 方位全部气数尽归于九宫范畴！一四七赤道、二五八黄道、三六九白道，严丝合缝！",
-            highlightPositions: [1, 4, 7, 2, 5, 8, 3, 6, 9],
-            sectorsCount: 12
-        },
-        tab4: {
-            title: "表4：周天 360° 连续对半分割归九收敛验证表",
-            columns: ["分割次序", "分割角度", "角度求和算式", "众和数计算", "众和极数"],
-            rows: [
-                ["原周天 (0)", "360°", "3 + 6 + 0", "9", "9 (极数)"],
-                ["第 1 次分割", "180°", "1 + 8 + 0", "9", "9 (极数)"],
-                ["第 2 次分割", "90°", "9 + 0", "9", "9 (极数)"],
-                ["第 3 次分割", "45°", "4 + 5", "9", "9 (极数)"],
-                ["第 4 次分割", "22.5°", "2 + 2 + 5", "9", "9 (极数)"],
-                ["第 5 次分割", "11.25°", "1 + 1 + 2 + 5", "9", "9 (极数)"],
-                ["第 6 次分割", "5.625°", "5 + 6 + 2 + 5", "18 ➔ 1 + 8", "9 (极数)"],
-                ["第 7 次分割", "2.8125°", "2 + 8 + 1 + 2 + 5", "18 ➔ 1 + 8", "9 (极数)"],
-                ["第 8 次分割", "1.40625°", "1+4+0+6+2+5", "18 ➔ 1 + 8", "9 (极数)"],
-                ["第 9 次分割", "0.703125°", "7+0+3+1+2+5", "18 ➔ 1 + 8", "9 (极数)"]
-            ],
-            summary: "证明：周天 360° 无论对半分割多少次，其数位众和数 100% 恒无条件收敛归于极数 9！",
-            highlightPositions: [9, 18, 27, 36, 45, 54, 63, 72, 81],
-            sectorsCount: 8
-        }
+    const tabBtns = document.querySelectorAll(".zhoutian-tab-btn");
+    const contentPanels = document.querySelectorAll(".zhoutian-content-panel");
+    const badgeTitle = document.getElementById("zhoutian-badge-title");
+    const badgeDesc = document.getElementById("zhoutian-badge-desc");
+
+    const BADGE_INFO = {
+        "panel-table-1": { title: "4 象 90° 质变与 4 个 81 矩映射表", desc: "解构 90° 质变节点在太乙 81 宫的阵图投影" },
+        "panel-table-2": { title: "6 × 60° 节卦六步周转与 60 花甲子表", desc: "节卦 6 律周转，每步 60°，6 步完成 360° 周天大循环" },
+        "panel-table-3": { title: "九宫范畴对 12 方位 3 大坐标系 81 矩表", desc: "展现坎水一宫、离火九宫等在赤黄白三道的气数控制" },
+        "panel-table-4": { title: "周天 360° 连续对半分割归九收敛表", desc: "从 360° 到 0.703125° 连续 9 次对半分割，众和极数恒为 9" }
     };
 
-    const tableTitle = document.getElementById("table-360-title");
-    const tableThead = document.getElementById("table-360-thead");
-    const tableTbody = document.getElementById("table-360-tbody");
-    const tableSummary = document.getElementById("table-360-summary");
-
-    function renderTable(tabKey) {
-        const data = TABLES_DATA[tabKey];
-        if (!data) return;
-
-        tableTitle.innerHTML = `<span>📋</span> ${data.title}`;
-
-        // 表头
-        let headerHtml = "<tr>";
-        data.columns.forEach(col => {
-            headerHtml += `<th>${col}</th>`;
-        });
-        headerHtml += "</tr>";
-        tableThead.innerHTML = headerHtml;
-
-        // 表体
-        let bodyHtml = "";
-        data.rows.forEach(row => {
-            bodyHtml += "<tr>";
-            row.forEach((cell, idx) => {
-                if (idx === row.length - 1) {
-                    bodyHtml += `<td style="color:#ffe066; font-weight:700;">${cell}</td>`;
-                } else {
-                    bodyHtml += `<td>${cell}</td>`;
-                }
-            });
-            bodyHtml += "</tr>";
-        });
-        tableTbody.innerHTML = bodyHtml;
-
-        // 分析总结
-        tableSummary.innerHTML = `
-            <div class="card-title"><span>💡</span> 原著深度解构</div>
-            <div class="law-desc-text" style="color:#ffffff;">${data.summary}</div>
-        `;
-
-        // 亮起太乙 81 矩阵
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            const p = parseInt(cell.dataset.pos, 10);
-            if (data.highlightPositions.includes(p)) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
-        });
-
-        // 更新 3D 扇区
-        engine.render360Sectors(data.sectorsCount);
-    }
-
-    document.querySelectorAll(".tab-360-btn").forEach(btn => {
+    tabBtns.forEach(btn => {
         btn.addEventListener("click", function() {
-            document.querySelectorAll(".tab-360-btn").forEach(b => b.classList.remove("active"));
+            tabBtns.forEach(b => b.classList.remove("active"));
             this.classList.add("active");
-            const key = this.dataset.tab;
-            renderTable(key);
+
+            const targetId = this.dataset.target;
+            contentPanels.forEach(panel => {
+                panel.style.display = (panel.id === targetId) ? "block" : "none";
+            });
+
+            if (BADGE_INFO[targetId]) {
+                badgeTitle.innerText = BADGE_INFO[targetId].title;
+                badgeDesc.innerText = BADGE_INFO[targetId].desc;
+            }
         });
     });
 
-    renderTable("tab1"); // 默认展示表 1
+    const btnSpeed = document.getElementById("btn-speed-control");
+    const speedVal = document.getElementById("speed-val");
+    const speedLevels = [0.5, 1.0, 2.0, 4.0];
+    let currentSpeedIdx = 1;
+
+    if (btnSpeed) {
+        btnSpeed.addEventListener("click", () => {
+            currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
+            const level = speedLevels[currentSpeedIdx];
+            if (speedVal) speedVal.innerText = `${level}x`;
+        });
+    }
+
+    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.equatorGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.eclipticGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.lunarGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-reset-view").addEventListener("click", () => {
+        engine.adjustCameraFit();
+    });
+    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.autoRotate = this.classList.contains("active");
+    });
 });

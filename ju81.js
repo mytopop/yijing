@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》用矩法·一矩至十二矩运动规律 - 核心逻辑 (ju81.js)
-   特点：1矩(81) ~ 12矩(972) 3D 螺旋光束 + 81 宫降维映射 + 三际天周解构
+   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 1矩(81) ~ 12矩(972) 3D 螺旋拓扑
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,7 +43,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class Ju813DEngine {
+class Ju81Vivid3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.width = this.container.clientWidth || 400;
@@ -57,12 +57,20 @@ class Ju813DEngine {
         this.equatorGroup = new THREE.Group();
         this.eclipticGroup = new THREE.Group();
         this.lunarGroup = new THREE.Group();
+        this.celestialGridGroup = new THREE.Group();
+        this.orbsGroup = new THREE.Group();
         this.juSpiralGroup = new THREE.Group();
 
+        this.sunMesh = null;
+        this.moonMesh = null;
+        this.sunAngle = 0;
+        this.moonAngle = 0;
         this.autoRotate = true;
 
         this.initScene();
         this.createArmillaryRings();
+        this.createCelestialGridAndPoles();
+        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -90,6 +98,8 @@ class Ju813DEngine {
         this.scene.add(this.equatorGroup);
         this.scene.add(this.eclipticGroup);
         this.scene.add(this.lunarGroup);
+        this.scene.add(this.celestialGridGroup);
+        this.scene.add(this.orbsGroup);
         this.scene.add(this.juSpiralGroup);
     }
 
@@ -124,30 +134,82 @@ class Ju813DEngine {
         this.scene.add(goldLight);
     }
 
+    createCelestialGridAndPoles() {
+        const radius = 6.0;
+
+        const gridGeom = new THREE.SphereGeometry(radius * 1.02, 24, 18);
+        const gridMat = new THREE.MeshBasicMaterial({ color: 0x4dabf7, wireframe: true, transparent: true, opacity: 0.08 });
+        const gridMesh = new THREE.Mesh(gridGeom, gridMat);
+        this.celestialGridGroup.add(gridMesh);
+
+        const polePoints = [new THREE.Vector3(0, 0, -8.5), new THREE.Vector3(0, 0, 8.5)];
+        const poleGeom = new THREE.BufferGeometry().setFromPoints(polePoints);
+        const poleMat = new THREE.LineDashedMaterial({ color: 0xffe066, dashSize: 0.4, gapSize: 0.2, linewidth: 2 });
+        const poleLine = new THREE.Line(poleGeom, poleMat);
+        poleLine.computeLineDistances();
+        this.celestialGridGroup.add(poleLine);
+
+        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
+        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        const northStar = new THREE.Mesh(northStarGeom, northStarMat);
+        northStar.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northStar);
+
+        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.8);
+        this.celestialGridGroup.add(northSprite);
+    }
+
     createArmillaryRings() {
         const radius = 6.0;
 
-        const equatorGeom = new THREE.TorusGeometry(radius, 0.05, 16, 120);
-        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x660000 });
+        const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
+        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
-        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x004400 });
+        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
-        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x002266 });
+        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
 
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
+
+            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
+            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
+            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
+            orbMesh.position.copy(pos);
+            this.orbsGroup.add(orbMesh);
+
+            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
+            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+            ringMesh.position.copy(pos);
+            ringMesh.rotation.x = Math.PI / 2;
+            this.orbsGroup.add(ringMesh);
+
             const sprite = this.createTextSprite(b.name, b.color);
             sprite.position.copy(pos.clone().multiplyScalar(1.18));
-            this.scene.add(sprite);
+            this.orbsGroup.add(sprite);
         });
+    }
+
+    createSunAndMoonObjects() {
+        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
+        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
+        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
+        this.scene.add(this.sunMesh);
+
+        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
+        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
+        this.scene.add(this.moonMesh);
     }
 
     createTextSprite(text, colorHex) {
@@ -156,7 +218,7 @@ class Ju813DEngine {
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(16, 22, 40, 0.92)";
+        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
         ctx.beginPath();
         ctx.arc(64, 64, 52, 0, Math.PI * 2);
         ctx.fill();
@@ -209,7 +271,6 @@ class Ju813DEngine {
         const tubeMesh = new THREE.Mesh(tubeGeom, tubeMat);
         this.juSpiralGroup.add(tubeMesh);
 
-        // 端点珠子
         points.forEach((p, idx) => {
             if (idx % 9 === 0) {
                 const sGeom = new THREE.SphereGeometry(0.38, 16, 16);
@@ -228,13 +289,24 @@ class Ju813DEngine {
             this.scene.rotation.z += 0.002;
         }
 
+        this.sunAngle += 0.008;
+        const sunRadius = 6.0;
+        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
+        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
+        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
+
+        this.moonAngle -= 0.012;
+        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
+        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
+        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
+
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Ju813DEngine("three-canvas-ju");
+    const engine = new Ju81Vivid3DEngine("three-canvas-ju");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -379,5 +451,38 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    renderJuDetail(1); // 默认 1 矩
+    const btnSpeed = document.getElementById("btn-speed-control");
+    const speedVal = document.getElementById("speed-val");
+    const speedLevels = [0.5, 1.0, 2.0, 4.0];
+    let currentSpeedIdx = 1;
+
+    if (btnSpeed) {
+        btnSpeed.addEventListener("click", () => {
+            currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
+            const level = speedLevels[currentSpeedIdx];
+            if (speedVal) speedVal.innerText = `${level}x`;
+        });
+    }
+
+    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.equatorGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.eclipticGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.lunarGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-reset-view").addEventListener("click", () => {
+        engine.adjustCameraFit();
+    });
+    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.autoRotate = this.classList.contains("active");
+    });
+
+    renderJuDetail(1);
 });

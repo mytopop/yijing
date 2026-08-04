@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》939697 计七数一览表解构馆 - 核心逻辑 (qishu939697.js)
-   特点：无中间大球 + 12地支三分坐标环 + 恢复原版 9 宫卡片 + 解构 93, 96, 97 矩数与乘 7 律
+   《易经数理秘笈》939697 计七数一览表解构馆 - (qishu939697.js)
+   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 白道与子午颠倒律解构
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,7 +43,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class Qishu939697Engine {
+class Qishu939697Vivid3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.width = this.container.clientWidth || 400;
@@ -57,14 +57,19 @@ class Qishu939697Engine {
         this.equatorGroup = new THREE.Group();
         this.eclipticGroup = new THREE.Group();
         this.lunarGroup = new THREE.Group();
-        this.nodesGroup = new THREE.Group();
-        this.beamGroup = new THREE.Group();
+        this.celestialGridGroup = new THREE.Group();
+        this.orbsGroup = new THREE.Group();
 
+        this.sunMesh = null;
+        this.moonMesh = null;
+        this.sunAngle = 0;
+        this.moonAngle = 0;
         this.autoRotate = true;
-        this.pulseSpeedMultiplier = 1.0;
 
         this.initScene();
         this.createArmillaryRings();
+        this.createCelestialGridAndPoles();
+        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -92,8 +97,8 @@ class Qishu939697Engine {
         this.scene.add(this.equatorGroup);
         this.scene.add(this.eclipticGroup);
         this.scene.add(this.lunarGroup);
-        this.scene.add(this.nodesGroup);
-        this.scene.add(this.beamGroup);
+        this.scene.add(this.celestialGridGroup);
+        this.scene.add(this.orbsGroup);
     }
 
     adjustCameraFit() {
@@ -125,26 +130,48 @@ class Qishu939697Engine {
         const goldLight = new THREE.PointLight(0xffe066, 2.5, 60);
         goldLight.position.set(0, 0, 15);
         this.scene.add(goldLight);
+    }
 
-        const blueLight = new THREE.PointLight(0x4dabf7, 1.8, 60);
-        blueLight.position.set(0, 15, -10);
-        this.scene.add(blueLight);
+    createCelestialGridAndPoles() {
+        const radius = 6.0;
+
+        const gridGeom = new THREE.SphereGeometry(radius * 1.02, 24, 18);
+        const gridMat = new THREE.MeshBasicMaterial({ color: 0x4dabf7, wireframe: true, transparent: true, opacity: 0.08 });
+        const gridMesh = new THREE.Mesh(gridGeom, gridMat);
+        this.celestialGridGroup.add(gridMesh);
+
+        const polePoints = [new THREE.Vector3(0, 0, -8.5), new THREE.Vector3(0, 0, 8.5)];
+        const poleGeom = new THREE.BufferGeometry().setFromPoints(polePoints);
+        const poleMat = new THREE.LineDashedMaterial({ color: 0xffe066, dashSize: 0.4, gapSize: 0.2, linewidth: 2 });
+        const poleLine = new THREE.Line(poleGeom, poleMat);
+        poleLine.computeLineDistances();
+        this.celestialGridGroup.add(poleLine);
+
+        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
+        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        const northStar = new THREE.Mesh(northStarGeom, northStarMat);
+        northStar.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northStar);
+
+        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.8);
+        this.celestialGridGroup.add(northSprite);
     }
 
     createArmillaryRings() {
         const radius = 6.0;
 
-        const equatorGeom = new THREE.TorusGeometry(radius, 0.05, 16, 120);
-        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x660000 });
+        const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
+        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
-        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x004400 });
+        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
-        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x002266 });
+        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
@@ -152,35 +179,35 @@ class Qishu939697Engine {
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const nodeGeom = new THREE.SphereGeometry(0.28, 16, 16);
-            const nodeMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1 });
-            const nodeMesh = new THREE.Mesh(nodeGeom, nodeMat);
-            nodeMesh.position.copy(pos);
-            this.nodesGroup.add(nodeMesh);
+            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
+            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
+            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
+            orbMesh.position.copy(pos);
+            this.orbsGroup.add(orbMesh);
+
+            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
+            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+            ringMesh.position.copy(pos);
+            ringMesh.rotation.x = Math.PI / 2;
+            this.orbsGroup.add(ringMesh);
 
             const sprite = this.createTextSprite(b.name, b.color);
             sprite.position.copy(pos.clone().multiplyScalar(1.18));
-            this.nodesGroup.add(sprite);
+            this.orbsGroup.add(sprite);
         });
-
-        this.createStarfield();
     }
 
-    createStarfield() {
-        const starsGeom = new THREE.BufferGeometry();
-        const count = 250;
-        const positions = new Float32Array(count * 3);
+    createSunAndMoonObjects() {
+        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
+        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
+        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
+        this.scene.add(this.sunMesh);
 
-        for (let i = 0; i < count * 3; i += 3) {
-            positions[i] = (Math.random() - 0.5) * 60;
-            positions[i+1] = (Math.random() - 0.5) * 60;
-            positions[i+2] = (Math.random() - 0.5) * 60;
-        }
-
-        starsGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const starsMat = new THREE.PointsMaterial({ color: 0xffe066, size: 0.08, transparent: true, opacity: 0.4 });
-        const starfield = new THREE.Points(starsGeom, starsMat);
-        this.scene.add(starfield);
+        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
+        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
+        this.scene.add(this.moonMesh);
     }
 
     createTextSprite(text, colorHex) {
@@ -189,7 +216,7 @@ class Qishu939697Engine {
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(16, 22, 40, 0.92)";
+        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
         ctx.beginPath();
         ctx.arc(64, 64, 52, 0, Math.PI * 2);
         ctx.fill();
@@ -210,38 +237,23 @@ class Qishu939697Engine {
         return sprite;
     }
 
-    clearBeams() {
-        while (this.beamGroup.children.length > 0) {
-            const obj = this.beamGroup.children.pop();
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
-        }
-    }
-
-    renderPairBeam(bIdx1, bIdx2) {
-        this.clearBeams();
-        const p1 = getBranch3DPos(bIdx1, 6.0);
-        const p2 = getBranch3DPos(bIdx2, 6.0);
-
-        const geom = new THREE.BufferGeometry().setFromPoints([p1, p2]);
-        const mat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
-        const line = new THREE.Line(geom, mat);
-        this.beamGroup.add(line);
-
-        const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff5252 }));
-        s1.position.copy(p1);
-        const s2 = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 16), new THREE.MeshBasicMaterial({ color: 0x4dabf7 }));
-        s2.position.copy(p2);
-        this.beamGroup.add(s1);
-        this.beamGroup.add(s2);
-    }
-
     animate() {
         requestAnimationFrame(() => this.animate());
 
         if (this.autoRotate) {
-            this.scene.rotation.z += 0.002 * this.pulseSpeedMultiplier;
+            this.scene.rotation.z += 0.002;
         }
+
+        this.sunAngle += 0.008;
+        const sunRadius = 6.0;
+        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
+        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
+        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
+
+        this.moonAngle -= 0.012;
+        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
+        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
+        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
 
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
@@ -249,7 +261,7 @@ class Qishu939697Engine {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Qishu939697Engine("three-canvas-939697");
+    const engine = new Qishu939697Vivid3DEngine("three-canvas-qishu939697");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -276,9 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.dataset.pos = num;
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
-                cell.addEventListener("click", () => {
-                    highlight939697Pos(num);
-                });
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -286,58 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function highlight939697Pos(num) {
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            if (parseInt(cell.dataset.pos, 10) === num) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
-        });
-    }
-
     initLuoshuTaiyi9x9Matrix();
-
-    const qishuBtns = document.querySelectorAll(".qishu-btn");
-    const qishuResultBox = document.getElementById("qishu-result-box");
-
-    const QISHU_DATA = {
-        "93": { name: "93 矩数 (243矩 · 白道)", branch1: 2, branch2: 8, pos: [24, 63], desc: "243 矩在寅位顺时针衍进，白道坐标核心枢纽 (寅申对冲)" },
-        "96": { name: "96 矩数 (54九 · 归妹卦)", branch1: 5, branch2: 11, pos: [54, 18], desc: "54 九归妹卦在巳位 (地户)，乘偶数归亥位 (天门)，巳亥阴阳对冲" },
-        "97": { name: "97 乘七律 (子午颠倒律)", branch1: 0, branch2: 6, pos: [49, 13], desc: "乘 7 律为子午颠倒律：子位 13×7=91(午位)，午位 7×7=49(子位)，构建天体正轴" }
-    };
-
-    qishuBtns.forEach(btn => {
-        btn.addEventListener("click", () => {
-            qishuBtns.forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            const mode = btn.dataset.mode;
-            const data = QISHU_DATA[mode];
-
-            engine.renderPairBeam(data.branch1, data.branch2);
-            document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-                const p = parseInt(cell.dataset.pos, 10);
-                if (data.pos.includes(p)) {
-                    cell.classList.add("active-pos");
-                } else {
-                    cell.classList.remove("active-pos");
-                }
-            });
-
-            if (qishuResultBox) {
-                qishuResultBox.innerHTML = `
-                    <div style="font-weight: 700; color: #ffe066;">
-                        解构项目：${data.name}
-                    </div>
-                    <div style="margin-top: 4px; font-size: 12px; color: #cbd5e1;">
-                        ${data.desc}。<br>
-                        太乙 81 宫矩阵对应落点 ${data.pos.join("、")} 号同步高亮！
-                    </div>
-                `;
-            }
-        });
-    });
 
     const btnSpeed = document.getElementById("btn-speed-control");
     const speedVal = document.getElementById("speed-val");
@@ -348,8 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSpeed.addEventListener("click", () => {
             currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
             const level = speedLevels[currentSpeedIdx];
-            engine.pulseSpeedMultiplier = level;
-            speedVal.innerText = `${level}x`;
+            if (speedVal) speedVal.innerText = `${level}x`;
         });
     }
 
@@ -372,6 +329,4 @@ document.addEventListener("DOMContentLoaded", () => {
         this.classList.toggle("active");
         engine.autoRotate = this.classList.contains("active");
     });
-
-    if (qishuBtns.length > 0) qishuBtns[0].click();
 });

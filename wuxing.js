@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》五行生克、天干合化与 180 年三元九运解构引擎 (wuxing.js)
-   特点：地支三合局月相算法 + 天干五合化气 + 五行生克 3D 五角星 + 180 年三元历法
+   《易经数理秘笈》五行三元与地支三合月相解构馆 - (wuxing.js)
+   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 四大五行三元权威模块
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,7 +43,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class Wuxing3DEngine {
+class WuxingVivid3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.width = this.container.clientWidth || 400;
@@ -57,12 +57,20 @@ class Wuxing3DEngine {
         this.equatorGroup = new THREE.Group();
         this.eclipticGroup = new THREE.Group();
         this.lunarGroup = new THREE.Group();
-        this.shapeGroup = new THREE.Group();
+        this.celestialGridGroup = new THREE.Group();
+        this.orbsGroup = new THREE.Group();
+        this.wuxing3DGroup = new THREE.Group();
 
+        this.sunMesh = null;
+        this.moonMesh = null;
+        this.sunAngle = 0;
+        this.moonAngle = 0;
         this.autoRotate = true;
 
         this.initScene();
         this.createArmillaryRings();
+        this.createCelestialGridAndPoles();
+        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -90,7 +98,9 @@ class Wuxing3DEngine {
         this.scene.add(this.equatorGroup);
         this.scene.add(this.eclipticGroup);
         this.scene.add(this.lunarGroup);
-        this.scene.add(this.shapeGroup);
+        this.scene.add(this.celestialGridGroup);
+        this.scene.add(this.orbsGroup);
+        this.scene.add(this.wuxing3DGroup);
     }
 
     adjustCameraFit() {
@@ -124,30 +134,82 @@ class Wuxing3DEngine {
         this.scene.add(goldLight);
     }
 
+    createCelestialGridAndPoles() {
+        const radius = 6.0;
+
+        const gridGeom = new THREE.SphereGeometry(radius * 1.02, 24, 18);
+        const gridMat = new THREE.MeshBasicMaterial({ color: 0x4dabf7, wireframe: true, transparent: true, opacity: 0.08 });
+        const gridMesh = new THREE.Mesh(gridGeom, gridMat);
+        this.celestialGridGroup.add(gridMesh);
+
+        const polePoints = [new THREE.Vector3(0, 0, -8.5), new THREE.Vector3(0, 0, 8.5)];
+        const poleGeom = new THREE.BufferGeometry().setFromPoints(polePoints);
+        const poleMat = new THREE.LineDashedMaterial({ color: 0xffe066, dashSize: 0.4, gapSize: 0.2, linewidth: 2 });
+        const poleLine = new THREE.Line(poleGeom, poleMat);
+        poleLine.computeLineDistances();
+        this.celestialGridGroup.add(poleLine);
+
+        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
+        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        const northStar = new THREE.Mesh(northStarGeom, northStarMat);
+        northStar.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northStar);
+
+        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.8);
+        this.celestialGridGroup.add(northSprite);
+    }
+
     createArmillaryRings() {
         const radius = 6.0;
 
-        const equatorGeom = new THREE.TorusGeometry(radius, 0.05, 16, 120);
-        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x660000 });
+        const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
+        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
-        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x004400 });
+        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
-        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x002266 });
+        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
 
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
+
+            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
+            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
+            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
+            orbMesh.position.copy(pos);
+            this.orbsGroup.add(orbMesh);
+
+            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
+            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+            ringMesh.position.copy(pos);
+            ringMesh.rotation.x = Math.PI / 2;
+            this.orbsGroup.add(ringMesh);
+
             const sprite = this.createTextSprite(b.name, b.color);
             sprite.position.copy(pos.clone().multiplyScalar(1.18));
-            this.scene.add(sprite);
+            this.orbsGroup.add(sprite);
         });
+    }
+
+    createSunAndMoonObjects() {
+        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
+        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
+        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
+        this.scene.add(this.sunMesh);
+
+        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
+        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
+        this.scene.add(this.moonMesh);
     }
 
     createTextSprite(text, colorHex) {
@@ -156,7 +218,7 @@ class Wuxing3DEngine {
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(16, 22, 40, 0.92)";
+        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
         ctx.beginPath();
         ctx.arc(64, 64, 52, 0, Math.PI * 2);
         ctx.fill();
@@ -177,56 +239,52 @@ class Wuxing3DEngine {
         return sprite;
     }
 
-    clearShapeGroup() {
-        while (this.shapeGroup.children.length > 0) {
-            const obj = this.shapeGroup.children.pop();
+    clearWuxing3DGroup() {
+        while (this.wuxing3DGroup.children.length > 0) {
+            const obj = this.wuxing3DGroup.children.pop();
             if (obj.geometry) obj.geometry.dispose();
             if (obj.material) obj.material.dispose();
         }
     }
 
-    render3DTriangle(branchIndices, colorHex) {
-        this.clearShapeGroup();
+    renderSanheTriangle(branchIndices, colorHex) {
+        this.clearWuxing3DGroup();
         const p1 = getBranch3DPos(branchIndices[0]);
         const p2 = getBranch3DPos(branchIndices[1]);
         const p3 = getBranch3DPos(branchIndices[2]);
-
         const points = [p1, p2, p3, p1];
+
         const geom = new THREE.BufferGeometry().setFromPoints(points);
         const mat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 3 });
         const line = new THREE.Line(geom, mat);
-        this.shapeGroup.add(line);
+        this.wuxing3DGroup.add(line);
 
         points.slice(0, 3).forEach(p => {
-            const sphereGeom = new THREE.SphereGeometry(0.4, 16, 16);
-            const sphereMat = new THREE.MeshStandardMaterial({ color: colorHex, emissive: colorHex, metalness: 0.9 });
-            const sphere = new THREE.Mesh(sphereGeom, sphereMat);
-            sphere.position.copy(p);
-            this.shapeGroup.add(sphere);
+            const sGeom = new THREE.SphereGeometry(0.45, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: colorHex, emissive: colorHex });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.wuxing3DGroup.add(sMesh);
         });
     }
 
-    render3DPentagram() {
-        this.clearShapeGroup();
-        // 5 个五行节点: 木(3), 火(9), 土(5), 金(7), 水(1)
-        const order = [3, 9, 5, 7, 1, 3];
-        const points = [];
-        order.forEach(palaceNum => {
-            // map palace to branch: 3->卯(3), 9->午(6), 5->辰(4), 7->酉(9), 1->子(0)
-            let bIdx = 0;
-            if (palaceNum === 3) bIdx = 3;
-            else if (palaceNum === 9) bIdx = 6;
-            else if (palaceNum === 5) bIdx = 4;
-            else if (palaceNum === 7) bIdx = 9;
-            else if (palaceNum === 1) bIdx = 0;
-
-            points.push(getBranch3DPos(bIdx));
-        });
+    renderPentagramKe() {
+        this.clearWuxing3DGroup();
+        const pentIndices = [0, 6, 9, 3, 4, 0];
+        const points = pentIndices.map(idx => getBranch3DPos(idx));
 
         const geom = new THREE.BufferGeometry().setFromPoints(points);
         const mat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
         const line = new THREE.Line(geom, mat);
-        this.shapeGroup.add(line);
+        this.wuxing3DGroup.add(line);
+
+        points.slice(0, 5).forEach(p => {
+            const sGeom = new THREE.SphereGeometry(0.4, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xaa7c11 });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.wuxing3DGroup.add(sMesh);
+        });
     }
 
     animate() {
@@ -236,13 +294,24 @@ class Wuxing3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
+        this.sunAngle += 0.008;
+        const sunRadius = 6.0;
+        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
+        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
+        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
+
+        this.moonAngle -= 0.012;
+        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
+        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
+        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
+
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Wuxing3DEngine("three-canvas-wuxing");
+    const engine = new WuxingVivid3DEngine("three-canvas-wuxing");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -278,135 +347,117 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
-    // 三合局与月相算法
-    const SANHE_DATA = {
-        water: {
-            name: "申子辰 (水局·润下)",
-            color: "#4dabf7",
-            branches: [8, 0, 4],
-            palaceNums: [1, 5, 9],
-            desc: "水局对应润下生灵，原书 P246 明确预报月相出落规律：",
-            moonList: [
-                "• 农历三日：月出辰时 (黄道)",
-                "• 农历十三日：月出申时 (白道)",
-                "• 农历二十三日：月出子时 (赤道)"
-            ]
-        },
-        metal: {
-            name: "巳酉丑 (金局·从革)",
-            color: "#dee2e6",
-            branches: [5, 9, 1],
-            palaceNums: [2, 6, 7],
-            desc: "金局对应从革肃杀，原书 P246 预测月相规律：",
-            moonList: [
-                "• 农历五日：月出巳时 (白道)",
-                "• 农历十五日：月出酉时 (赤道)",
-                "• 农历二十五日：月出丑时 (黄道)"
-            ]
-        },
-        fire: {
-            name: "寅午戌 (火局·炎上)",
-            color: "#ff5252",
-            branches: [2, 6, 10],
-            palaceNums: [3, 8, 9],
-            desc: "火局对应炎上光明，原书 P246 预测月相规律：",
-            moonList: [
-                "• 农历八日：月出午时 (赤道)",
-                "• 农历十八日：月出戌时 (黄道)",
-                "• 农历二十八日：月出寅时 (白道)"
-            ]
-        },
-        wood: {
-            name: "亥卯未 (木局·发生)",
-            color: "#40c057",
-            branches: [11, 3, 7],
-            palaceNums: [3, 4, 8],
-            desc: "木局对应曲直发生，原书 P246 预测月相规律：",
-            moonList: [
-                "• 农历十日：月出未时 (黄道)",
-                "• 农历二十日：月出亥时 (白道)",
-                "• 农历三十日：月出卯时 (赤道)"
-            ]
+    const wuxingModuleSelect = document.getElementById("wuxing-module-select");
+    const moduleCardSanhe = document.getElementById("module-card-sanhe");
+    const moduleCardTiangan = document.getElementById("module-card-tiangan");
+    const moduleCardShengke = document.getElementById("module-card-shengke");
+    const moduleCardSanyuan = document.getElementById("module-card-sanyuan");
+
+    const wuxingBadgeTitle = document.getElementById("wuxing-badge-title");
+    const wuxingBadgeDesc = document.getElementById("wuxing-badge-desc");
+
+    function switchModule(modKey) {
+        [moduleCardSanhe, moduleCardTiangan, moduleCardShengke, moduleCardSanyuan].forEach(el => {
+            if (el) el.style.display = "none";
+        });
+
+        document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+
+        if (modKey === "sanhe") {
+            if (moduleCardSanhe) moduleCardSanhe.style.display = "block";
+            wuxingBadgeTitle.innerText = "地支三合局 3D 三角形与月相算法";
+            wuxingBadgeDesc.innerText = "根据原书 P246，申子辰水局、巳酉丑金局等预报农历出落时辰";
+            engine.renderSanheTriangle([8, 0, 4], 0x4dabf7);
+            highlightMatrixByBranches([8, 0, 4]);
+        } else if (modKey === "tiangan") {
+            if (moduleCardTiangan) moduleCardTiangan.style.display = "block";
+            wuxingBadgeTitle.innerText = "天干五合化气律与九宫归属表";
+            wuxingBadgeDesc.innerText = "甲己合化土、乙庚合化金、丙辛合化水、丁壬合化木、戊癸合化火";
+            engine.clearWuxing3DGroup();
+        } else if (modKey === "shengke") {
+            if (moduleCardShengke) moduleCardShengke.style.display = "block";
+            wuxingBadgeTitle.innerText = "五行相生相克 3D 五角星阵";
+            wuxingBadgeDesc.innerText = "相生(水木火土金)与 3D 天球五行相克五角星阵拓扑";
+            engine.renderPentagramKe();
+        } else if (modKey === "sanyuan") {
+            if (moduleCardSanyuan) moduleCardSanyuan.style.display = "block";
+            wuxingBadgeTitle.innerText = "180 年甲子三元九运大周天历表";
+            wuxingBadgeDesc.innerText = "上中下三元共 180 年（每运 20 年），解构天道运化81宫归属";
+            engine.clearWuxing3DGroup();
         }
-    };
+    }
 
-    const sanheResultBox = document.getElementById("sanhe-result-box");
-
-    function renderSanhe(sanheKey) {
-        const data = SANHE_DATA[sanheKey];
-        if (!data) return;
-
-        let moonHtml = data.moonList.map(m => `<div style="font-size:12px; color:#ffffff; margin:3px 0;">${m}</div>`).join('');
-
-        sanheResultBox.innerHTML = `
-            <div style="font-size: 13px; font-weight: 800; color: ${data.color}; margin-bottom: 4px;">
-                🔺 ${data.name}
-            </div>
-            <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 6px;">
-                ${data.desc}
-            </div>
-            <div style="background: rgba(10, 14, 23, 0.7); padding: 8px; border-radius: 6px; border: 1px solid ${data.color};">
-                ${moonHtml}
-            </div>
-        `;
-
+    function highlightMatrixByBranches(branchIndices) {
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
             const p = parseInt(cell.dataset.pos, 10);
-            const rem81 = p % 81 === 0 ? 81 : p % 81;
-            const rem12 = rem81 % 12 === 0 ? 12 : rem81 % 12;
-            const bIdx = rem12 - 1;
-
-            if (data.branches.includes(bIdx)) {
+            const rem12 = p % 12 === 0 ? 12 : p % 12;
+            if (branchIndices.includes(rem12 - 1)) {
                 cell.classList.add("active-pos");
             } else {
                 cell.classList.remove("active-pos");
             }
         });
-
-        engine.render3DTriangle(data.branches, parseInt(data.color.replace('#', '0x'), 16));
     }
 
-    document.querySelectorAll(".sanhe-detail-btn").forEach(btn => {
+    if (wuxingModuleSelect) {
+        wuxingModuleSelect.addEventListener("change", (e) => {
+            switchModule(e.target.value);
+        });
+    }
+
+    const SANHE_MAP = {
+        wood:  { name: "亥卯未 (木局)", color: "#40c057", branches: [11, 3, 7] },
+        fire:  { name: "寅午戌 (火局)", color: "#ff5252", branches: [2, 6, 10] },
+        metal: { name: "巳酉丑 (金局)", color: "#dee2e6", branches: [5, 9, 1] },
+        water: { name: "申子辰 (水局)", color: "#4dabf7", branches: [8, 0, 4] }
+    };
+
+    document.querySelectorAll(".sanhe-btn").forEach(btn => {
         btn.addEventListener("click", function() {
-            document.querySelectorAll(".sanhe-detail-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".sanhe-btn").forEach(b => b.classList.remove("active"));
             this.classList.add("active");
-            renderSanhe(this.dataset.sanhe);
+
+            const key = this.dataset.sanhe;
+            const data = SANHE_MAP[key];
+            if (!data) return;
+
+            engine.renderSanheTriangle(data.branches, parseInt(data.color.replace('#', '0x'), 16));
+            highlightMatrixByBranches(data.branches);
         });
     });
 
-    // 四大主 Tab 切换
-    document.querySelectorAll(".wuxing-tab-btn").forEach(btn => {
-        btn.addEventListener("click", function() {
-            document.querySelectorAll(".wuxing-tab-btn").forEach(b => b.classList.remove("active"));
-            this.classList.add("active");
+    const btnSpeed = document.getElementById("btn-speed-control");
+    const speedVal = document.getElementById("speed-val");
+    const speedLevels = [0.5, 1.0, 2.0, 4.0];
+    let currentSpeedIdx = 1;
 
-            const tabKey = this.dataset.tab;
-            document.querySelectorAll(".wuxing-section-box").forEach(box => box.style.display = "none");
-
-            if (tabKey === "tab-sanhe") {
-                document.getElementById("section-sanhe").style.display = "block";
-                renderSanhe("water");
-            } else if (tabKey === "tab-hehua") {
-                document.getElementById("section-hehua").style.display = "block";
-                engine.clearShapeGroup();
-            } else if (tabKey === "tab-shengke") {
-                document.getElementById("section-shengke").style.display = "block";
-                const shengkeBox = document.getElementById("shengke-result-box");
-                shengkeBox.innerHTML = `
-                    <div style="font-size:13px; font-weight:700; color:#ffe066;">五行相生相克 3D 几何说明</div>
-                    <div style="font-size:12px; color:#cbd5e1; margin-top:4px;">
-                        原著第 74 页指出：阴阳二气流行演化为五行。<br>
-                        • <strong>相生环</strong>: 坎一水 ➔ 震巽木 ➔ 离九火 ➔ 坤艮中土 ➔ 乾兑金 ➔ 坎一水。<br>
-                        • <strong>相克阵</strong>: 在 3D 浑天仪上顺次连结构成五角星阵。
-                    </div>
-                `;
-                engine.render3DPentagram();
-            } else if (tabKey === "tab-sanyuan") {
-                document.getElementById("section-sanyuan").style.display = "block";
-                engine.clearShapeGroup();
-            }
+    if (btnSpeed) {
+        btnSpeed.addEventListener("click", () => {
+            currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
+            const level = speedLevels[currentSpeedIdx];
+            if (speedVal) speedVal.innerText = `${level}x`;
         });
+    }
+
+    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.equatorGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.eclipticGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.lunarGroup.visible = this.classList.contains("active");
+    });
+    document.getElementById("btn-reset-view").addEventListener("click", () => {
+        engine.adjustCameraFit();
+    });
+    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
+        this.classList.toggle("active");
+        engine.autoRotate = this.classList.contains("active");
     });
 
-    renderSanhe("water"); // 默认水局
+    switchModule("sanhe"); // 默认模块 1
 });

@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》九宫纪·七输入一览表 - 核心逻辑 (jiugong_qi.js)
-   特点：无中间大球 + 12地支三分坐标环 + 恢复原版 9 宫卡片 + 书中七输入算式演示
+   《易经数理秘笈》九宫纪·七输入一览表解构馆 - (jiugong_qi.js)
+   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 七行递算演算
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,7 +43,7 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class JiugongQiEngine {
+class JiugongQiVivid3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.width = this.container.clientWidth || 400;
@@ -57,14 +57,19 @@ class JiugongQiEngine {
         this.equatorGroup = new THREE.Group();
         this.eclipticGroup = new THREE.Group();
         this.lunarGroup = new THREE.Group();
-        this.nodesGroup = new THREE.Group();
-        this.lineGroup = new THREE.Group();
+        this.celestialGridGroup = new THREE.Group();
+        this.orbsGroup = new THREE.Group();
 
+        this.sunMesh = null;
+        this.moonMesh = null;
+        this.sunAngle = 0;
+        this.moonAngle = 0;
         this.autoRotate = true;
-        this.pulseSpeedMultiplier = 1.0;
 
         this.initScene();
         this.createArmillaryRings();
+        this.createCelestialGridAndPoles();
+        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -92,8 +97,8 @@ class JiugongQiEngine {
         this.scene.add(this.equatorGroup);
         this.scene.add(this.eclipticGroup);
         this.scene.add(this.lunarGroup);
-        this.scene.add(this.nodesGroup);
-        this.scene.add(this.lineGroup);
+        this.scene.add(this.celestialGridGroup);
+        this.scene.add(this.orbsGroup);
     }
 
     adjustCameraFit() {
@@ -125,26 +130,48 @@ class JiugongQiEngine {
         const goldLight = new THREE.PointLight(0xffe066, 2.5, 60);
         goldLight.position.set(0, 0, 15);
         this.scene.add(goldLight);
+    }
 
-        const blueLight = new THREE.PointLight(0x4dabf7, 1.8, 60);
-        blueLight.position.set(0, 15, -10);
-        this.scene.add(blueLight);
+    createCelestialGridAndPoles() {
+        const radius = 6.0;
+
+        const gridGeom = new THREE.SphereGeometry(radius * 1.02, 24, 18);
+        const gridMat = new THREE.MeshBasicMaterial({ color: 0x4dabf7, wireframe: true, transparent: true, opacity: 0.08 });
+        const gridMesh = new THREE.Mesh(gridGeom, gridMat);
+        this.celestialGridGroup.add(gridMesh);
+
+        const polePoints = [new THREE.Vector3(0, 0, -8.5), new THREE.Vector3(0, 0, 8.5)];
+        const poleGeom = new THREE.BufferGeometry().setFromPoints(polePoints);
+        const poleMat = new THREE.LineDashedMaterial({ color: 0xffe066, dashSize: 0.4, gapSize: 0.2, linewidth: 2 });
+        const poleLine = new THREE.Line(poleGeom, poleMat);
+        poleLine.computeLineDistances();
+        this.celestialGridGroup.add(poleLine);
+
+        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
+        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        const northStar = new THREE.Mesh(northStarGeom, northStarMat);
+        northStar.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northStar);
+
+        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.8);
+        this.celestialGridGroup.add(northSprite);
     }
 
     createArmillaryRings() {
         const radius = 6.0;
 
-        const equatorGeom = new THREE.TorusGeometry(radius, 0.05, 16, 120);
-        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x660000 });
+        const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
+        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
-        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x004400 });
+        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
-        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x002266 });
+        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
@@ -152,35 +179,35 @@ class JiugongQiEngine {
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const nodeGeom = new THREE.SphereGeometry(0.28, 16, 16);
-            const nodeMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1 });
-            const nodeMesh = new THREE.Mesh(nodeGeom, nodeMat);
-            nodeMesh.position.copy(pos);
-            this.nodesGroup.add(nodeMesh);
+            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
+            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
+            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
+            orbMesh.position.copy(pos);
+            this.orbsGroup.add(orbMesh);
+
+            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
+            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+            ringMesh.position.copy(pos);
+            ringMesh.rotation.x = Math.PI / 2;
+            this.orbsGroup.add(ringMesh);
 
             const sprite = this.createTextSprite(b.name, b.color);
             sprite.position.copy(pos.clone().multiplyScalar(1.18));
-            this.nodesGroup.add(sprite);
+            this.orbsGroup.add(sprite);
         });
-
-        this.createStarfield();
     }
 
-    createStarfield() {
-        const starsGeom = new THREE.BufferGeometry();
-        const count = 250;
-        const positions = new Float32Array(count * 3);
+    createSunAndMoonObjects() {
+        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
+        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
+        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
+        this.scene.add(this.sunMesh);
 
-        for (let i = 0; i < count * 3; i += 3) {
-            positions[i] = (Math.random() - 0.5) * 60;
-            positions[i+1] = (Math.random() - 0.5) * 60;
-            positions[i+2] = (Math.random() - 0.5) * 60;
-        }
-
-        starsGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const starsMat = new THREE.PointsMaterial({ color: 0xffe066, size: 0.08, transparent: true, opacity: 0.4 });
-        const starfield = new THREE.Points(starsGeom, starsMat);
-        this.scene.add(starfield);
+        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
+        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
+        this.scene.add(this.moonMesh);
     }
 
     createTextSprite(text, colorHex) {
@@ -189,7 +216,7 @@ class JiugongQiEngine {
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(16, 22, 40, 0.92)";
+        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
         ctx.beginPath();
         ctx.arc(64, 64, 52, 0, Math.PI * 2);
         ctx.fill();
@@ -210,31 +237,23 @@ class JiugongQiEngine {
         return sprite;
     }
 
-    clearLines() {
-        while (this.lineGroup.children.length > 0) {
-            const obj = this.lineGroup.children.pop();
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
-        }
-    }
-
-    highlightBranch(branchIdx) {
-        this.clearLines();
-        const pos = getBranch3DPos(branchIdx, 6.0);
-
-        const geom = new THREE.SphereGeometry(0.45, 16, 16);
-        const mat = new THREE.MeshBasicMaterial({ color: 0xffe066 });
-        const mesh = new THREE.Mesh(geom, mat);
-        mesh.position.copy(pos);
-        this.lineGroup.add(mesh);
-    }
-
     animate() {
         requestAnimationFrame(() => this.animate());
 
         if (this.autoRotate) {
-            this.scene.rotation.z += 0.002 * this.pulseSpeedMultiplier;
+            this.scene.rotation.z += 0.002;
         }
+
+        this.sunAngle += 0.008;
+        const sunRadius = 6.0;
+        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
+        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
+        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
+
+        this.moonAngle -= 0.012;
+        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
+        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
+        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
 
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
@@ -242,7 +261,7 @@ class JiugongQiEngine {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new JiugongQiEngine("three-canvas-qi");
+    const engine = new JiugongQiVivid3DEngine("three-canvas-jiugong-qi");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -269,9 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.dataset.pos = num;
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
-                cell.addEventListener("click", () => {
-                    renderQiRowForNum(num);
-                });
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -281,56 +297,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
-    const qiTableBody = document.getElementById("qi-table-body");
-    const qiResultBox = document.getElementById("qi-result-box");
+    const qi7TableBody = document.getElementById("qi7-table-body");
+    const qiBadgeTitle = document.getElementById("jiugong-qi-badge-title");
+    const qiBadgeDesc = document.getElementById("jiugong-qi-badge-desc");
 
-    function renderQiRowForNum(num) {
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            if (parseInt(cell.dataset.pos, 10) === num) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
-        });
-
-        const rem12 = num % 12 === 0 ? 12 : num % 12;
-        const branchIdx = rem12 - 1;
-        const branch = EARTHLY_BRANCHES[branchIdx];
-
-        engine.highlightBranch(branchIdx);
-
-        let rowsHtml = "";
+    function renderQi7Table() {
+        let html = "";
         for (let row = 1; row <= 7; row++) {
-            const val = num + (row - 1) * 81;
-            const r12 = val % 12 === 0 ? 12 : val % 12;
-            const b = EARTHLY_BRANCHES[r12 - 1];
-            rowsHtml += `
+            const val = 7 * row;
+            const rem81 = val % 81 === 0 ? 81 : val % 81;
+            const rem12 = val % 12 === 0 ? 12 : val % 12;
+            const branch = EARTHLY_BRANCHES[rem12 - 1];
+
+            html += `
                 <tr>
-                    <td>第 ${row} 行</td>
-                    <td>${num} + (${row-1} × 81)</td>
-                    <td><strong>${val}</strong></td>
-                    <td>${r12}</td>
-                    <td style="color:${b.color}; font-weight:700;">${b.name}</td>
-                    <td>${b.system}</td>
+                    <td>行 ${row}</td>
+                    <td>7 × ${row}</td>
+                    <td>${val}</td>
+                    <td>${rem81} 号宫</td>
+                    <td>余 ${rem12}</td>
+                    <td style="color:${branch.color}; font-weight:700;">${branch.name}</td>
+                    <td>${branch.system.split('(')[0]}</td>
                 </tr>
             `;
         }
-        if (qiTableBody) qiTableBody.innerHTML = rowsHtml;
-
-        if (qiResultBox) {
-            qiResultBox.innerHTML = `
-                <div style="font-weight: 700; color: #ffe066;">
-                    数值 ${num} 的七输入七行衍生算式
-                </div>
-                <div style="margin-top: 4px; font-size: 12px; color: #cbd5e1;">
-                    首行落于地支 <strong>${branch.name}位</strong> (${branch.system})。<br>
-                    经矩 81 累加后，7 行数值在 12 地支间呈现固定周期运动，揭示九宫范畴对周天天体能量的严密节律掌控！
-                </div>
-            `;
-        }
+        if (qi7TableBody) qi7TableBody.innerHTML = html;
     }
 
-    renderQiRowForNum(7);
+    renderQi7Table();
 
     const btnSpeed = document.getElementById("btn-speed-control");
     const speedVal = document.getElementById("speed-val");
@@ -341,8 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSpeed.addEventListener("click", () => {
             currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
             const level = speedLevels[currentSpeedIdx];
-            engine.pulseSpeedMultiplier = level;
-            speedVal.innerText = `${level}x`;
+            if (speedVal) speedVal.innerText = `${level}x`;
         });
     }
 
