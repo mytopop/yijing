@@ -410,21 +410,26 @@ document.addEventListener("DOMContentLoaded", () => {
     function bindTableClickEvents(vals) {
         if (!tableBody) return;
 
-        // 行级别点击 (使用受好评的 rowBounceShake 震荡晃动)
+        // 行级别点击 (整行解构定位 + 受好评的 rowBounceShake 弹簧震荡晃动 + Toggle Off)
         tableBody.querySelectorAll(".interactive-row").forEach(tr => {
-            tr.addEventListener("click", function(e) {
-                // 如果点击的是具体单元格，由单元格逻辑优先处理
-                if (e.target.classList.contains("interactive-cell")) return;
-
+            tr.addEventListener("click", function() {
                 const isAlreadyActive = this.classList.contains("active-row");
                 tableBody.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
-                tableBody.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
 
                 if (isAlreadyActive) {
-                    run7ValuesCalculation(); // 取消选中，恢复全量
+                    // 【取消选中】恢复全量 7 行 3D 轨迹与太乙 81 宫高亮
+                    document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+                        const p = parseInt(cell.dataset.pos, 10);
+                        const rem81List = vals.map(v => v % 81 === 0 ? 81 : v % 81);
+                        cell.classList.toggle("active-pos", rem81List.includes(p));
+                    });
+                    engine.render7ValuesTrajectory(vals);
+                    if (badgeTitle) badgeTitle.innerText = `七行参数太乙 81 降维拓扑`;
+                    if (badgeDesc) badgeDesc.innerText = `七行参数 [${vals.join(', ')}] 已成功在 3D 空间与 81 宫渲染 (点击右侧任意行看定位)`;
                     return;
                 }
 
+                // 【选中行高亮】
                 this.classList.add("active-row");
                 this.classList.add("row-click-flash");
                 setTimeout(() => this.classList.remove("row-click-flash"), 450);
@@ -442,43 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 engine.highlightSingleBranch(bIdx);
 
                 if (badgeTitle) badgeTitle.innerText = `第 ${this.dataset.idx} 行参数 ${v} ➔ 第 ${rem81} 宫 ${subTag}`;
-                if (badgeDesc) badgeDesc.innerText = `降维落入太乙 81 阵图 【第 ${rem81} 宫 ${subTag}】，3D 精准定位至 【${branch.name}位】 (${branch.system})`;
-            });
-
-            // 单格级别点击 (使用受好评的弹性晃动震荡与高亮)
-            tr.querySelectorAll(".interactive-cell").forEach(cellTd => {
-                cellTd.addEventListener("click", function(e) {
-                    e.stopPropagation();
-
-                    const isCellActive = this.classList.contains("active-cell");
-                    tableBody.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
-                    tableBody.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
-
-                    if (isCellActive) {
-                        run7ValuesCalculation(); // 取消选中
-                        return;
-                    }
-
-                    this.classList.add("active-cell");
-                    tr.classList.add("active-row");
-                    tr.classList.add("row-click-flash");
-                    setTimeout(() => tr.classList.remove("row-click-flash"), 450);
-
-                    const v = parseInt(tr.dataset.val, 10);
-                    const rem81 = parseInt(tr.dataset.rem81, 10);
-                    const bIdx = parseInt(tr.dataset.branch, 10);
-                    const branch = EARTHLY_BRANCHES[bIdx];
-                    const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
-
-                    document.querySelectorAll(".taiyi-81-cell").forEach(c => {
-                        c.classList.toggle("active-pos", parseInt(c.dataset.pos, 10) === rem81);
-                    });
-
-                    engine.highlightSingleBranch(bIdx);
-
-                    if (badgeTitle) badgeTitle.innerText = `单格精准聚焦: 第 ${tr.dataset.idx} 行 ${v} ➔ 第 ${rem81} 宫 ${subTag}`;
-                    if (badgeDesc) badgeDesc.innerText = `参数 ${v} 降维归太乙 81 阵图 【${subTag}】，3D 定位 【${branch.name}位】`;
-                });
+                if (badgeDesc) badgeDesc.innerText = `参数 ${v} 降维归太乙 81 阵图 【第 ${rem81} 宫 ${subTag}】，3D 精准定位至 【${branch.name}位】 (${branch.system})`;
             });
         });
     }
