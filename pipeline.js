@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》任意数据 12 步拆解推演流水线 - (pipeline.js)
-   特点：纯粹数理逻辑 3D 浑天天象坐标体系 + 12 步推演数据脉冲轨迹
+   特点：纯粹数理逻辑 3D 浑天天象坐标体系 + 5 步动画递算 + N*k 映射明细表弹簧晃动震荡与取消机制
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -39,9 +39,8 @@ const TAIYI_81_SUB_LABELS = {
     34: "(七₄)", 79: "(七₉)", 16: "(七₂)", 25: "(七₃)", 43: "(七₅)", 61: "(七₇)", 70: "(七₈)", 7: "(七₁)", 52: "(七₆)",
     35: "(八₄)", 80: "(八₉)", 17: "(八₂)", 26: "(八₃)", 44: "(八₅)", 62: "(八₇)", 71: "(八₈)", 8: "(八₁)", 53: "(八₆)",
     28: "(一₄)", 73: "(一₉)", 10: "(一₂)", 19: "(一₃)", 37: "(一₅)", 55: "(一₇)", 64: "(一₈)", 1: "(一₁)", 46: "(一₆)",
-    33: "(六₄)", 78: "(六₉)", 15: "(六₂)", 24: "(六₃)", 42: "(六₅)", 60: "(六₇)", 69: "(六₈)", 6: "(六₁)", 51: "(六₆)"
+    33: "(六₄)", 78: "(六₉)", 15: "(六₂)", 24: "(六₃)", 42: "(六₅)", 60: "(六₉)", 69: "(六₈)", 6: "(六₁)", 51: "(六₆)"
 };
-
 
 function getBranch3DPos(branchIdx, radius = 6.0) {
     const angle = THREE.MathUtils.degToRad(90 - branchIdx * 30);
@@ -284,6 +283,16 @@ class PipelinePureMath3DEngine {
         this.pipe3DGroup.add(this.dataPulseMesh);
     }
 
+    highlightSingleBranch(bIdx) {
+        this.clearPipe3DGroup();
+        const pos = getBranch3DPos(bIdx);
+        const pulseGeom = new THREE.SphereGeometry(0.5, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.8 });
+        const pulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        pulseMesh.position.copy(pos);
+        this.pipe3DGroup.add(pulseMesh);
+    }
+
     animate() {
         requestAnimationFrame(() => this.animate());
 
@@ -307,6 +316,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const engine = new PipelinePureMath3DEngine("three-canvas-pipeline");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
+    const numInput = document.getElementById("num-input");
+    const btnCalculate = document.getElementById("btn-calculate");
+    const seqTableBody = document.getElementById("seq-table-body");
+    const pipeBadgeTitle = document.getElementById("pipe-badge-title");
+    const pipeBadgeDesc = document.getElementById("pipe-badge-desc");
+
+    let isDeductionRunning = false;
+    let stepAnimationTimer = null;
 
     function initLuoshuTaiyi9x9Matrix() {
         if (!matrixContainer) return;
@@ -333,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const subTag = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[num]) ? TAIYI_81_SUB_LABELS[num] : "";
                 cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-sub">${subTag}</div>`;
                 cell.addEventListener("click", () => {
-                    document.getElementById("num-input").value = num;
+                    numInput.value = num;
                     calculatePipeline(num);
                 });
                 grid3x3.appendChild(cell);
@@ -344,12 +361,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     initLuoshuTaiyi9x9Matrix();
-
-    const numInput = document.getElementById("num-input");
-    const btnCalculate = document.getElementById("btn-calculate");
-    const seqTableBody = document.getElementById("seq-table-body");
-    const pipeBadgeTitle = document.getElementById("pipe-badge-title");
-    const pipeBadgeDesc = document.getElementById("pipe-badge-desc");
 
     function getDigitalRoot(n) {
         let val = Math.abs(n);
@@ -367,9 +378,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const rem12 = inputVal % 12 === 0 ? 12 : inputVal % 12;
         const branch = EARTHLY_BRANCHES[rem12 - 1];
         const digRoot = getDigitalRoot(inputVal);
+        const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
 
         document.getElementById("val-step-1").innerText = `N = ${inputVal}`;
-        document.getElementById("val-step-2").innerText = `${inputVal} % 81 = ${rem81} 号宫`;
+        document.getElementById("val-step-2").innerText = `${inputVal} % 81 = ${rem81} 号宫 ${subTag}`;
         document.getElementById("val-step-3").innerText = `余 ${rem12} ➔ ${branch.name}位`;
         
         const step4El = document.getElementById("val-step-4");
@@ -384,13 +396,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const r12 = val % 12 === 0 ? 12 : val % 12;
             const b = EARTHLY_BRANCHES[r12 - 1];
             tableHtml += `
-                <tr>
-                    <td>${k}</td>
-                    <td>${inputVal}×${k}</td>
-                    <td>${val}</td>
-                    <td>${r12}</td>
-                    <td style="color:${b.color}; font-weight:700;">${b.name}</td>
-                    <td>${b.system.split('(')[0]}</td>
+                <tr class="interactive-row" data-k="${k}" data-val="${val}" data-branch="${r12 - 1}">
+                    <td class="interactive-cell">${k}</td>
+                    <td class="interactive-cell">${inputVal}×${k}</td>
+                    <td class="interactive-cell"><strong style="color:#ffe066;">${val}</strong></td>
+                    <td class="interactive-cell">${r12}</td>
+                    <td class="interactive-cell" style="color:${b.color}; font-weight:700;">${b.name}</td>
+                    <td class="interactive-cell">${b.system.split('(')[0]}</td>
                 </tr>
             `;
         }
@@ -398,22 +410,113 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
             const p = parseInt(cell.dataset.pos, 10);
-            if (p === rem81) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
+            cell.classList.toggle("active-pos", p === rem81);
         });
 
         engine.renderNumber12StepTrajectory(inputVal);
 
+        bindTableEvents(inputVal);
+
         pipeBadgeTitle.innerText = `数值 ${inputVal} 3D 周天空间轨迹`;
-        pipeBadgeDesc.innerText = `模 81 降维落于第 ${rem81} 宫。地支属【${branch.name}】(${branch.system})`;
+        pipeBadgeDesc.innerText = `模 81 降维落于第 ${rem81} 宫 ${subTag}。地支属【${branch.name}】(${branch.system})`;
     }
 
+    // 绑定 N x k 表格行/单格点击 (使用受好评的 rowBounceShake 弹簧震荡晃动 + Toggle Off)
+    function bindTableEvents(inputVal) {
+        if (!seqTableBody) return;
+
+        seqTableBody.querySelectorAll(".interactive-row").forEach(tr => {
+            tr.addEventListener("click", function() {
+                const isAlreadyActive = this.classList.contains("active-row");
+                seqTableBody.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+
+                if (isAlreadyActive) {
+                    calculatePipeline(inputVal); // 取消选中，恢复全量 12 步轨迹
+                    return;
+                }
+
+                this.classList.add("active-row");
+                this.classList.add("row-click-flash");
+                setTimeout(() => this.classList.remove("row-click-flash"), 450);
+
+                const bIdx = parseInt(this.dataset.branch, 10);
+                const val = parseInt(this.dataset.val, 10);
+                const k = this.dataset.k;
+                const rem81 = val % 81 === 0 ? 81 : val % 81;
+                const branch = EARTHLY_BRANCHES[bIdx];
+                const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
+
+                document.querySelectorAll(".taiyi-81-cell").forEach(c => {
+                    c.classList.toggle("active-pos", parseInt(c.dataset.pos, 10) === rem81);
+                });
+
+                engine.highlightSingleBranch(bIdx);
+
+                if (pipeBadgeTitle) pipeBadgeTitle.innerText = `第 ${k} 步: ${inputVal}×${k} = ${val} ➔ ${branch.name}位`;
+                if (pipeBadgeDesc) pipeBadgeDesc.innerText = `乘积 ${val} 降维落于第 ${rem81} 宫 ${subTag}，定位至 【${branch.name}位】 (${branch.system})`;
+            });
+        });
+    }
+
+    // 5 步拆解推演流水线动画执行逻辑 (步步高亮 + 侧向弹簧晃动震荡)
+    function animate5StepsDeduction() {
+        const steps = [1, 2, 3, 4, 5];
+        let currentStep = 0;
+
+        steps.forEach(s => {
+            const el = document.getElementById(`step-box-${s}`);
+            if (el) el.classList.remove("active", "row-click-flash");
+        });
+
+        stepAnimationTimer = setInterval(() => {
+            if (currentStep > 0) {
+                const prevEl = document.getElementById(`step-box-${steps[currentStep - 1]}`);
+                if (prevEl) prevEl.classList.remove("row-click-flash");
+            }
+
+            if (currentStep < steps.length) {
+                const stepNum = steps[currentStep];
+                const curEl = document.getElementById(`step-box-${stepNum}`);
+                if (curEl) {
+                    curEl.classList.add("active", "row-click-flash");
+                }
+                currentStep++;
+            } else {
+                clearInterval(stepAnimationTimer);
+                stepAnimationTimer = null;
+            }
+        }, 450);
+    }
+
+    // 按钮点击：推演数理 / 再次点击取消 (Toggle Off)
     if (btnCalculate) {
         btnCalculate.addEventListener("click", () => {
-            calculatePipeline(numInput.value);
+            isDeductionRunning = !isDeductionRunning;
+
+            if (isDeductionRunning) {
+                btnCalculate.innerText = "🛑 结束推演 (再点取消)";
+                btnCalculate.style.background = "linear-gradient(135deg, #ff5252 0%, #c92a2a 100%)";
+                btnCalculate.style.color = "#ffffff";
+
+                calculatePipeline(numInput.value);
+                animate5StepsDeduction();
+            } else {
+                if (stepAnimationTimer) {
+                    clearInterval(stepAnimationTimer);
+                    stepAnimationTimer = null;
+                }
+                btnCalculate.innerText = "🚀 推演数理 (点击启动)";
+                btnCalculate.style.background = "linear-gradient(135deg, #d4af37 0%, #aa7c11 100%)";
+                btnCalculate.style.color = "#0a0e17";
+
+                // 重置 / 清除 5 步高亮
+                [1, 2, 3, 4, 5].forEach(s => {
+                    const el = document.getElementById(`step-box-${s}`);
+                    if (el) el.classList.remove("active", "row-click-flash");
+                });
+
+                calculatePipeline(numInput.value);
+            }
         });
     }
 
@@ -451,7 +554,7 @@ document.addEventListener("DOMContentLoaded", () => {
         engine.autoRotate = this.classList.contains("active");
     });
 
-    calculatePipeline(7);
+    calculatePipeline(70000);
 });
 
 /* 全局屏幕点击金彩粒子波纹火花特效 (Click Visual Spark Listener) */

@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v16">
+    <link rel="stylesheet" href="index.css?v=20260804_v34">
 </head>
 <body>
     <div class="app-container">
@@ -28,23 +28,24 @@
                 </div>
             </div>
             
-                                    <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab">🏠 首页</a>
+            <nav class="header-nav-tabs">
+                <a href="index.html" class="nav-tab ">🏠 首页</a>
                 <a href="pipeline.html" class="nav-tab active">⚡ 流水线</a>
-                <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
-                <a href="laws.html" class="nav-tab">✨ 5大定律</a>
-                <a href="wuxing.html" class="nav-tab">☯ 五行三元</a>
-                <a href="jiugong_qi.html" class="nav-tab">📜 九宫七输入</a>
-                <a href="zhoutian360.html" class="nav-tab">🌀 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
-                <a href="coordinates12.html" class="nav-tab">🌌 12方位3坐标</a>
-                <a href="ju81.html" class="nav-tab">📐 用矩81</a>
+                <a href="hexagrams.html" class="nav-tab ">☰ 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab ">✨ 5大定律</a>
+                <a href="wuxing.html" class="nav-tab ">☯ 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab ">📜 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab ">🌀 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab ">🔢 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab ">🌌 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab ">📐 用矩81</a>
+                <a href="jiugong_tables.html" class="nav-tab ">📊 九宫纪气大表</a>
             </nav>
         </header>
 
-        <!-- 三栏并行主容器 -->
+        <!-- 三栏并行主容器 (28% 36% 36%) -->
         <main class="main-three-split-container">
-            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <!-- 栏一：3D 浑天时空仪 (28%) -->
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
@@ -91,7 +92,7 @@
                 </div>
             </section>
 
-            <!-- 栏二：太乙九宫八十一宫阵图 (全页 100% 绝对统一) (33%) -->
+            <!-- 栏二：太乙九宫八十一宫阵图 (36%) -->
             <section class="col-middle-taiyi">
                 <div class="glass-panel">
                     <div class="card-title">
@@ -105,56 +106,56 @@
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：数据拆解控制台 (33%) -->
-            <section class="col-right-controls">
+            <!-- 栏三：数据拆解控制台 (36%) -->
+            <section class="col-right-controls" style="display: flex; flex-direction: column; height: 100%; overflow-y: auto;">
                 <div class="glass-panel">
                     <div class="card-title">
                         <span>⚡</span> 任意数值推演控制台
                     </div>
                     
                     <div class="input-group" style="margin-top: 8px;">
-                        <label>请输入任意自然数 N（如 7, 10, 40, 100）:</label>
-                        <div class="input-wrapper">
-                            <input type="number" id="num-input" value="7" min="1" max="999999">
-                            <button id="btn-calculate" class="action-btn-gold" style="width: 100px;">
-                                🚀 推演数理
+                        <label style="font-size: 12.5px; color: #cbd5e1;">请输入任意自然数 N（如 7, 10, 40, 70000）:</label>
+                        <div class="input-wrapper" style="display: flex; gap: 8px;">
+                            <input type="number" id="num-input" value="70000" min="1" max="999999" class="custom-input" style="flex: 1;">
+                            <button id="btn-calculate" class="action-btn-gold" style="width: 140px;">
+                                🚀 推演数理 (再点取消)
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- 5 步拆解推演流水线 -->
-                <div class="glass-panel" style="margin-top: 6px;">
+                <div id="pipeline-steps-card" class="glass-panel" style="margin-top: 6px;">
                     <div class="card-title">
                         <span>🔍</span> 数据降维 5 步推演流水线
                     </div>
                     
-                    <div class="pipeline-steps">
-                        <div class="pipe-step active" id="step-box-1">
+                    <div class="pipeline-steps" style="display: flex; flex-direction: column; gap: 4px;">
+                        <div class="pipe-step interactive-row" id="step-box-1">
                             <div class="step-num">1</div>
                             <div class="step-content">
                                 <div class="step-name">原始数值 (N)</div>
-                                <div class="step-val" id="val-step-1">N = 7</div>
+                                <div class="step-val" id="val-step-1">N = 70000</div>
                             </div>
                         </div>
 
-                        <div class="pipe-step" id="step-box-2">
+                        <div class="pipe-step interactive-row" id="step-box-2">
                             <div class="step-num">2</div>
                             <div class="step-content">
                                 <div class="step-name">太乙 81 降维 (N % 81)</div>
-                                <div class="step-val" id="val-step-2">7 % 81 = 7</div>
+                                <div class="step-val" id="val-step-2">70000 % 81 = 16 号宫</div>
                             </div>
                         </div>
 
-                        <div class="pipe-step" id="step-box-3">
+                        <div class="pipe-step interactive-row" id="step-box-3">
                             <div class="step-num">3</div>
                             <div class="step-content">
                                 <div class="step-name">地支 12 位归属 (N % 12)</div>
-                                <div class="step-val" id="val-step-3">余 7 ➔ 午位</div>
+                                <div class="step-val" id="val-step-3">余 4 ➔ 卯位</div>
                             </div>
                         </div>
 
-                        <div class="pipe-step" id="step-box-4">
+                        <div class="pipe-step interactive-row" id="step-box-4">
                             <div class="step-num">4</div>
                             <div class="step-content">
                                 <div class="step-name">三元坐标系归属</div>
@@ -162,7 +163,7 @@
                             </div>
                         </div>
 
-                        <div class="pipe-step" id="step-box-5">
+                        <div class="pipe-step interactive-row" id="step-box-5">
                             <div class="step-num">5</div>
                             <div class="step-content">
                                 <div class="step-name">众和极数 (数位累加至单数字)</div>
@@ -172,13 +173,13 @@
                     </div>
                 </div>
 
-                <!-- 12 步跳跃映射表 -->
-                <div class="glass-panel" style="margin-top: 6px;">
+                <!-- 12 步跳跃映射表 (向下拓展拉长，充分享用底部空间) -->
+                <div class="glass-panel" style="margin-top: 6px; flex: 1; display: flex; flex-direction: column; min-height: 380px;">
                     <div class="card-title">
                         <span>📋</span> N × k (1~12) 周天跳跃映射明细
                     </div>
                     
-                    <div class="sequence-table-container">
+                    <div class="sequence-table-container" style="flex: 1; max-height: calc(100vh - 300px); min-height: 340px; margin-top: 6px;">
                         <table class="seq-table">
                             <thead>
                                 <tr>
@@ -201,6 +202,6 @@
     </div>
 
     <!-- 流水线引擎 (带版本防缓存) -->
-    <script src="pipeline.js?v=20260804_v13"></script>
+    <script src="pipeline.js?v=20260804_v34"></script>
 </body>
 </html>
