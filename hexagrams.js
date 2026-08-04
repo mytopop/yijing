@@ -399,11 +399,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     
                     if (!isAlreadyActive) {
                         cell.classList.add("active-pos");
-                        if (num <= 64) {
-                            const hexSelect = document.getElementById("hex-select");
-                            if (hexSelect) hexSelect.value = num;
-                            renderHexagramDetail(num);
-                        }
+                        const mappedHexNum = ((num - 1) % 64) + 1;
+                        const hexSelect = document.getElementById("hex-select");
+                        if (hexSelect) hexSelect.value = mappedHexNum;
+                        renderHexagramDetail(mappedHexNum);
                     }
                 });
                 grid3x3.appendChild(cell);
