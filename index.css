@@ -353,22 +353,21 @@ body {
 }
 
 .taiyi-81-cell:hover {
-    transform: scale(1.15);
-    z-index: 10;
-    box-shadow: 0 0 12px rgba(255, 224, 102, 0.9);
+    box-shadow: 0 0 10px rgba(255, 224, 102, 0.8);
     border-color: #ffe066;
+    background: rgba(212, 175, 55, 0.35);
 }
 
 .taiyi-81-cell.active-pos {
-    background: #ffd54f !important;
+    background: #ffe066 !important;
     color: #0a0e17 !important;
     font-family: var(--font-times) !important;
-    font-size: 16px !important;
+    font-size: 15px !important;
     font-weight: 900 !important;
-    box-shadow: 0 0 18px rgba(255, 213, 79, 0.95) !important;
-    border-color: #ffffff !important;
-    transform: scale(1.18);
-    z-index: 20;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 224, 102, 0.7) !important;
+    border: 1.5px solid #ffffff !important;
+    transform: none !important;
+    z-index: 2;
 }
 
 /* 洛书 9 宫九色柔和底层 */
@@ -797,25 +796,22 @@ input[type="number"] {
     transform: scale(1.04) !important;
 }
 
-/* 3. 81 宫单元格点击高亮金光冲击波 */
+/* 3. 太乙 81 宫单元格高亮：干净清晰，无缩放震荡，严禁重叠遮挡 */
 .taiyi-81-cell {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.15s ease, border-color 0.15s ease;
+    box-sizing: border-box;
 }
 
 .taiyi-81-cell.active-pos {
-    background: radial-gradient(circle, rgba(255, 224, 102, 0.95) 0%, rgba(255, 82, 82, 0.8) 100%) !important;
+    background: #ffe066 !important;
     color: #000000 !important;
     font-weight: 900 !important;
-    transform: scale(1.2) !important;
-    border-color: #ffffff !important;
-    box-shadow: 0 0 22px rgba(255, 224, 102, 0.95), 0 0 38px rgba(255, 82, 82, 0.8) !important;
-    z-index: 10 !important;
-    animation: cellClickGlow 1.2s infinite alternate !important;
+    border: 1.5px solid #ffffff !important;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4), 0 0 6px rgba(255, 224, 102, 0.6) !important;
+    transform: none !important;
+    animation: none !important;
+    z-index: 2 !important;
 }
 
-@keyframes cellClickGlow {
-    0% { transform: scale(1.15); box-shadow: 0 0 15px rgba(255, 224, 102, 0.7); }
-    100% { transform: scale(1.24); box-shadow: 0 0 28px rgba(255, 224, 102, 1), 0 0 42px rgba(77, 171, 247, 0.85); }
-}
 
 
