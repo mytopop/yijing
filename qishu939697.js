@@ -370,9 +370,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 三向联动：点击右侧表格行
     document.querySelectorAll(".interactive-row").forEach(row => {
-        row.addEventListener("click", function() {
+        row.querySelectorAll("td").forEach(td => td.classList.add("interactive-cell"));
+        row.addEventListener("click", function(e) {
+            const isAlreadyActive = this.classList.contains("active-row");
             document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+            document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+            
+            if (isAlreadyActive) {
+                document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                return;
+            }
             this.classList.add("active-row");
+            this.classList.add("row-click-flash");
+            setTimeout(() => this.classList.remove("row-click-flash"), 450);
 
             const seq = this.dataset.seq;
             const num = this.dataset.num;
@@ -471,3 +481,21 @@ document.addEventListener("click", (e) => {
         }
     }, 450);
 });
+
+            row.querySelectorAll(".interactive-cell").forEach(td => {
+                td.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    const isCellActive = this.classList.contains("active-cell");
+                    document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+                    document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+                    if (isCellActive) {
+                        document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                        return;
+                    }
+                    this.classList.add("active-cell");
+                    row.classList.add("active-row");
+                    row.classList.add("row-click-flash");
+                    setTimeout(() => row.classList.remove("row-click-flash"), 450);
+                });
+            });
+            

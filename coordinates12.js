@@ -384,9 +384,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 三向联动：点击表格行
     document.querySelectorAll(".interactive-row").forEach(row => {
-        row.addEventListener("click", function() {
+        row.querySelectorAll("td").forEach(td => td.classList.add("interactive-cell"));
+        row.addEventListener("click", function(e) {
+            const isAlreadyActive = this.classList.contains("active-row");
             document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+            document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+            
+            if (isAlreadyActive) {
+                document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                return;
+            }
             this.classList.add("active-row");
+            this.classList.add("row-click-flash");
+            setTimeout(() => this.classList.remove("row-click-flash"), 450);
 
             const bIdx = parseInt(this.dataset.branch, 10);
             updateDetailCardByBranch(bIdx);

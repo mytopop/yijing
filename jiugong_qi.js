@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》九宫七输入通用推演解构馆 - (jiugong_qi.js)
-   特点：纯粹数理逻辑 3D 浑天坐标体系 + 七行通用参数降维推演
+   特点：推演树点击启动/结束 + 5 步动画递算节点 + 明细表格单格/整行受好评弹性晃动震荡与高亮
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -41,7 +41,6 @@ const TAIYI_81_SUB_LABELS = {
     28: "(一₄)", 73: "(一₉)", 10: "(一₂)", 19: "(一₃)", 37: "(一₅)", 55: "(一₇)", 64: "(一₈)", 1: "(一₁)", 46: "(一₆)",
     33: "(六₄)", 78: "(六₉)", 15: "(六₂)", 24: "(六₃)", 42: "(六₅)", 60: "(六₇)", 69: "(六₈)", 6: "(六₁)", 51: "(六₆)"
 };
-
 
 function getBranch3DPos(branchIdx, radius = 6.0) {
     const angle = THREE.MathUtils.degToRad(90 - branchIdx * 30);
@@ -270,6 +269,17 @@ class JiugongQiPureMath3DEngine {
         });
     }
 
+    highlightSingleBranch(bIdx) {
+        this.clearQi7Group();
+        const pos = getBranch3DPos(bIdx);
+
+        const pulseGeom = new THREE.SphereGeometry(0.5, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.8 });
+        const pulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        pulseMesh.position.copy(pos);
+        this.qi7Group.add(pulseMesh);
+    }
+
     animate() {
         requestAnimationFrame(() => this.animate());
 
@@ -286,7 +296,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const engine = new JiugongQiPureMath3DEngine("three-canvas-jiugong_qi");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
+    const tableBody = document.getElementById("qi7-table-body");
+    const badgeTitle = document.getElementById("jiugong-qi-badge-title");
+    const badgeDesc = document.getElementById("jiugong-qi-badge-desc");
+    const btnCalculate = document.getElementById("btn-qi7-calculate");
+    const btnToggleTree = document.getElementById("btn-toggle-tree");
 
+    let isTreeDeductionRunning = false;
+    let treeIntervalTimer = null;
+    let currentStepIdx = 1;
+
+    // 渲染太乙 81 宫阵图 (双行角标位号匹配原图)
     function initLuoshuTaiyi9x9Matrix() {
         if (!matrixContainer) return;
         matrixContainer.className = "luoshu-taiyi-9x9-container";
@@ -309,8 +329,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.className = "taiyi-81-cell";
                 cell.dataset.pos = num;
                 cell.title = `数值 ${num} (${palace.name})`;
-                const subTag = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[num]) ? TAIYI_81_SUB_LABELS[num] : "";
+                const subTag = TAIYI_81_SUB_LABELS[num] || "";
                 cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-sub">${subTag}</div>`;
+                cell.addEventListener("click", () => {
+                    const isAlreadyActive = cell.classList.contains("active-pos");
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                    
+                    if (!isAlreadyActive) {
+                        cell.classList.add("active-pos");
+                        const rem12 = num % 12 === 0 ? 12 : num % 12;
+                        engine.highlightSingleBranch(rem12 - 1);
+                    }
+                });
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -320,11 +350,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
-    const tableBody = document.getElementById("qi7-table-body");
-    const badgeTitle = document.getElementById("jiugong-qi-badge-title");
-    const badgeDesc = document.getElementById("jiugong-qi-badge-desc");
-    const btnCalculate = document.getElementById("btn-qi7-calculate");
-
     function getDigitalRoot(n) {
         let val = Math.abs(n);
         while (val >= 10) {
@@ -333,6 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return val;
     }
 
+    // 运行七行算法推演 (表格每行与每个单格均支持受好评的弹性晃动震荡与高亮 + Toggle Off)
     function run7ValuesCalculation() {
         const vals = [];
         for (let i = 1; i <= 7; i++) {
@@ -349,35 +375,174 @@ document.addEventListener("DOMContentLoaded", () => {
             const rem12 = v % 12 === 0 ? 12 : v % 12;
             const branch = EARTHLY_BRANCHES[rem12 - 1];
             const root = getDigitalRoot(v);
+            const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
             rem81List.push(rem81);
 
             tableRowsHtml += `
-                <tr>
-                    <td>第 ${idx + 1} 行</td>
-                    <td><strong>${v}</strong></td>
-                    <td>${rem81} 号宫</td>
-                    <td style="color:${branch.color}; font-weight:700;">${branch.name}</td>
-                    <td>${branch.system.split('(')[0]}</td>
-                    <td style="color:#ffe066; font-weight:700;">${root}</td>
+                <tr class="interactive-row" data-val="${v}" data-rem81="${rem81}" data-branch="${rem12 - 1}" data-idx="${idx + 1}">
+                    <td class="interactive-cell" data-val="${v}">第 ${idx + 1} 行</td>
+                    <td class="interactive-cell" data-val="${v}"><strong style="color:#ffe066;">${v}</strong></td>
+                    <td class="interactive-cell" data-val="${v}">${rem81}号宫 ${subTag}</td>
+                    <td class="interactive-cell" data-val="${v}" style="color:${branch.color}; font-weight:700;">${branch.name}位</td>
+                    <td class="interactive-cell" data-val="${v}">${branch.system.split('(')[0]}</td>
+                    <td class="interactive-cell" data-val="${v}" style="color:#ffe066; font-weight:700;">极数 ${root}</td>
                 </tr>
             `;
         });
 
         if (tableBody) tableBody.innerHTML = tableRowsHtml;
 
+        // 默认高亮全量 7 行 81 宫
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
             const p = parseInt(cell.dataset.pos, 10);
-            if (rem81List.includes(p)) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
+            cell.classList.toggle("active-pos", rem81List.includes(p));
         });
 
         engine.render7ValuesTrajectory(vals);
 
+        // 绑定明细表格【受好评的整行与单格弹性晃动震荡与高亮动画 + Toggle Off】
+        bindTableClickEvents(vals);
+
         if (badgeTitle) badgeTitle.innerText = `七行参数太乙 81 降维拓扑`;
-        if (badgeDesc) badgeDesc.innerText = `七行参数 [${vals.join(', ')}] 已成功在 3D 空间与 81 宫渲染`;
+        if (badgeDesc) badgeDesc.innerText = `七行参数 [${vals.join(', ')}] 已成功在 3D 空间与 81 宫渲染 (点击右侧任意行/单格看推导)`;
+    }
+
+    function bindTableClickEvents(vals) {
+        if (!tableBody) return;
+
+        // 行级别点击 (使用受好评的 rowBounceShake 震荡晃动)
+        tableBody.querySelectorAll(".interactive-row").forEach(tr => {
+            tr.addEventListener("click", function(e) {
+                // 如果点击的是具体单元格，由单元格逻辑优先处理
+                if (e.target.classList.contains("interactive-cell")) return;
+
+                const isAlreadyActive = this.classList.contains("active-row");
+                tableBody.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+                tableBody.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+
+                if (isAlreadyActive) {
+                    run7ValuesCalculation(); // 取消选中，恢复全量
+                    return;
+                }
+
+                this.classList.add("active-row");
+                this.classList.add("row-click-flash");
+                setTimeout(() => this.classList.remove("row-click-flash"), 450);
+
+                const v = parseInt(this.dataset.val, 10);
+                const rem81 = parseInt(this.dataset.rem81, 10);
+                const bIdx = parseInt(this.dataset.branch, 10);
+                const branch = EARTHLY_BRANCHES[bIdx];
+                const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
+
+                document.querySelectorAll(".taiyi-81-cell").forEach(c => {
+                    c.classList.toggle("active-pos", parseInt(c.dataset.pos, 10) === rem81);
+                });
+
+                engine.highlightSingleBranch(bIdx);
+
+                if (badgeTitle) badgeTitle.innerText = `第 ${this.dataset.idx} 行参数 ${v} ➔ 第 ${rem81} 宫 ${subTag}`;
+                if (badgeDesc) badgeDesc.innerText = `降维落入太乙 81 阵图 【第 ${rem81} 宫 ${subTag}】，3D 精准定位至 【${branch.name}位】 (${branch.system})`;
+            });
+
+            // 单格级别点击 (使用受好评的弹性晃动震荡与高亮)
+            tr.querySelectorAll(".interactive-cell").forEach(cellTd => {
+                cellTd.addEventListener("click", function(e) {
+                    e.stopPropagation();
+
+                    const isCellActive = this.classList.contains("active-cell");
+                    tableBody.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+                    tableBody.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+
+                    if (isCellActive) {
+                        run7ValuesCalculation(); // 取消选中
+                        return;
+                    }
+
+                    this.classList.add("active-cell");
+                    tr.classList.add("active-row");
+                    tr.classList.add("row-click-flash");
+                    setTimeout(() => tr.classList.remove("row-click-flash"), 450);
+
+                    const v = parseInt(tr.dataset.val, 10);
+                    const rem81 = parseInt(tr.dataset.rem81, 10);
+                    const bIdx = parseInt(tr.dataset.branch, 10);
+                    const branch = EARTHLY_BRANCHES[bIdx];
+                    const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
+
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => {
+                        c.classList.toggle("active-pos", parseInt(c.dataset.pos, 10) === rem81);
+                    });
+
+                    engine.highlightSingleBranch(bIdx);
+
+                    if (badgeTitle) badgeTitle.innerText = `单格精准聚焦: 第 ${tr.dataset.idx} 行 ${v} ➔ 第 ${rem81} 宫 ${subTag}`;
+                    if (badgeDesc) badgeDesc.innerText = `参数 ${v} 降维归太乙 81 阵图 【${subTag}】，3D 定位 【${branch.name}位】`;
+                });
+            });
+        });
+    }
+
+    // 数理推演树动画步数执行
+    function stepDeductionTree(stepNum) {
+        currentStepIdx = stepNum;
+        const stepCards = document.querySelectorAll(".pipe-step.step-card");
+        stepCards.forEach(card => {
+            const s = parseInt(card.dataset.step, 10);
+            card.classList.toggle("active", s === stepNum);
+            if (s === stepNum) {
+                card.classList.add("row-click-flash");
+                setTimeout(() => card.classList.remove("row-click-flash"), 450);
+            }
+        });
+
+        const stepDescriptions = {
+            1: { title: "推演树 · 步1：七行通用参数归纳", desc: "归纳一切人事天道七行数据进退周流法则。" },
+            2: { title: "推演树 · 步2：洛书 9 宫模降维计算", desc: "运用模 81 运算将数值精准降维归纳至九宫方阵。" },
+            3: { title: "推演树 · 步3：12 地支三道系统归系", desc: "划归赤道(天)、黄道(地)、白道(万物)三大天体坐标系统。" },
+            4: { title: "推演树 · 步4：太乙 81 宫矩阵点亮", desc: "将 7 行结果降维点亮太乙 81 宫阵图对应单元格及位号角标。" },
+            5: { title: "推演树 · 步5：周天 360° 众和终极归九", desc: "通过众和数加总，终极证明数理恒无条件收敛归于 9！" }
+        };
+
+        const stepInfo = stepDescriptions[stepNum] || stepDescriptions[1];
+        if (badgeTitle) badgeTitle.innerText = stepInfo.title;
+        if (badgeDesc) badgeDesc.innerText = stepInfo.desc;
+    }
+
+    // 绑定推演树卡片手动点击 (应用 rowBounceShake 震荡晃动)
+    document.querySelectorAll(".pipe-step.step-card").forEach(card => {
+        card.addEventListener("click", function() {
+            const stepNum = parseInt(this.dataset.step, 10);
+            stepDeductionTree(stepNum);
+        });
+    });
+
+    // 绑定推演树开关按钮 (点击启动 / 再点结束推演)
+    if (btnToggleTree) {
+        btnToggleTree.addEventListener("click", () => {
+            isTreeDeductionRunning = !isTreeDeductionRunning;
+
+            if (isTreeDeductionRunning) {
+                btnToggleTree.innerText = "🛑 结束推演 (点击停止)";
+                btnToggleTree.style.background = "linear-gradient(135deg, #ff5252 0%, #c92a2a 100%)";
+                btnToggleTree.style.color = "#ffffff";
+
+                stepDeductionTree(1);
+                treeIntervalTimer = setInterval(() => {
+                    currentStepIdx = (currentStepIdx % 5) + 1;
+                    stepDeductionTree(currentStepIdx);
+                }, 1200);
+            } else {
+                clearInterval(treeIntervalTimer);
+                treeIntervalTimer = null;
+                btnToggleTree.innerText = "🌳 启动推演树 (再点结束)";
+                btnToggleTree.style.background = "linear-gradient(135deg, #d4af37 0%, #aa7c11 100%)";
+                btnToggleTree.style.color = "#0a0e17";
+
+                document.querySelectorAll(".pipe-step.step-card").forEach(c => c.classList.remove("active"));
+                run7ValuesCalculation();
+            }
+        });
     }
 
     if (btnCalculate) {
