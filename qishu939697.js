@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》939697 计七数一览表解构馆 - (qishu939697.js)
-   特点：100% 同步全新 3D 日月极星全息浑天坐标体系 + 白道与子午颠倒律解构
+   《易经数理秘笈》939697 七数解构馆 - (qishu939697.js)
+   特点：纯粹数理逻辑 3D 浑天坐标 + 7 数三向联动 (Column 1, 2, 3 双向交互)
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,9 +43,11 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class Qishu939697Vivid3DEngine {
+class Qishu9396973DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        if (!this.container) return;
+
         this.width = this.container.clientWidth || 400;
         this.height = this.container.clientHeight || 500;
 
@@ -59,17 +61,17 @@ class Qishu939697Vivid3DEngine {
         this.lunarGroup = new THREE.Group();
         this.celestialGridGroup = new THREE.Group();
         this.orbsGroup = new THREE.Group();
+        this.qishuGroup = new THREE.Group();
 
-        this.sunMesh = null;
-        this.moonMesh = null;
-        this.sunAngle = 0;
-        this.moonAngle = 0;
         this.autoRotate = true;
+        this.pulseProgress = 0;
+        this.speedMultiplier = 1.0;
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
 
         this.initScene();
         this.createArmillaryRings();
         this.createCelestialGridAndPoles();
-        this.createSunAndMoonObjects();
         this.setupLights();
         
         this.adjustCameraFit();
@@ -99,6 +101,7 @@ class Qishu939697Vivid3DEngine {
         this.scene.add(this.lunarGroup);
         this.scene.add(this.celestialGridGroup);
         this.scene.add(this.orbsGroup);
+        this.scene.add(this.qishuGroup);
     }
 
     adjustCameraFit() {
@@ -198,18 +201,6 @@ class Qishu939697Vivid3DEngine {
         });
     }
 
-    createSunAndMoonObjects() {
-        const sunGeom = new THREE.SphereGeometry(0.55, 32, 32);
-        const sunMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffaa00, emissiveIntensity: 1.0 });
-        this.sunMesh = new THREE.Mesh(sunGeom, sunMat);
-        this.scene.add(this.sunMesh);
-
-        const moonGeom = new THREE.SphereGeometry(0.42, 32, 32);
-        const moonMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 0.8 });
-        this.moonMesh = new THREE.Mesh(moonGeom, moonMat);
-        this.scene.add(this.moonMesh);
-    }
-
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
@@ -237,6 +228,49 @@ class Qishu939697Vivid3DEngine {
         return sprite;
     }
 
+    clearQishuGroup() {
+        while (this.qishuGroup.children.length > 0) {
+            const obj = this.qishuGroup.children.pop();
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) obj.material.dispose();
+        }
+        this.activeCurve = null;
+        this.dataPulseMesh = null;
+    }
+
+    render7QishuTrajectory(branchIdxList) {
+        this.clearQishuGroup();
+        const points = branchIdxList.map(idx => getBranch3DPos(idx));
+        points.push(points[0]);
+
+        this.activeCurve = new THREE.CatmullRomCurve3(points, true);
+        const lineGeom = new THREE.BufferGeometry().setFromPoints(this.activeCurve.getPoints(100));
+        const lineMat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
+        const line = new THREE.Line(lineGeom, lineMat);
+        this.qishuGroup.add(line);
+
+        points.slice(0, points.length - 1).forEach(p => {
+            const sGeom = new THREE.SphereGeometry(0.38, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: 0xff5252, emissive: 0xff5252 });
+            const sMesh = new THREE.Mesh(sGeom, sMat);
+            sMesh.position.copy(p);
+            this.qishuGroup.add(sMesh);
+        });
+
+        // 光速数据脉冲球
+        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5 });
+        this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        this.qishuGroup.add(this.dataPulseMesh);
+    }
+
+    highlightSingleBranch(branchIdx) {
+        const pos = getBranch3DPos(branchIdx);
+        if (this.dataPulseMesh) {
+            this.dataPulseMesh.position.copy(pos);
+        }
+    }
+
     animate() {
         requestAnimationFrame(() => this.animate());
 
@@ -244,24 +278,20 @@ class Qishu939697Vivid3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        this.sunAngle += 0.008;
-        const sunRadius = 6.0;
-        const sunPos = new THREE.Vector3(sunRadius * Math.cos(this.sunAngle), sunRadius * Math.sin(this.sunAngle), 0);
-        sunPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
-        if (this.sunMesh) this.sunMesh.position.copy(sunPos);
+        if (this.activeCurve && this.dataPulseMesh) {
+            this.pulseProgress += 0.003 * this.speedMultiplier;
+            if (this.pulseProgress > 1.0) this.pulseProgress = 0;
+            const pos = this.activeCurve.getPointAt(this.pulseProgress);
+            this.dataPulseMesh.position.copy(pos);
+        }
 
-        this.moonAngle -= 0.012;
-        const moonPos = new THREE.Vector3(sunRadius * Math.cos(this.moonAngle), sunRadius * Math.sin(this.moonAngle), 0);
-        moonPos.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
-        if (this.moonMesh) this.moonMesh.position.copy(moonPos);
-
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
+        if (this.controls) this.controls.update();
+        if (this.renderer) this.renderer.render(this.scene, this.camera);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Qishu939697Vivid3DEngine("three-canvas-qishu939697");
+    const engine = new Qishu9396973DEngine("three-canvas-qishu939697");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -288,6 +318,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.dataset.pos = num;
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
+                cell.addEventListener("click", () => {
+                    // 三向联动：点击 81 宫单元格，联动左侧 3D 与右侧表格
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                    cell.classList.add("active-pos");
+
+                    const rem12 = num % 12 === 0 ? 12 : num % 12;
+                    engine.highlightSingleBranch(rem12 - 1);
+
+                    // 高亮右侧对应的表格行
+                    document.querySelectorAll(".interactive-row").forEach(row => {
+                        const rRem = parseInt(row.dataset.rem81, 10);
+                        if (rRem === num) {
+                            row.classList.add("active-row");
+                        } else {
+                            row.classList.remove("active-row");
+                        }
+                    });
+                });
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -296,6 +344,55 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     initLuoshuTaiyi9x9Matrix();
+
+    const tableBody = document.getElementById("qishu-table-body");
+    const detailCard = document.getElementById("qishu-detail-card");
+    const badgeTitle = document.getElementById("qishu-badge-title");
+    const badgeDesc = document.getElementById("qishu-badge-desc");
+
+    // 预渲染 7 数完整 3D 轨迹 (9, 3, 9, 6, 9, 7, 243)
+    const sevenBranchIndices = [9, 2, 8, 5, 8, 6, 2]; // 酉(9), 寅(2), 申(8), 巳(5), 申(8), 午(6), 寅(2)
+    engine.render7QishuTrajectory(sevenBranchIndices);
+
+    // 三向联动：点击右侧表格行
+    document.querySelectorAll(".interactive-row").forEach(row => {
+        row.addEventListener("click", function() {
+            document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+            this.classList.add("active-row");
+
+            const seq = this.dataset.seq;
+            const num = this.dataset.num;
+            const rem81 = parseInt(this.dataset.rem81, 10);
+            const branchIdx = parseInt(this.dataset.branch, 10);
+            const branch = EARTHLY_BRANCHES[branchIdx - 1] || EARTHLY_BRANCHES[0];
+
+            if (detailCard) {
+                detailCard.innerHTML = `
+                    <div style="font-size: 14px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
+                        🔢 序号 ${seq} · 数 ${num} 双向联动解析
+                    </div>
+                    <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
+                        • 太乙 81 降维: <strong>${rem81} 号宫</strong><br>
+                        • 12 地支映射: <span style="color:${branch.color}; font-weight:800;">${branch.name}位 (${branch.system})</span>
+                    </div>
+                    <div style="margin-top: 6px; font-size: 11px; color: #ffffff; background: rgba(77,171,247,0.18); padding: 4px 8px; border-radius: 4px;">
+                        联动响应：左侧 3D 脉冲球已定位至【${branch.name}】位，中间阵图第 ${rem81} 宫高亮点亮！
+                    </div>
+                `;
+            }
+
+            // 联动 81 宫
+            document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+                cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === rem81);
+            });
+
+            // 联动 3D 节点
+            engine.highlightSingleBranch(branchIdx - 1);
+
+            if (badgeTitle) badgeTitle.innerText = `序号 ${seq} · 数 ${num} (${branch.name}位) 3D 节点`;
+            if (badgeDesc) badgeDesc.innerText = `数 ${num} 降维落在太乙 81 阵图第 ${rem81} 宫，地支属【${branch.name}】`;
+        });
+    });
 
     const btnSpeed = document.getElementById("btn-speed-control");
     const speedVal = document.getElementById("speed-val");
@@ -306,27 +403,43 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSpeed.addEventListener("click", () => {
             currentSpeedIdx = (currentSpeedIdx + 1) % speedLevels.length;
             const level = speedLevels[currentSpeedIdx];
+            engine.speedMultiplier = level;
             if (speedVal) speedVal.innerText = `${level}x`;
         });
     }
 
-    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.equatorGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.eclipticGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.lunarGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-reset-view").addEventListener("click", () => {
-        engine.adjustCameraFit();
-    });
-    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.autoRotate = this.classList.contains("active");
-    });
+    const btnEq = document.getElementById("btn-toggle-equator");
+    if (btnEq) {
+        btnEq.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.equatorGroup) engine.equatorGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnEc = document.getElementById("btn-toggle-ecliptic");
+    if (btnEc) {
+        btnEc.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.eclipticGroup) engine.eclipticGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnLu = document.getElementById("btn-toggle-lunar");
+    if (btnLu) {
+        btnLu.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.lunarGroup) engine.lunarGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnReset = document.getElementById("btn-reset-view");
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            engine.adjustCameraFit();
+        });
+    }
+    const btnRot = document.getElementById("btn-toggle-autorotate");
+    if (btnRot) {
+        btnRot.addEventListener("click", function() {
+            this.classList.toggle("active");
+            engine.autoRotate = this.classList.contains("active");
+        });
+    }
 });

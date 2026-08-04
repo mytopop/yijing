@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》天象五大定律核心引擎 - (laws.js)
-   特点：纯粹数理逻辑 3D 浑天坐标 + 地支数据动态脉冲运动 (Data Motion)
+   特点：纯粹数理逻辑 3D 浑天坐标 + 5 大定律双重控件 (按键+滑动条) 与三向联动
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -242,7 +242,6 @@ class LawsPureMath3DEngine {
         this.clearLaws3DGroup();
         const pos = getBranch3DPos(branchIdx, 6.0);
 
-        // 创建一条绕地支游走的路径
         const branchPoints = [];
         for (let i = 0; i < 12; i++) {
             branchPoints.push(getBranch3DPos(i));
@@ -250,14 +249,12 @@ class LawsPureMath3DEngine {
         branchPoints.push(branchPoints[0]);
         this.activeCurve = new THREE.CatmullRomCurve3(branchPoints, true);
 
-        // 高亮目标地支点
         const sphereGeom = new THREE.SphereGeometry(0.55, 32, 32);
         const sphereMat = new THREE.MeshStandardMaterial({ color: colorHex, emissive: colorHex, emissiveIntensity: 0.9 });
         const mesh = new THREE.Mesh(sphereGeom, sphereMat);
         mesh.position.copy(pos);
         this.laws3DGroup.add(mesh);
 
-        // 光速数据脉冲球
         const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
         const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: colorHex, emissiveIntensity: 1.5 });
         this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
@@ -288,7 +285,6 @@ class LawsPureMath3DEngine {
             this.laws3DGroup.add(sMesh);
         });
 
-        // 光速数据脉冲球
         const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
         const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5 });
         this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
@@ -316,7 +312,6 @@ class LawsPureMath3DEngine {
             this.laws3DGroup.add(sMesh);
         });
 
-        // 光速数据脉冲球
         const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
         const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: colorHex, emissiveIntensity: 1.5 });
         this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
@@ -345,7 +340,6 @@ class LawsPureMath3DEngine {
             this.laws3DGroup.add(sMesh);
         });
 
-        // 天地门轴线光速脉冲
         const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
         const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x4dabf7, emissiveIntensity: 1.5 });
         this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
@@ -359,7 +353,6 @@ class LawsPureMath3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        // 数据脉冲地支间游走运动
         if (this.activeCurve && this.dataPulseMesh) {
             this.pulseProgress += 0.004 * this.speedMultiplier;
             if (this.pulseProgress > 1.0) this.pulseProgress = 0;
@@ -400,6 +393,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.dataset.pos = num;
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
+                cell.addEventListener("click", () => {
+                    // 三向联动：点击阵图单元格，高亮左侧与右侧
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                    cell.classList.add("active-pos");
+
+                    const rem12 = num % 12 === 0 ? 12 : num % 12;
+                    engine.highlightBranchPos(rem12 - 1, 0xff5252);
+                });
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -419,6 +420,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateLaw1(n) {
         const valStr = `10^${n} = ${Math.pow(10, n).toLocaleString()}`;
         if (powerValLabel) powerValLabel.innerText = valStr;
+        if (powerSlider) powerSlider.value = n;
+
+        document.querySelectorAll(".power-quick-btn").forEach(b => {
+            b.classList.toggle("active", parseInt(b.dataset.n, 10) === n);
+        });
 
         const bigVal = BigInt(10) ** BigInt(n);
         const rem81Big = bigVal % 81n;
@@ -453,8 +459,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         engine.highlightBranchPos(branch.idx, 0xff5252);
-        if (lawBadgeTitle) lawBadgeTitle.innerText = `☀️ 10^${n} 太阳赤道守恒律数据运动`;
-        if (lawBadgeDesc) lawBadgeDesc.innerText = `余数 ${rem12} 对应【${branch.name}】位，数据在赤道正位之间闪耀游走`;
+        if (lawBadgeTitle) lawBadgeTitle.innerText = `☀️ 10^${n} 太阳赤道守恒律数据脉冲`;
+        if (lawBadgeDesc) lawBadgeDesc.innerText = `余数 ${rem12} 对应【${branch.name}】位，数据在赤道正位闪耀运动`;
     }
 
     if (powerSlider) {
@@ -462,6 +468,12 @@ document.addEventListener("DOMContentLoaded", () => {
             updateLaw1(parseInt(e.target.value, 10));
         });
     }
+
+    document.querySelectorAll(".power-quick-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            updateLaw1(parseInt(this.dataset.n, 10));
+        });
+    });
 
     const btnDemoStar7 = document.getElementById("btn-demo-star7");
     let isStar7Active = false;
@@ -474,8 +486,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 engine.renderStar7Line();
 
                 document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.add("active-pos"));
-                if (lawBadgeTitle) lawBadgeTitle.innerText = "✨ 数 7 · 12 芒星数据流光运动";
-                if (lawBadgeDesc) lawBadgeDesc.innerText = "按 7 × k 顺次环绕 12 地支，数据粒子在芒星阵上光速游走";
+                if (lawBadgeTitle) lawBadgeTitle.innerText = "✨ 数 7 · 12 芒星数据流光脉冲";
+                if (lawBadgeDesc) lawBadgeDesc.innerText = "按 7 × k 顺次环绕 12 地支，数据粒子在芒星阵上光速穿梭";
             } else {
                 btnDemoStar7.classList.remove("active");
                 engine.clearLaws3DGroup();
@@ -503,6 +515,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateLaw3(idx) {
         const item = splitValues[idx] || splitValues[0];
         if (splitValLabel) splitValLabel.innerText = `${item.parts} 份 (${item.deg})`;
+        if (splitSlider) splitSlider.value = idx;
+
+        document.querySelectorAll(".split-quick-btn").forEach(b => {
+            b.classList.toggle("active", parseInt(b.dataset.idx, 10) === idx);
+        });
 
         if (law3ResultBox) {
             law3ResultBox.innerHTML = `
@@ -535,6 +552,12 @@ document.addEventListener("DOMContentLoaded", () => {
             updateLaw3(parseInt(e.target.value, 10));
         });
     }
+
+    document.querySelectorAll(".split-quick-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            updateLaw3(parseInt(this.dataset.idx, 10));
+        });
+    });
 
     if (btnDemoLaw3) {
         btnDemoLaw3.addEventListener("click", () => {

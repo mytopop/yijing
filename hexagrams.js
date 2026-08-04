@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》六十四卦 3D 拓扑解构馆 - (hexagrams.js)
-   特点：纯粹数理逻辑 3D 浑天坐标 + 地支数据动态脉冲运动 (Data Motion)
+   特点：六爻行全面可点击，触发 3D 浑天节点、太乙 81 宫与卦象爻辞三向实时联动
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -31,70 +31,70 @@ const LUOSHU_PALACES_EXACT = [
 ];
 
 const HEXAGRAMS_64_DATA = [
-    { num: 1, name: "乾为天", symbol: "☰☰", lines: [1,1,1,1,1,1] },
-    { num: 2, name: "坤为地", symbol: "☷☷", lines: [0,0,0,0,0,0] },
-    { num: 3, name: "水雷屯", symbol: "☵☳", lines: [1,0,0,0,1,0] },
-    { num: 4, name: "山水蒙", symbol: "☶☵", lines: [0,1,0,0,0,1] },
-    { num: 5, name: "水天需", symbol: "☵☰", lines: [1,1,1,0,1,0] },
-    { num: 6, name: "天水讼", symbol: "☰☵", lines: [0,1,0,1,1,1] },
-    { num: 7, name: "地水师", symbol: "☷☵", lines: [0,1,0,0,0,0] },
-    { num: 8, name: "水地比", symbol: "☵☷", lines: [0,0,0,0,1,0] },
-    { num: 9, name: "风天小畜", symbol: "☴☰", lines: [1,1,1,0,1,1] },
-    { num: 10, name: "天泽履", symbol: "☰☱", lines: [1,1,0,1,1,1] },
-    { num: 11, name: "地天泰", symbol: "☷☰", lines: [1,1,1,0,0,0] },
-    { num: 12, name: "天地否", symbol: "☰☷", lines: [0,0,0,1,1,1] },
-    { num: 13, name: "天火同人", symbol: "☰☲", lines: [1,0,1,1,1,1] },
-    { num: 14, name: "火天大有", symbol: "☲☰", lines: [1,1,1,1,0,1] },
-    { num: 15, name: "地山谦", symbol: "☷☶", lines: [0,0,1,0,0,0] },
-    { num: 16, name: "雷地豫", symbol: "☳☷", lines: [0,0,0,1,0,0] },
-    { num: 17, name: "泽雷随", symbol: "☱☳", lines: [1,0,0,1,1,0] },
-    { num: 18, name: "山风蛊", symbol: "☶☴", lines: [0,1,1,0,0,1] },
-    { num: 19, name: "地泽临", symbol: "☷☱", lines: [1,1,0,0,0,0] },
-    { num: 20, name: "风地观", symbol: "☴☷", lines: [0,0,0,0,1,1] },
-    { num: 21, name: "火雷噬嗑", symbol: "☲☳", lines: [1,0,0,1,0,1] },
-    { num: 22, name: "山火贲", symbol: "☶☲", lines: [1,0,1,0,0,1] },
-    { num: 23, name: "山地剥", symbol: "☶☷", lines: [0,0,0,0,0,1] },
-    { num: 24, name: "地雷复", symbol: "☷☳", lines: [1,0,0,0,0,0] },
-    { num: 25, name: "天雷无妄", symbol: "☰☳", lines: [1,0,0,1,1,1] },
-    { num: 26, name: "山天大畜", symbol: "☶☰", lines: [1,1,1,0,0,1] },
-    { num: 27, name: "山雷颐", symbol: "☶☳", lines: [1,0,0,0,0,1] },
-    { num: 28, name: "泽风大过", symbol: "☱☴", lines: [0,1,1,1,1,0] },
-    { num: 29, name: "坎为水", symbol: "☵☵", lines: [0,1,0,0,1,0] },
-    { num: 30, name: "离为火", symbol: "☲☲", lines: [1,0,1,1,0,1] },
-    { num: 31, name: "泽山咸", symbol: "☱☶", lines: [0,0,1,1,1,0] },
-    { num: 32, name: "雷风恒", symbol: "☳☴", lines: [0,1,1,1,0,0] },
-    { num: 33, name: "天山遁", symbol: "☰☶", lines: [0,0,1,1,1,1] },
-    { num: 34, name: "雷天大壮", symbol: "☳☰", lines: [1,1,1,1,0,0] },
-    { num: 35, name: "火地晋", symbol: "☲☷", lines: [0,0,0,1,0,1] },
-    { num: 36, name: "地火明夷", symbol: "☷☲", lines: [1,0,1,0,0,0] },
-    { num: 37, name: "风火家人", symbol: "☴☲", lines: [1,0,1,0,1,1] },
-    { num: 38, name: "火泽睽", symbol: "☲☱", lines: [1,1,0,1,0,1] },
-    { num: 39, name: "水山蹇", symbol: "☵☶", lines: [0,0,1,0,1,0] },
-    { num: 40, name: "雷水解", symbol: "☳☵", lines: [0,1,0,1,0,0] },
-    { num: 41, name: "山泽损", symbol: "☶☱", lines: [1,1,0,0,0,1] },
-    { num: 42, name: "风雷益", symbol: "☴☳", lines: [1,0,0,0,1,1] },
-    { num: 43, name: "泽天夬", symbol: "☱☰", lines: [1,1,1,1,1,0] },
-    { num: 44, name: "天风姤", symbol: "☰☴", lines: [0,1,1,1,1,1] },
-    { num: 45, name: "泽地萃", symbol: "☱☷", lines: [0,0,0,1,1,0] },
-    { num: 46, name: "地风升", symbol: "☷☴", lines: [0,1,1,0,0,0] },
-    { num: 47, name: "泽水困", symbol: "☱☵", lines: [0,1,0,1,1,0] },
-    { num: 48, name: "水风井", symbol: "☵☴", lines: [0,1,1,0,1,0] },
-    { num: 49, name: "泽火革", symbol: "☱☲", lines: [1,0,1,1,1,0] },
-    { num: 50, name: "火风鼎", symbol: "☲☴", lines: [0,1,1,1,0,1] },
-    { num: 51, name: "震为雷", symbol: "☳☳", lines: [1,0,0,1,0,0] },
-    { num: 52, name: "艮为山", symbol: "☶☶", lines: [0,0,1,0,0,1] },
-    { num: 53, name: "风山渐", symbol: "☴☶", lines: [0,0,1,0,1,1] },
-    { num: 54, name: "雷泽归妹", symbol: "☳☱", lines: [1,1,0,1,0,0] },
-    { num: 55, name: "雷火丰", symbol: "☳☲", lines: [1,0,1,1,0,0] },
-    { num: 56, name: "火山旅", symbol: "☲☶", lines: [0,0,1,1,0,1] },
-    { num: 57, name: "巽为风", symbol: "☴☴", lines: [0,1,1,0,1,1] },
-    { num: 58, name: "兑为泽", symbol: "☱☱", lines: [1,1,0,1,1,0] },
-    { num: 59, name: "风水涣", symbol: "☴☵", lines: [0,1,0,0,1,1] },
-    { num: 60, name: "水泽节", symbol: "☵☱", lines: [1,1,0,0,1,0] },
-    { num: 61, name: "风泽中孚", symbol: "☴☱", lines: [1,1,0,0,1,1] },
-    { num: 62, name: "雷山小过", symbol: "☳☶", lines: [0,0,1,1,0,0] },
-    { num: 63, name: "水火既济", symbol: "☵☲", lines: [1,0,1,0,1,0] },
-    { num: 64, name: "火水未济", symbol: "☲☵", lines: [0,1,0,1,0,1] }
+    { num: 1, name: "乾为天", symbol: "☰☰", upper: "乾 (天)", lower: "乾 (天)", ci: "元亨利贞。", lines: [1,1,1,1,1,1] },
+    { num: 2, name: "坤为地", symbol: "☷☷", upper: "坤 (地)", lower: "坤 (地)", ci: "元亨，利贞马之贞。", lines: [0,0,0,0,0,0] },
+    { num: 3, name: "水雷屯", symbol: "☵☳", upper: "坎 (水)", lower: "震 (雷)", ci: "元亨利贞，勿用有攸往。", lines: [1,0,0,0,1,0] },
+    { num: 4, name: "山水蒙", symbol: "☶☵", upper: "艮 (山)", lower: "坎 (水)", ci: "亨。匪我求童蒙，童蒙求我。", lines: [0,1,0,0,0,1] },
+    { num: 5, name: "水天需", symbol: "☵☰", upper: "坎 (水)", lower: "乾 (天)", ci: "有孚，光亨，贞吉。", lines: [1,1,1,0,1,0] },
+    { num: 6, name: "天水讼", symbol: "☰☵", upper: "乾 (天)", lower: "坎 (水)", ci: "有孚，窒惕，中吉。", lines: [0,1,0,1,1,1] },
+    { num: 7, name: "地水师", symbol: "☷☵", upper: "坤 (地)", lower: "坎 (水)", ci: "贞，丈人，吉无咎。", lines: [0,1,0,0,0,0] },
+    { num: 8, name: "水地比", symbol: "☵☷", upper: "坎 (水)", lower: "坤 (地)", ci: "吉。原筮元永贞，无咎。", lines: [0,0,0,0,1,0] },
+    { num: 9, name: "风天小畜", symbol: "☴☰", upper: "巽 (风)", lower: "乾 (天)", ci: "亨。密云不雨，自我西郊。", lines: [1,1,1,0,1,1] },
+    { num: 10, name: "天泽履", symbol: "☰☱", upper: "乾 (天)", lower: "兑 (泽)", ci: "履虎尾，不咥人，亨。", lines: [1,1,0,1,1,1] },
+    { num: 11, name: "地天泰", symbol: "☷☰", upper: "坤 (地)", lower: "乾 (天)", ci: "小往大来，吉亨。", lines: [1,1,1,0,0,0] },
+    { num: 12, name: "天地否", symbol: "☰☷", upper: "乾 (天)", lower: "坤 (地)", ci: "否之匪人，不利君子贞。", lines: [0,0,0,1,1,1] },
+    { num: 13, name: "天火同人", symbol: "☰☲", upper: "乾 (天)", lower: "离 (火)", ci: "同人于野，亨。利涉大川。", lines: [1,0,1,1,1,1] },
+    { num: 14, name: "火天大有", symbol: "☲☰", upper: "离 (火)", lower: "乾 (天)", ci: "元亨。", lines: [1,1,1,1,0,1] },
+    { num: 15, name: "地山谦", symbol: "☷☶", upper: "坤 (地)", lower: "艮 (山)", ci: "亨，君子有终。", lines: [0,0,1,0,0,0] },
+    { num: 16, name: "雷地豫", symbol: "☳☷", upper: "震 (雷)", lower: "坤 (地)", ci: "利建侯行师。", lines: [0,0,0,1,0,0] },
+    { num: 17, name: "泽雷随", symbol: "☱☳", upper: "兑 (泽)", lower: "震 (雷)", ci: "元亨利贞，无咎。", lines: [1,0,0,1,1,0] },
+    { num: 18, name: "山风蛊", symbol: "☶☴", upper: "艮 (山)", lower: "巽 (风)", ci: "元亨，利涉大川。", lines: [0,1,1,0,0,1] },
+    { num: 19, name: "地泽临", symbol: "☷☱", upper: "坤 (地)", lower: "兑 (泽)", ci: "元亨利贞。至于八月有凶。", lines: [1,1,0,0,0,0] },
+    { num: 20, name: "风地观", symbol: "☴☷", upper: "巽 (风)", lower: "坤 (地)", ci: "盥而不荐，有孚颙若。", lines: [0,0,0,0,1,1] },
+    { num: 21, name: "火雷噬嗑", symbol: "☲☳", upper: "离 (火)", lower: "震 (雷)", ci: "亨。利用狱。", lines: [1,0,0,1,0,1] },
+    { num: 22, name: "山火贲", symbol: "☶☲", upper: "艮 (山)", lower: "离 (火)", ci: "亨。小利有攸往。", lines: [1,0,1,0,0,1] },
+    { num: 23, name: "山地剥", symbol: "☶☷", upper: "艮 (山)", lower: "坤 (地)", ci: "不利有攸往。", lines: [0,0,0,0,0,1] },
+    { num: 24, name: "地雷复", symbol: "☷☳", upper: "坤 (地)", lower: "震 (雷)", ci: "亨。出入无疾，朋来无咎。", lines: [1,0,0,0,0,0] },
+    { num: 25, name: "天雷无妄", symbol: "☰☳", upper: "乾 (天)", lower: "震 (雷)", ci: "元亨利贞。", lines: [1,0,0,1,1,1] },
+    { num: 26, name: "山天大畜", symbol: "☶☰", upper: "艮 (山)", lower: "乾 (天)", ci: "利贞，不家食吉。", lines: [1,1,1,0,0,1] },
+    { num: 27, name: "山雷颐", symbol: "☶☳", upper: "艮 (山)", lower: "震 (雷)", ci: "贞吉。观颐，自求口实。", lines: [1,0,0,0,0,1] },
+    { num: 28, name: "泽风大过", symbol: "☱☴", upper: "兑 (泽)", lower: "巽 (风)", ci: "栋桡，利有攸往，亨。", lines: [0,1,1,1,1,0] },
+    { num: 29, name: "坎为水", symbol: "☵☵", upper: "坎 (水)", lower: "坎 (水)", ci: "习坎，有孚，维心亨。", lines: [0,1,0,0,1,0] },
+    { num: 30, name: "离为火", symbol: "☲☲", upper: "离 (火)", lower: "离 (火)", ci: "利贞，亨。畜牝牛，吉。", lines: [1,0,1,1,0,1] },
+    { num: 31, name: "泽山咸", symbol: "☱☶", upper: "兑 (泽)", lower: "艮 (山)", ci: "亨，利贞，取女吉。", lines: [0,0,1,1,1,0] },
+    { num: 32, name: "雷风恒", symbol: "☳☴", upper: "震 (雷)", lower: "巽 (风)", ci: "亨，无咎，利贞。", lines: [0,1,1,1,0,0] },
+    { num: 33, name: "天山遁", symbol: "☰☶", upper: "乾 (天)", lower: "艮 (山)", ci: "亨，小利贞。", lines: [0,0,1,1,1,1] },
+    { num: 34, name: "雷天大壮", symbol: "☳☰", upper: "震 (雷)", lower: "乾 (天)", ci: "利贞。", lines: [1,1,1,1,0,0] },
+    { num: 35, name: "火地晋", symbol: "☲☷", upper: "离 (火)", lower: "坤 (地)", ci: "康侯用锡马蕃庶。", lines: [0,0,0,1,0,1] },
+    { num: 36, name: "地火明夷", symbol: "☷☲", upper: "坤 (地)", lower: "离 (火)", ci: "利艰贞。", lines: [1,0,1,0,0,0] },
+    { num: 37, name: "风火家人", symbol: "☴☲", upper: "巽 (风)", lower: "离 (火)", ci: "利女贞。", lines: [1,0,1,0,1,1] },
+    { num: 38, name: "火泽睽", symbol: "☲☱", upper: "离 (火)", lower: "兑 (泽)", ci: "小事吉。", lines: [1,1,0,1,0,1] },
+    { num: 39, name: "水山蹇", symbol: "☵☶", upper: "坎 (水)", lower: "艮 (山)", ci: "利西南，不利东北。", lines: [0,0,1,0,1,0] },
+    { num: 40, name: "雷水解", symbol: "☳☵", upper: "震 (雷)", lower: "坎 (水)", ci: "利西南，无所往，其来复吉。", lines: [0,1,0,1,0,0] },
+    { num: 41, name: "山泽损", symbol: "☶☱", upper: "艮 (山)", lower: "兑 (泽)", ci: "有孚，元吉，无咎。", lines: [1,1,0,0,0,1] },
+    { num: 42, name: "风雷益", symbol: "☴☳", upper: "巽 (风)", lower: "震 (雷)", ci: "利有攸往，利涉大川。", lines: [1,0,0,0,1,1] },
+    { num: 43, name: "泽天夬", symbol: "☱☰", upper: "兑 (泽)", lower: "乾 (天)", ci: "扬于王庭，孚号有厉。", lines: [1,1,1,1,1,0] },
+    { num: 44, name: "天风姤", symbol: "☰☴", upper: "乾 (天)", lower: "巽 (风)", ci: "女壮，勿用取女。", lines: [0,1,1,1,1,1] },
+    { num: 45, name: "泽地萃", symbol: "☱☷", upper: "兑 (泽)", lower: "坤 (地)", ci: "亨。王假有庙，利见大人。", lines: [0,0,0,1,1,0] },
+    { num: 46, name: "地风升", symbol: "☷☴", upper: "坤 (地)", lower: "巽 (风)", ci: "元亨，用见大人，勿恤。", lines: [0,1,1,0,0,0] },
+    { num: 47, name: "泽水困", symbol: "☱☵", upper: "兑 (泽)", lower: "坎 (水)", ci: "亨，贞，大人吉，无咎。", lines: [0,1,0,1,1,0] },
+    { num: 48, name: "水风井", symbol: "☵☴", upper: "坎 (水)", lower: "巽 (风)", ci: "改邑不改井，无丧无得。", lines: [0,1,1,0,1,0] },
+    { num: 49, name: "泽火革", symbol: "☱☲", upper: "兑 (泽)", lower: "离 (火)", ci: "己日乃孚，元亨利贞。", lines: [1,0,1,1,1,0] },
+    { num: 50, name: "火风鼎", symbol: "☲☴", upper: "离 (火)", lower: "巽 (风)", ci: "元吉，亨。", lines: [0,1,1,1,0,1] },
+    { num: 51, name: "震为雷", symbol: "☳☳", upper: "震 (雷)", lower: "震 (雷)", ci: "亨。震来虩虩，笑言哑哑。", lines: [1,0,0,1,0,0] },
+    { num: 52, name: "艮为山", symbol: "☶☶", upper: "艮 (山)", lower: "艮 (山)", ci: "艮其背，不获其身。", lines: [0,0,1,0,0,1] },
+    { num: 53, name: "风山渐", symbol: "☴☶", upper: "巽 (风)", lower: "艮 (山)", ci: "女归吉，利贞。", lines: [0,0,1,0,1,1] },
+    { num: 54, name: "雷泽归妹", symbol: "☳☱", upper: "震 (雷)", lower: "兑 (泽)", ci: "征凶，无攸利。", lines: [1,1,0,1,0,0] },
+    { num: 55, name: "雷火丰", symbol: "☳☲", upper: "震 (雷)", lower: "离 (火)", ci: "亨，王假之，勿忧，宜日中。", lines: [1,0,1,1,0,0] },
+    { num: 56, name: "火山旅", symbol: "☲☶", upper: "离 (火)", lower: "艮 (山)", ci: "小亨，旅贞吉。", lines: [0,0,1,1,0,1] },
+    { num: 57, name: "巽为风", symbol: "☴☴", upper: "巽 (风)", lower: "巽 (风)", ci: "小亨，利有攸往，利见大人。", lines: [0,1,1,0,1,1] },
+    { num: 58, name: "兑为泽", symbol: "☱☱", upper: "兑 (泽)", lower: "兑 (泽)", ci: "亨，利贞。", lines: [1,1,0,1,1,0] },
+    { num: 59, name: "风水涣", symbol: "☴☵", upper: "巽 (风)", lower: "坎 (水)", ci: "亨。王假有庙，利涉大川。", lines: [0,1,0,0,1,1] },
+    { num: 60, name: "水泽节", symbol: "☵☱", upper: "坎 (水)", lower: "兑 (泽)", ci: "亨。苦节不可贞。", lines: [1,1,0,0,1,0] },
+    { num: 61, name: "风泽中孚", symbol: "☴☱", upper: "巽 (风)", lower: "兑 (泽)", ci: "豚鱼吉，利涉大川，利贞。", lines: [1,1,0,0,1,1] },
+    { num: 62, name: "雷山小过", symbol: "☳☶", upper: "震 (雷)", lower: "艮 (山)", ci: "亨，利贞。可小事，不可大事。", lines: [0,0,1,1,0,0] },
+    { num: 63, name: "水火既济", symbol: "☵☲", upper: "坎 (水)", lower: "离 (火)", ci: "亨，小利贞，初吉终乱。", lines: [1,0,1,0,1,0] },
+    { num: 64, name: "火水未济", symbol: "☲☵", upper: "离 (火)", lower: "坎 (水)", ci: "亨，小狐汔济，濡其尾，无攸利。", lines: [0,1,0,1,0,1] }
 ];
 
 function getBranch3DPos(branchIdx, radius = 6.0) {
@@ -333,11 +333,18 @@ class HexagramPureMath3DEngine {
             this.hex3DGroup.add(sMesh);
         });
 
-        // 光速数据脉冲球 (Data Pulse Motion)
+        // 光速数据脉冲球
         const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
         const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5 });
         this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
         this.hex3DGroup.add(this.dataPulseMesh);
+    }
+
+    highlightSingleYaoNode(branchIdx) {
+        const pos = getBranch3DPos(branchIdx);
+        if (this.dataPulseMesh) {
+            this.dataPulseMesh.position.copy(pos);
+        }
     }
 
     animate() {
@@ -347,7 +354,6 @@ class HexagramPureMath3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        // 六爻轨迹数据脉冲游走
         if (this.activeCurve && this.dataPulseMesh) {
             this.pulseProgress += 0.004 * this.speedMultiplier;
             if (this.pulseProgress > 1.0) this.pulseProgress = 0;
@@ -389,6 +395,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
                 cell.addEventListener("click", () => {
+                    // 三向联动：点击 81 宫单元格，联动 3D 与右侧 64 卦
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                    cell.classList.add("active-pos");
+
                     if (num <= 64) {
                         const hexSelect = document.getElementById("hex-select");
                         if (hexSelect) hexSelect.value = num;
@@ -440,7 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 `<div class="yao-line-yin"><span></span><span></span></div>`;
 
             rowsHtml += `
-                <div class="yao-row">
+                <div class="yao-row interactive-yao-row" data-yao="${yaoIdx}" data-math="${mathVal}" data-rem12="${rem12}" data-branch="${rem12 - 1}">
                     <div class="yao-name">${YAO_NAMES[idx]}</div>
                     <div class="yao-symbol">${symbolHtml}</div>
                     <div class="yao-math-calc">${hex.num} × ${yaoIdx} = ${mathVal}</div>
@@ -453,14 +463,44 @@ document.addEventListener("DOMContentLoaded", () => {
         if (hexDetailBox) {
             hexDetailBox.innerHTML = `
                 <div class="hex-header">
-                    <div class="hex-name">${hex.symbol} 第 ${hex.num} 卦 · ${hex.name}</div>
-                    <div class="hex-sum">初爻算式: ${hex.num} × 1 = ${hex.num} (太乙 81 降维落第 ${rem81} 宫)</div>
+                    <div class="hex-name">${hex.symbol} 第 ${hex.num} 卦 · ${hex.name} (上 ${hex.upper} / 下 ${hex.lower})</div>
+                    <div class="hex-sum">卦辞：${hex.ci} | 初爻算式: ${hex.num} × 1 = ${hex.num} (落 81 阵图第 ${rem81} 宫)</div>
+                </div>
+                <div style="font-size:11px; color:#ffe066; margin: 4px 0 6px 0; background:rgba(255,224,102,0.12); padding:4px 8px; border-radius:4px;">
+                    👇 点击下方任意爻节点行，全页三栏 (左侧 3D 节点 + 中间 81 宫 + 右侧爻辞) 实时三向联动！
                 </div>
                 <div class="hex-lines-grid">
                     ${rowsHtml}
                 </div>
             `;
         }
+
+        // 绑定六爻行点击交互 (三向联动：点击爻行 ➔ 联动 3D 节点 + 联动 81 宫阵图)
+        document.querySelectorAll(".interactive-yao-row").forEach(r => {
+            r.addEventListener("click", function() {
+                document.querySelectorAll(".interactive-yao-row").forEach(el => el.classList.remove("active-yao-row"));
+                this.classList.add("active-yao-row");
+
+                const yaoNum = this.dataset.yao;
+                const mVal = parseInt(this.dataset.math, 10);
+                const r12 = parseInt(this.dataset.rem12, 10);
+                const bIdx = parseInt(this.dataset.branch, 10);
+                const branch = EARTHLY_BRANCHES[bIdx];
+
+                const yRem81 = mVal % 81 === 0 ? 81 : mVal % 81;
+
+                // 联动高亮太乙 81 宫
+                document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+                    cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === yRem81);
+                });
+
+                // 联动 3D 节点与脉冲球
+                engine.highlightSingleYaoNode(bIdx);
+
+                if (hexBadgeTitle) hexBadgeTitle.innerText = `${hex.name} · ${YAO_NAMES[yaoNum - 1]} (${hex.num} × ${yaoNum} = ${mVal})`;
+                if (hexBadgeDesc) hexBadgeDesc.innerText = `算式余 ${r12} 落【${branch.name}位】 (${branch.system})，太乙 81 阵图第 ${yRem81} 宫高亮！`;
+            });
+        });
 
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
             const p = parseInt(cell.dataset.pos, 10);
@@ -474,7 +514,7 @@ document.addEventListener("DOMContentLoaded", () => {
         engine.renderHexagram3DTrajectory(hex.num);
 
         if (hexBadgeTitle) hexBadgeTitle.innerText = `${hex.name} (${hex.symbol}) 3D 地支数据运动轨迹`;
-        if (hexBadgeDesc) hexBadgeDesc.innerText = `六爻 1~6 数据在 12 地支之间作流光脉冲巡航运动`;
+        if (hexBadgeDesc) hexBadgeDesc.innerText = `六爻 1~6 数据在 12 地支之间作流光脉冲巡航运动 (点击右侧爻行可定位)`;
     }
 
     const btnSpeed = document.getElementById("btn-speed-control");

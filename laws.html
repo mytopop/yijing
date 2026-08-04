@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>易经数理秘笈 - 天象数理五大规律演示馆</title>
+    <title>易经数理秘笈 - 天象五大定律演示馆</title>
     <!-- 引入 Google 字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,17 +18,17 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 统一 100% 结构固定 Header 顶栏 -->
+        <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
                 <div class="logo-icon">☯</div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
-                    <span class="subtitle">根据梁致堂原著解构 · 天象数理五大规律演示馆</span>
+                    <span class="subtitle">根据梁致堂原著解构 · 天象五大定律演示馆</span>
                 </div>
             </div>
             
-                                    <nav class="header-nav-tabs">
+                        <nav class="header-nav-tabs">
                 <a href="index.html" class="nav-tab">🏠 首页</a>
                 <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
                 <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
@@ -44,16 +44,16 @@
 
         <!-- 三栏并行主容器 -->
         <main class="main-three-split-container">
-            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <!-- 栏一：纯粹数理逻辑 3D 浑天天象坐标仪 (34%) -->
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪
+                        <span>🌌</span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
-                        <span class="legend-item equator">● 赤道(天)</span>
-                        <span class="legend-item ecliptic">● 黄道(地)</span>
-                        <span class="legend-item lunar">● 白道(万物)</span>
+                        <span class="legend-item equator">● 赤道(0°)</span>
+                        <span class="legend-item ecliptic">● 黄道(+23.5°)</span>
+                        <span class="legend-item lunar">● 白道(-15°)</span>
                     </div>
                 </div>
 
@@ -85,8 +85,8 @@
 
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
-                        <div id="law-badge-title" class="badge-title">天象数理五大定律演示</div>
-                        <div id="law-badge-desc" class="badge-desc">点击下方规律按钮，查看天体运动与数理律动的 3D 映射</div>
+                        <div id="law-badge-title" class="badge-title">天象五大定律 3D 演示</div>
+                        <div id="law-badge-desc" class="badge-desc">选择右侧定律控件，观察 3D 天极数据脉冲与太乙 81 宫阵图联动</div>
                     </div>
                 </div>
             </section>
@@ -98,98 +98,102 @@
                         <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
                     </div>
                     <div class="law-desc-text">
-                        点击右侧五大定律控制按钮，太乙 81 宫阵图中对应的宫数同步亮起！
+                        点击右侧定律按钮、拖动滑块或选择单元格，太乙 81 宫阵图同步闪耀高亮！
                     </div>
                 </div>
 
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：天象五大规律控制台 (33%) -->
-            <section class="col-right-controls">
-                <!-- 规律一：10^n 太阳赤道守恒律 -->
-                <div class="glass-panel" style="border-color: rgba(255, 82, 82, 0.6); background: rgba(255, 82, 82, 0.08);">
-                    <div class="card-title" style="color: #ff5252;">
-                        <span>☀️</span> 规律一：10^n 太阳赤道守恒律
+            <!-- 栏三：天象五大定律可交互控制台 (兼具滑块与快捷按键) (33%) -->
+            <section class="col-right-controls" style="overflow-y: auto; max-height: calc(100vh - 120px);">
+                <!-- 定律 1：10^n 太阳赤道守恒律 (滑块 + 10 个快捷按键) -->
+                <div class="glass-panel">
+                    <div class="card-title">
+                        <span>☀️</span> 定律1 · 10^n 太阳赤道守恒律 (双重交互控件)
                     </div>
-                    <div class="law-desc-text">
-                        太阳能量 $10^n$ 经矩 81 降维后再模 12 地支，余数 **100% 严格恒落赤道四正位（子、卯、午、酉）**！
-                    </div>
-                    <div style="margin-top: 8px;">
-                        <label style="font-size: 11px; color: #ffe066; font-weight: 700;">🎛️ 拖动选择太阳指数 n (10^n):</label>
-                        <input type="range" id="power-slider" min="1" max="10" value="3" style="width: 100%; margin-top: 4px;">
-                        <div id="power-val-label" style="text-align: right; font-size: 13px; color: #ffe066; font-weight: 800; font-family: var(--font-times);">
-                            10^3 = 1,000
+                    <div class="slider-container" style="margin-top: 4px;">
+                        <div style="font-size:12px; color:#cbd5e1; margin-bottom:2px;">
+                            连续滑动指数 n: <span id="power-val-label" style="color:#ff5252; font-weight:800;">10^3 = 1,000</span>
                         </div>
+                        <input type="range" id="power-slider" min="1" max="10" value="3" class="custom-slider">
                     </div>
+                    <!-- 快捷 N 次方按键 -->
+                    <div class="sanhe-btn-grid" style="grid-template-columns: repeat(5, 1fr); margin-top: 6px;">
+                        <button class="sanhe-btn power-quick-btn" data-n="1">10¹</button>
+                        <button class="sanhe-btn power-quick-btn" data-n="2">10²</button>
+                        <button class="sanhe-btn power-quick-btn active" data-n="3">10³</button>
+                        <button class="sanhe-btn power-quick-btn" data-n="4">10⁴</button>
+                        <button class="sanhe-btn power-quick-btn" data-n="5">10⁵</button>
+                        <button class="sanhe-btn power-quick-btn" data-n="6">10⁶</button>
+                        <button class="sanhe-btn power-quick-btn" data-n="7">10⁷</button>
+                        <button class="sanhe-btn power-quick-btn" data-n="8">10⁸</button>
+                        <button class="sanhe-btn power-quick-btn" data-n="9">10⁹</button>
+                        <button class="sanhe-btn power-quick-btn" data-n="10">10¹⁰</button>
+                    </div>
+
                     <div id="law1-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
-                        <!-- 动态渲染 10^n 演算明细 -->
+                        <!-- JS 动态渲染 -->
                     </div>
                 </div>
 
-                <!-- 规律二：数 7 · 北斗七星芒星律 -->
+                <!-- 定律 2：数 7 北斗七星芒星律 -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title">
-                        <span>✨</span> 规律二：数 7 · 北斗七星芒星律
-                    </div>
-                    <div class="law-desc-text">
-                        按 7 × k 顺次经过 12 地支方位，在 3D 天球上勾勒出北斗七星十二芒星阵图。
-                    </div>
-                    <button id="btn-demo-star7" class="action-btn-gold" style="margin-top: 6px;">
-                        🌌 开启/取消 3D 北斗芒星阵
+                    <div class="card-title"><span>✨</span> 定律2 · 数 7 · 北斗七星芒星律</div>
+                    <button id="btn-demo-star7" class="action-btn" style="margin-top: 4px; width: 100%;">
+                        ✨ 渲染 12 芒星数据流光脉冲轨迹
                     </button>
                 </div>
 
-                <!-- 规律三：360° 周天对半分割归九律 -->
+                <!-- 定律 3：周天 360° 切割归九律 (滑块 + 角度按键) -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title">
-                        <span>🌀</span> 规律三：360° 周天分割归九律
+                    <div class="card-title"><span>🌀</span> 定律3 · 周天 360° 切割归九律</div>
+                    <div class="slider-container" style="margin-top: 4px;">
+                        <div style="font-size:12px; color:#cbd5e1; margin-bottom:2px;">
+                            对半切割份数: <span id="split-val-label" style="color:#ffe066; font-weight:800;">1 份 (360°)</span>
+                        </div>
+                        <input type="range" id="split-slider" min="0" max="6" value="0" class="custom-slider">
                     </div>
-                    <div class="law-desc-text">
-                        将周天 360° 连续对半分割（180°, 90°, 45°...），数值众和数恒收敛于极数 9。
+                    <!-- 快捷角度按键 -->
+                    <div class="sanhe-btn-grid" style="grid-template-columns: repeat(4, 1fr); margin-top: 6px;">
+                        <button class="sanhe-btn split-quick-btn active" data-idx="0">360°</button>
+                        <button class="sanhe-btn split-quick-btn" data-idx="1">180°</button>
+                        <button class="sanhe-btn split-quick-btn" data-idx="2">90°</button>
+                        <button class="sanhe-btn split-quick-btn" data-idx="3">45°</button>
+                        <button class="sanhe-btn split-quick-btn" data-idx="4">22.5°</button>
+                        <button class="sanhe-btn split-quick-btn" data-idx="5">11.25°</button>
+                        <button class="sanhe-btn split-quick-btn" data-idx="6">5.625°</button>
+                        <button id="btn-demo-law3" class="sanhe-btn">验证归九</button>
                     </div>
-                    <div style="margin-top: 6px;">
-                        <input type="range" id="split-slider" min="0" max="6" value="0" style="width: 100%;">
-                        <div id="split-val-label" style="text-align: right; font-size: 12px; color: #ffe066; font-weight: 700;">1 份 (360°)</div>
-                    </div>
+
                     <div id="law3-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
-                        <!-- 动态渲染 -->
+                        <!-- JS 动态渲染 -->
                     </div>
-                    <button id="btn-demo-law3" class="action-btn-gold" style="margin-top: 6px;">
-                        🎯 演示/取消 归九律
-                    </button>
                 </div>
 
-                <!-- 规律四：地支三合局 3D 几何 -->
+                <!-- 定律 4：地支三合局 -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title">
-                        <span>🔺</span> 规律四：地支三合局 3D 能量三角形
-                    </div>
-                    <div class="sanhe-btn-grid" style="margin-top: 6px;">
+                    <div class="card-title"><span>🔺</span> 定律4 · 地支三合局 3D 拓扑</div>
+                    <div class="sanhe-btn-grid" style="margin-top: 4px;">
+                        <button class="sanhe-btn active" data-sanhe="water">申子辰 (水局)</button>
+                        <button class="sanhe-btn" data-sanhe="metal">巳酉丑 (金局)</button>
                         <button class="sanhe-btn" data-sanhe="wood">亥卯未 (木局)</button>
                         <button class="sanhe-btn" data-sanhe="fire">寅午戌 (火局)</button>
-                        <button class="sanhe-btn" data-sanhe="metal">巳酉丑 (金局)</button>
-                        <button class="sanhe-btn" data-sanhe="water">申子辰 (水局)</button>
                     </div>
                 </div>
 
-                <!-- 规律五：永静数 6 天地门轴线 -->
-                <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title">
-                        <span>🚪</span> 规律五：永静数 6 天地门轴线
-                    </div>
-                    <div class="law-desc-text">
-                        数 6 乘奇数必落巳位 (地户)，乘偶数必落亥位 (天门)，构成天地对冲轴线。
-                    </div>
-                    <button id="btn-demo-yongjing" class="action-btn-gold" style="margin-top: 6px;">
-                        🚪 演示/取消 天地门轴线
+                <!-- 定律 5：永静数 6 天地门轴线 -->
+                <div class="glass-panel" style="margin-top: 6px; margin-bottom: 20px;">
+                    <div class="card-title"><span>🚪</span> 定律5 · 永静数 6 天地门轴线</div>
+                    <button id="btn-demo-yongjing" class="action-btn" style="margin-top: 4px; width: 100%;">
+                        🚪 渲染巳亥天地门轴线数据脉冲
                     </button>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- 规律引擎 (带版本防缓存) -->
-    <script src="laws.js?v=20260804_v11"></script>
+    <!-- 天象五大定律引擎 (带版本防缓存) -->
+    <script src="laws.js?v=20260804_v20"></script>
 </body>
 </html>

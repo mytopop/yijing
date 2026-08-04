@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>易经数理秘笈 - 12 方位三个坐标按周纪次解构馆</title>
+    <title>易经数理秘笈 - 十二方位三坐标系解构馆</title>
     <!-- 引入 Google 字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,17 +18,17 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 统一 100% 结构固定 Header 顶栏 -->
+        <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
                 <div class="logo-icon">☯</div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
-                    <span class="subtitle">根据梁致堂原著解构 · 12 方位三个坐标按周纪次解构馆</span>
+                    <span class="subtitle">根据梁致堂原著解构 · 十二方位三坐标系解构馆</span>
                 </div>
             </div>
             
-                                    <nav class="header-nav-tabs">
+                        <nav class="header-nav-tabs">
                 <a href="index.html" class="nav-tab">🏠 首页</a>
                 <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
                 <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
@@ -44,16 +44,16 @@
 
         <!-- 三栏并行主容器 -->
         <main class="main-three-split-container">
-            <!-- 栏一：3D 浑天时空仪 (34%) -->
+            <!-- 栏一：纯粹数理逻辑 3D 浑天天象坐标仪 (34%) -->
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪
+                        <span>🌌</span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
-                        <span class="legend-item equator">● 赤道(天)</span>
-                        <span class="legend-item ecliptic">● 黄道(地)</span>
-                        <span class="legend-item lunar">● 白道(万物)</span>
+                        <span class="legend-item equator">● 赤道(0°)</span>
+                        <span class="legend-item ecliptic">● 黄道(+23.5°)</span>
+                        <span class="legend-item lunar">● 白道(-15°)</span>
                     </div>
                 </div>
 
@@ -80,13 +80,13 @@
                         </button>
                     </div>
 
-                    <!-- Three.js 渲染画布 -->
-                    <div id="three-canvas-coord" style="width:100%; height:100%;"></div>
+                    <!-- Three.js 渲染画布 (正确匹配 ID) -->
+                    <div id="three-canvas-coordinates12" style="width:100%; height:100%;"></div>
 
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
-                        <div class="badge-title">12 方位 3 坐标 3D 系统</div>
-                        <div class="badge-desc">呈现赤道(1,4,7,10)、黄道(2,5,8,11)与白道(3,6,9,12)的三轨投影</div>
+                        <div id="coord-badge-title" class="badge-title">12 地支三坐标系全景归属表</div>
+                        <div id="coord-badge-desc" class="badge-desc">点击表格行、3D 地支珠或 81 宫单元格，全页三栏实现双向同步联动</div>
                     </div>
                 </div>
             </section>
@@ -98,69 +98,91 @@
                         <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
                     </div>
                     <div class="law-desc-text">
-                        根据右侧筛选的坐标系统与周次，太乙 81 宫阵图中对应的降维宫位同步亮起！
+                        点击阵图中的 81 宫单元格，左侧 3D 地支节点与右侧表格行将同步高亮闪耀。
                     </div>
                 </div>
 
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：12 方位 3 坐标控制台 (33%) -->
-            <section class="col-right-controls">
+            <!-- 栏三：12 方位 3 坐标系解构控制台 (三向联动) (33%) -->
+            <section class="col-right-controls" style="overflow-y: auto; max-height: calc(100vh - 120px);">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>🌌</span> 原著《12 方位三个坐标按周纪次》解构
+                        <span>🌌</span> 12 地支三坐标系分属选择器
                     </div>
-                    <div class="law-desc-text">
-                        原著补充材料之三：12 地支划分为三才三大坐标系统，按周次（1~12, 13~24, 25~36...）滚动递进。
+                    <div class="sanhe-btn-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 4px;">
+                        <button class="sanhe-btn sys-filter-btn active" data-sys="all">全部12方位</button>
+                        <button class="sanhe-btn sys-filter-btn" data-sys="equator" style="color:#ff5252;">赤道(天)</button>
+                        <button class="sanhe-btn sys-filter-btn" data-sys="ecliptic" style="color:#40c057;">黄道(地)</button>
+                        <button class="sanhe-btn sys-filter-btn" data-sys="lunar" style="color:#4dabf7;">白道(万物)</button>
                     </div>
                 </div>
 
-                <!-- 筛选菜单 -->
+                <!-- 12 地支 3 坐标系完整表 (可点击行) -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title">
-                        <span>🔍</span> 选择坐标系统筛选
-                    </div>
-                    <select id="coord-filter-select" class="custom-select" style="margin-top: 4px;">
-                        <option value="all">🌐 显示全部 12 方位 (赤黄白全景)</option>
-                        <option value="赤道">🔴 赤道坐标 (子、卯、午、酉)</option>
-                        <option value="黄道">🟢 黄道坐标 (丑、辰、未、戌)</option>
-                        <option value="白道">🔵 白道坐标 (寅、巳、申、亥)</option>
-                    </select>
-                </div>
-
-                <!-- 数据表格 -->
-                <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title">
-                        <span>📋</span> 按周纪次数据罗列明细
-                    </div>
-                    
-                    <div class="sequence-table-container" style="max-height: 220px;">
+                    <div class="card-title"><span>📋</span> 12 地支 3 坐标系属性大表 (点击行实时联动)</div>
+                    <div class="sequence-table-container" style="max-height: 280px;">
                         <table class="seq-table">
                             <thead>
                                 <tr>
-                                    <th>周次</th>
                                     <th>地支</th>
-                                    <th>坐标系统</th>
-                                    <th>原数</th>
-                                    <th>81宫落点</th>
+                                    <th>余数</th>
+                                    <th>三坐标归属</th>
+                                    <th>核心功能定位</th>
                                 </tr>
                             </thead>
                             <tbody id="coord-table-body">
-                                <!-- 动态插入 -->
+                                <tr class="interactive-row active-row" data-branch="0" data-sys="equator" data-rem="1">
+                                    <td style="color:#ff5252; font-weight:700;">子位</td><td>余 1</td><td>赤道 (天)</td><td>阳气萌动正北位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="1" data-sys="ecliptic" data-rem="2">
+                                    <td style="color:#40c057; font-weight:700;">丑位</td><td>余 2</td><td>黄道 (地)</td><td>阴阳交替东北位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="2" data-sys="lunar" data-rem="3">
+                                    <td style="color:#4dabf7; font-weight:700;">寅位</td><td>余 3</td><td>白道 (万物)</td><td>奇数演进始生位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="3" data-sys="equator" data-rem="4">
+                                    <td style="color:#ff5252; font-weight:700;">卯位</td><td>余 4</td><td>赤道 (天)</td><td>日出东方正东位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="4" data-sys="ecliptic" data-rem="5">
+                                    <td style="color:#40c057; font-weight:700;">辰位</td><td>余 5</td><td>黄道 (地)</td><td>草木长茂东南位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="5" data-sys="lunar" data-rem="6">
+                                    <td style="color:#4dabf7; font-weight:700;">巳位</td><td>余 6</td><td>白道 (万物)</td><td>90° 质变地户位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="6" data-sys="equator" data-rem="7">
+                                    <td style="color:#ff5252; font-weight:700;">午位</td><td>余 7</td><td>赤道 (天)</td><td>阳极阴生正南位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="7" data-sys="ecliptic" data-rem="8">
+                                    <td style="color:#40c057; font-weight:700;">未位</td><td>余 8</td><td>黄道 (地)</td><td>万物成实西南位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="8" data-sys="lunar" data-rem="9">
+                                    <td style="color:#4dabf7; font-weight:700;">申位</td><td>余 9</td><td>白道 (万物)</td><td>白道开局主轴位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="9" data-sys="equator" data-rem="10">
+                                    <td style="color:#ff5252; font-weight:700;">酉位</td><td>余 10</td><td>赤道 (天)</td><td>日落西方正西位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="10" data-sys="ecliptic" data-rem="11">
+                                    <td style="color:#40c057; font-weight:700;">戌位</td><td>余 11</td><td>黄道 (地)</td><td>万物归藏西北位</td>
+                                </tr>
+                                <tr class="interactive-row" data-branch="11" data-sys="lunar" data-rem="12">
+                                    <td style="color:#4dabf7; font-weight:700;">亥位</td><td>余 12</td><td>白道 (万物)</td><td>天门 324 受德之筐位</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div id="coord-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
-                    <!-- 动态渲染 -->
+                <!-- 选定地支属性解析卡片 -->
+                <div id="coord-detail-card" class="hexagram-detail-box" style="margin-top: 6px;">
+                    <!-- JS 动态填入 -->
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- 12坐标引擎 (带版本防缓存) -->
-    <script src="coordinates12.js?v=20260804_v6"></script>
+    <!-- 12 方位 3 坐标系引擎 (带版本防缓存) -->
+    <script src="coordinates12.js?v=20260804_v20"></script>
 </body>
 </html>
