@@ -1,6 +1,6 @@
 /* ==========================================================================
-   《易经数理秘笈》用矩法·一矩至十二矩运动规律 - 核心全景引擎 (ju81.js)
-   特点：纯粹数理逻辑 3D 浑天坐标 + 四大原书《用矩法》解构模块 (1~12矩/四白分属/324筐/圆出于方)
+   《易经数理秘笈》用矩法·一矩至十二矩运动规律 - 交互增强引擎 (ju81.js)
+   特点：纯粹数理逻辑 3D 浑天坐标 + 四大原书《用矩法》可交互模块 (滑块/按钮/实效演算)
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -43,9 +43,11 @@ function getBranch3DPos(branchIdx, radius = 6.0) {
     return baseVec;
 }
 
-class Ju81PureMath3DEngine {
+class Ju81Interactive3DEngine {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        if (!this.container) return;
+
         this.width = this.container.clientWidth || 400;
         this.height = this.container.clientHeight || 500;
 
@@ -269,7 +271,7 @@ class Ju81PureMath3DEngine {
         });
     }
 
-    renderFourCornersSquare() {
+    renderFourCornersSquare(highlightIdx = null) {
         this.clearJuSpiralGroup();
         const cornerIndices = [8, 5, 2, 11, 8]; // 申(8), 巳(5), 寅(2), 亥(11)
         const points = cornerIndices.map(idx => getBranch3DPos(idx));
@@ -279,12 +281,42 @@ class Ju81PureMath3DEngine {
         const line = new THREE.Line(geom, mat);
         this.juSpiralGroup.add(line);
 
-        points.slice(0, 4).forEach(p => {
-            const sGeom = new THREE.SphereGeometry(0.45, 16, 16);
-            const sMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, emissive: 0x0033aa });
+        points.slice(0, 4).forEach((p, idx) => {
+            const isTarget = (highlightIdx !== null && cornerIndices[idx] === highlightIdx);
+            const size = isTarget ? 0.65 : 0.45;
+            const color = isTarget ? 0xffe066 : 0x4dabf7;
+
+            const sGeom = new THREE.SphereGeometry(size, 16, 16);
+            const sMat = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: 0.8 });
             const sMesh = new THREE.Mesh(sGeom, sMat);
             sMesh.position.copy(p);
             this.juSpiralGroup.add(sMesh);
+        });
+    }
+
+    renderPolygonFitting(sides = 60) {
+        this.clearJuSpiralGroup();
+        const points = [];
+        const radius = 6.0;
+
+        for (let i = 0; i <= sides; i++) {
+            const angle = (i / sides) * Math.PI * 2;
+            points.push(new THREE.Vector3(radius * Math.cos(angle), radius * Math.sin(angle), 0));
+        }
+
+        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = new THREE.LineBasicMaterial({ color: 0x40c057, linewidth: 3 });
+        const line = new THREE.Line(geom, mat);
+        this.juSpiralGroup.add(line);
+
+        points.slice(0, sides).forEach((p, idx) => {
+            if (idx % Math.max(1, Math.floor(sides / 12)) === 0) {
+                const sGeom = new THREE.SphereGeometry(0.3, 16, 16);
+                const sMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffe066 });
+                const sMesh = new THREE.Mesh(sGeom, sMat);
+                sMesh.position.copy(p);
+                this.juSpiralGroup.add(sMesh);
+            }
         });
     }
 
@@ -295,13 +327,13 @@ class Ju81PureMath3DEngine {
             this.scene.rotation.z += 0.002;
         }
 
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
+        if (this.controls) this.controls.update();
+        if (this.renderer) this.renderer.render(this.scene, this.camera);
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const engine = new Ju81PureMath3DEngine("three-canvas-ju");
+    const engine = new Ju81Interactive3DEngine("three-canvas-ju");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
@@ -337,69 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
-    const JU_DATA = {
-        1: {
-            name: "1 矩 (81 · 地气基本矩)",
-            val: 81,
-            formula: "81 × 1 = 81",
-            row: "第 9 行 (81九)",
-            hex: "81九太乙矩",
-            level: "基本方阵单元",
-            desc: "1 矩为九九八十一基本单元。包含 9 宫 81 种全象，是天体气数降维的方针定域基石。",
-            rem81: 81
-        },
-        2: {
-            name: "2 矩 (162 · 蛊卦已位)",
-            val: 162,
-            formula: "81 × 2 = 162",
-            row: "第 18 行 (18九2)",
-            hex: "18九2蛊卦 (已位)",
-            level: "阴阳对冲初阶",
-            desc: "2 矩 162 = 18 × 9。经过已位与亥位成 180° 对冲，形成天地阴阳交感的前阶路途。",
-            rem81: 81
-        },
-        3: {
-            name: "3 矩 (243 · 白道颐卦)",
-            val: 243,
-            formula: "81 × 3 = 243",
-            row: "第 27 行 (27九3)",
-            hex: "27九3颐卦 (申位)",
-            level: "白道坐标系主轴",
-            desc: "3 矩 243 = 27 × 9。位于第 27 行颐卦（申位），是白道坐标系三角定畴的核心主轴。",
-            rem81: 81
-        },
-        4: {
-            name: "4 矩 (324 · 下际天周)",
-            val: 324,
-            formula: "81 × 4 = 324",
-            row: "第 27 行下 (36九4)",
-            hex: "36九4明夷卦 (亥位)",
-            level: "下际天周 (324 + 36 = 360°)",
-            desc: "4 矩 324 = 36 × 9。下天际线，结合子午天门地户 36 气数成 360° 周天全功大圆满！",
-            rem81: 81
-        },
-        8: {
-            name: "8 矩 (648 · 中际归妹)",
-            val: 648,
-            formula: "81 × 8 = 648",
-            row: "第 54 行中 (54九6)",
-            hex: "54九6归妹卦 (已位)",
-            level: "中际天周 (天地大义)",
-            desc: "8 矩 648 = 54 × 12。中天际线，归妹卦已位地户，归妹天地之大义也，人之终始也！",
-            rem81: 81
-        },
-        12: {
-            name: "12 矩 (972 · 上际大圆满)",
-            val: 972,
-            formula: "81 × 12 = 972",
-            row: "第 81 行上 (81九9)",
-            hex: "81九9大矩 (亥位)",
-            level: "上际天周 (12矩三元大圆满)",
-            desc: "12 矩 972 = 81 × 12。上天际最高层，12 方位与三元周天 12 矩达成终极全功！",
-            rem81: 81
-        }
-    };
-
+    // DOM 元素绑定与防御判断
     const juModuleSelect = document.getElementById("ju-module-select");
     const moduleJu12 = document.getElementById("module-ju-12");
     const moduleJuCorners = document.getElementById("module-ju-corners");
@@ -407,41 +377,41 @@ document.addEventListener("DOMContentLoaded", () => {
     const moduleJuSquare = document.getElementById("module-ju-square");
 
     const juDetailBox = document.getElementById("ju-detail-box");
-    const juBadgeTitle = document.getElementById("ju-badge-title");
-    const juBadgeDesc = document.getElementById("ju-badge-desc");
+    const cornerDetailBox = document.getElementById("corner-detail-box");
+    const basketDetailBox = document.getElementById("basket-detail-box");
+    const polygonDetailBox = document.getElementById("polygon-detail-box");
 
-    function switchJuModule(modKey) {
-        [moduleJu12, moduleJuCorners, moduleJuBasket, moduleJuSquare].forEach(el => {
-            if (el) el.style.display = "none";
-        });
+    const badgeTitle = document.getElementById("ju-badge-title");
+    const badgeDesc = document.getElementById("ju-badge-desc");
 
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+    // 控件 1：矩数 Slider & Buttons
+    const juSlider = document.getElementById("ju-slider");
+    const juSliderLabel = document.getElementById("ju-slider-val-label");
 
-        if (modKey === "12ju") {
-            if (moduleJu12) moduleJu12.style.display = "block";
-            renderJuDetail(1);
-        } else if (modKey === "four_corners") {
-            if (moduleJuCorners) moduleJuCorners.style.display = "block";
-            juBadgeTitle.innerText = "申巳寅亥“四白定畴”四角分属拓扑";
-            juBadgeDesc.innerText = "申(水)开局、寅(木)演进、巳(火)质变、亥(金)归宿，勾勒白道四角方阵";
-            engine.renderFourCornersSquare();
-            highlightMatrixByPositions([9, 18, 27, 36, 45, 54, 63, 72, 81]);
-        } else if (modKey === "basket") {
-            if (moduleJuBasket) moduleJuBasket.style.display = "block";
-            juBadgeTitle.innerText = "天门 324“承受天德之筐”与复卦算法";
-            juBadgeDesc.innerText = "324 - 60×5 = 24，归妹六交 4 矩扣除 5 节后复见天地之心 24 六";
-            engine.clearJuSpiralGroup();
-            highlightMatrixByPositions([24, 54, 81]);
-        } else if (modKey === "square_circle") {
-            if (moduleJuSquare) moduleJuSquare.style.display = "block";
-            juBadgeTitle.innerText = "“圆出于方，规出于矩”周天化圆推演";
-            juBadgeDesc.innerText = "81 矩(方)经 60 花甲子节卦按 6×60° 转化为 360° 圆周天";
-            engine.renderJu3DSpiral(4);
-            highlightMatrixByPositions([81]);
-        }
-    }
+    // 控件 3：Basket Slider
+    const basketSlider = document.getElementById("basket-slider");
+    const basketSliderLabel = document.getElementById("basket-slider-val-label");
 
-    function highlightMatrixByPositions(posList) {
+    // 控件 4：Polygon Slider
+    const polygonSlider = document.getElementById("polygon-slider");
+    const polygonSliderLabel = document.getElementById("polygon-slider-val-label");
+
+    const JU_METADATA = {
+        1:  { hex: "81九太乙矩", level: "基本方阵单元", desc: "1 矩为九九八十一基本单元。包含 9 宫 81 种全象，是天体气数降维的方针定域基石。" },
+        2:  { hex: "18九2蛊卦", level: "巳亥地户天门交会", desc: "2 矩 162 = 18 × 9。经过巳位与亥位成 180° 对冲，形成天地阴阳交感的前阶路途。" },
+        3:  { hex: "27九3颐卦", level: "白道坐标系主轴", desc: "3 矩 243 = 27 × 9。位于第 27 行颐卦（申位），是白道坐标系三角定畴的核心主轴。" },
+        4:  { hex: "36九4明夷卦", level: "下际天周 (324 + 36 = 360°)", desc: "4 矩 324 = 36 × 9。下天际线，结合子午天门地户 36 气数成 360° 周天全功大圆满！" },
+        5:  { hex: "45九萃卦", level: "申位中数主轴", desc: "5 矩 405 = 45 × 9。位于第 45 行萃卦（申位），承载赤道中数 4 与 81 矩结合！" },
+        6:  { hex: "486 (54九6归妹)", level: "巳位 90° 质变交点", desc: "6 矩 486 = 54 × 9。位于地户 54 行归妹卦，贯通申寅巳亥四白主轴！" },
+        7:  { hex: "567 (63九既济)", level: "寅位奇数演进", desc: "7 矩 567 = 63 × 9。位于第 63 行既济卦（寅位），统领奇数演进！" },
+        8:  { hex: "648 (54九6归妹)", level: "中际天周 (天地大义)", desc: "8 矩 648 = 54 × 12。中天际线，归妹卦已位地户，归妹天地之大义也！" },
+        9:  { hex: "729 (81九大矩)", level: "申位白道顶峰", desc: "9 矩 729 = 81 × 9。到达白道申位顶峰，9 宫全满归一！" },
+        10: { hex: "810 (90九质变)", level: "巳位 90° 终极质变", desc: "10 矩 810 = 90 × 9。位于巳位地户，90° 数值产生终极质变！" },
+        11: { hex: "891 (99九高阶)", level: "寅位高阶奇数", desc: "11 矩 891 = 99 × 9。寅位高阶演进，逼近上际周天！" },
+        12: { hex: "972 (81九9大矩)", level: "上际天周 (12矩大圆满)", desc: "12 矩 972 = 81 × 12。上天际最高层，12 方位与三元周天 12 矩达成终极全功！" }
+    };
+
+    function highlightMatrixPositions(posList) {
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
             const p = parseInt(cell.dataset.pos, 10);
             if (posList.includes(p)) {
@@ -452,29 +422,150 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function renderJuDetail(juNum) {
-        const data = JU_DATA[juNum] || JU_DATA[1];
+    function updateJu12Interactive(k) {
+        const juVal = k * 81;
+        const rem81 = juVal % 81 === 0 ? 81 : juVal % 81;
+        const rem12 = juVal % 12 === 0 ? 12 : juVal % 12;
+        const branch = EARTHLY_BRANCHES[rem12 - 1];
+        const meta = JU_METADATA[k] || JU_METADATA[1];
 
-        juDetailBox.innerHTML = `
-            <div style="font-size: 14px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
-                📐 ${data.name}
-            </div>
-            <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
-                • 算式: <strong>${data.formula}</strong><br>
-                • 所在行次: <strong>${data.row}</strong><br>
-                • 对应卦象: <span style="color:#ff5252; font-weight:700;">${data.hex}</span><br>
-                • 周天层级: <span style="color:#40c057; font-weight:700;">${data.level}</span>
-            </div>
-            <div style="margin-top: 6px; font-size: 11px; color: #ffffff; background: rgba(212,175,55,0.18); border: 1px solid rgba(255,224,102,0.4); padding: 6px 8px; border-radius: 6px;">
-                原著奥理：${data.desc}
-            </div>
-        `;
+        if (juSlider) juSlider.value = k;
+        if (juSliderLabel) juSliderLabel.innerText = `${k} 矩 (${juVal} 气数)`;
 
-        highlightMatrixByPositions([data.rem81]);
-        engine.renderJu3DSpiral(juNum);
+        document.querySelectorAll(".ju-btn").forEach(b => {
+            b.classList.toggle("active", parseInt(b.dataset.ju, 10) === k);
+        });
 
-        juBadgeTitle.innerText = `${data.name} 3D 运动拓扑`;
-        juBadgeDesc.innerText = `包含 ${juNum} 个 81 矩 (共 ${data.val} 气数)，在天体空间形成 ${juNum * 9} 步螺旋展开`;
+        if (juDetailBox) {
+            juDetailBox.innerHTML = `
+                <div style="font-size: 14px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
+                    📐 ${k} 矩 动态演算分析
+                </div>
+                <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
+                    • 气数算式: 81 × ${k} = <strong>${juVal}</strong><br>
+                    • 太乙 81 降维: ${juVal} % 81 = <strong>${rem81} 号宫</strong><br>
+                    • 地支 12 位: ${juVal} % 12 = <span style="color:${branch.color}; font-weight:800;">余 ${rem12} (${branch.name}位 · ${branch.system.split('(')[0]})</span><br>
+                    • 对应卦象: <span style="color:#ff5252; font-weight:700;">${meta.hex}</span> (${meta.level})
+                </div>
+                <div style="margin-top: 6px; font-size: 11px; color: #ffffff; background: rgba(212,175,55,0.18); border: 1px solid rgba(255,224,102,0.4); padding: 6px 8px; border-radius: 6px;">
+                    原著奥理：${meta.desc}
+                </div>
+            `;
+        }
+
+        highlightMatrixPositions([rem81]);
+        engine.renderJu3DSpiral(k);
+
+        if (badgeTitle) badgeTitle.innerText = `${k} 矩 (81 × ${k} = ${juVal}) 3D 动态螺旋拓扑`;
+        if (badgeDesc) badgeDesc.innerText = `包含 ${k} 个 81 矩单元，在天体空间形成 ${k * 9} 步 3D 螺旋展开轨迹`;
+    }
+
+    const CORNER_DATA = {
+        shen: { name: "申位 (水局 · 1, 5, 9 矩)", color: "#4dabf7", branches: [8], numbers: [9, 45, 81], desc: "申为白道开局主轴，统领 1 矩(81)、5 矩(405)、9 矩(729)及 9, 45, 81 三大核心宫位！" },
+        yin:  { name: "寅位 (木局 · 3, 7, 11 矩)", color: "#40c057", branches: [2], numbers: [27, 63], desc: "寅位统领奇数演进（寅顺申逆），包含 3 矩(243颐卦)、7 矩(567既济卦)及 11 矩(891)！" },
+        si:   { name: "巳位 (火局 · 2, 6, 10 矩)", color: "#ffe066", branches: [5], numbers: [18, 54, 90], desc: "巳位为地户 90° 质变交点，统领 2 矩(162蛊卦)、6 矩(486归妹卦)与 10 矩(810)！" },
+        hai:  { name: "亥位 (金局 · 4, 8, 12 矩)", color: "#ff5252", branches: [11], numbers: [36, 72, 81], desc: "亥位为天门三际周天归宿点，统领 4 矩(324下际)、8 矩(648中际)与 12 矩(972上际)！" }
+    };
+
+    function updateCornerInteractive(key) {
+        const data = CORNER_DATA[key] || CORNER_DATA.shen;
+
+        document.querySelectorAll(".corner-btn").forEach(b => {
+            b.classList.toggle("active", b.dataset.corner === key);
+        });
+
+        if (cornerDetailBox) {
+            cornerDetailBox.innerHTML = `
+                <div style="font-size: 14px; font-weight: 800; color: ${data.color}; margin-bottom: 4px;">
+                    📍 ${data.name} 剖析
+                </div>
+                <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5;">
+                    • 关联太乙 81 宫: <strong>${data.numbers.join(" 号宫, ")} 号宫</strong><br>
+                    • 3D 天球坐标: <span style="color:${data.color}; font-weight:800;">地支【${EARTHLY_BRANCHES[data.branches[0]].name}】位</span>
+                </div>
+                <div style="margin-top: 6px; font-size: 11px; color: #ffe066; background: rgba(77,171,247,0.15); padding: 6px 8px; border-radius: 6px;">
+                    奥理：${data.desc}
+                </div>
+            `;
+        }
+
+        highlightMatrixPositions(data.numbers);
+        engine.renderFourCornersSquare(data.branches[0]);
+
+        if (badgeTitle) badgeTitle.innerText = `${data.name} 3D 拓扑视角`;
+        if (badgeDesc) badgeDesc.innerText = `在 3D 天球上高亮【${EARTHLY_BRANCHES[data.branches[0]].name}】方位并绘制四白方阵框`;
+    }
+
+    function updateBasketInteractive(m) {
+        const subtractVal = 60 * m;
+        const remVal = 324 - subtractVal;
+        const rem81 = remVal % 81 === 0 ? 81 : remVal % 81;
+
+        if (basketSlider) basketSlider.value = m;
+        if (basketSliderLabel) basketSliderLabel.innerText = `${m} 个节卦 (${subtractVal}°)`;
+
+        const isFuHexagram = (m === 5); // 324 - 300 = 24 (24 六复卦)
+
+        if (basketDetailBox) {
+            basketDetailBox.innerHTML = `
+                <div style="font-size: 13.5px; font-weight: 800; color: ${isFuHexagram ? '#40c057' : '#ff5252'}; margin-bottom: 4px;">
+                    🧺 扣除 ${m} 节 (${subtractVal}°) 演算结果: 324 - ${subtractVal} = <strong>${remVal}</strong>
+                </div>
+                <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
+                    • 算式: 324 - 60 × ${m} = <strong>${remVal}</strong><br>
+                    • 太乙 81 降维: ${remVal} % 81 = <strong>${rem81} 号宫</strong><br>
+                    ${isFuHexagram ? '<strong style="color:#ffe066; font-size:13px;">🌟 触发奇迹结论：第 24 号宫即【24 六复卦】（“复其见天地之心乎”！）</strong>' : `• 剩余气数: ${remVal}`}
+                </div>
+            `;
+        }
+
+        highlightMatrixPositions([rem81]);
+        engine.clearJuSpiralGroup();
+
+        if (badgeTitle) badgeTitle.innerText = `天门 324 扣除 ${m} 节 (${subtractVal}°) 演算`;
+        if (badgeDesc) badgeDesc.innerText = isFuHexagram ? "324 - 300 = 24，惊现天地之心 24 六复卦！" : `扣除 ${subtractVal}° 节律后余 ${remVal} 气数`;
+    }
+
+    function updatePolygonInteractive(sides) {
+        if (polygonSlider) polygonSlider.value = sides;
+        if (polygonSliderLabel) polygonSliderLabel.innerText = `${sides} 边形 (${sides === 60 ? '花甲子节律' : (sides === 4 ? '正方形/矩' : '多边形逼近')})`;
+
+        if (polygonDetailBox) {
+            polygonDetailBox.innerHTML = `
+                <div style="font-size: 13.5px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
+                    ☯ ${sides} 边形化圆逼近演算
+                </div>
+                <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5;">
+                    • 细分边数: <strong>${sides} 边</strong><br>
+                    • 单角弧度: ${(360 / sides).toFixed(2)}°<br>
+                    • 逼近圆周率比例: ${(Math.sin(Math.PI / sides) * sides / Math.PI).toFixed(5)} (完全收敛于圆)
+                </div>
+            `;
+        }
+
+        engine.renderPolygonFitting(sides);
+        if (badgeTitle) badgeTitle.innerText = `“圆出于方，规出于矩” ${sides} 边形拟合拓扑`;
+        if (badgeDesc) badgeDesc.innerText = `3D 天球上展示从 4 边形(方矩)到 ${sides} 边形逼近 360° 周天(圆规)的过程`;
+    }
+
+    function switchJuModule(modKey) {
+        [moduleJu12, moduleJuCorners, moduleJuBasket, moduleJuSquare].forEach(el => {
+            if (el) el.style.display = "none";
+        });
+
+        if (modKey === "12ju") {
+            if (moduleJu12) moduleJu12.style.display = "block";
+            updateJu12Interactive(juSlider ? parseInt(juSlider.value, 10) : 1);
+        } else if (modKey === "four_corners") {
+            if (moduleJuCorners) moduleJuCorners.style.display = "block";
+            updateCornerInteractive("shen");
+        } else if (modKey === "basket") {
+            if (moduleJuBasket) moduleJuBasket.style.display = "block";
+            updateBasketInteractive(basketSlider ? parseInt(basketSlider.value, 10) : 5);
+        } else if (modKey === "square_circle") {
+            if (moduleJuSquare) moduleJuSquare.style.display = "block";
+            updatePolygonInteractive(polygonSlider ? parseInt(polygonSlider.value, 10) : 60);
+        }
     }
 
     if (juModuleSelect) {
@@ -483,13 +574,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // 控件事件监听绑定
+    if (juSlider) {
+        juSlider.addEventListener("input", (e) => {
+            updateJu12Interactive(parseInt(e.target.value, 10));
+        });
+    }
+
     document.querySelectorAll(".ju-btn").forEach(btn => {
         btn.addEventListener("click", function() {
-            document.querySelectorAll(".ju-btn").forEach(b => b.classList.remove("active"));
-            this.classList.add("active");
-            renderJuDetail(parseInt(this.dataset.ju, 10));
+            updateJu12Interactive(parseInt(this.dataset.ju, 10));
         });
     });
+
+    document.querySelectorAll(".corner-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            updateCornerInteractive(this.dataset.corner);
+        });
+    });
+
+    if (basketSlider) {
+        basketSlider.addEventListener("input", (e) => {
+            updateBasketInteractive(parseInt(e.target.value, 10));
+        });
+    }
+
+    if (polygonSlider) {
+        polygonSlider.addEventListener("input", (e) => {
+            updatePolygonInteractive(parseInt(e.target.value, 10));
+        });
+    }
 
     const btnSpeed = document.getElementById("btn-speed-control");
     const speedVal = document.getElementById("speed-val");
@@ -504,25 +618,40 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    document.getElementById("btn-toggle-equator").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.equatorGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-ecliptic").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.eclipticGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-toggle-lunar").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.lunarGroup.visible = this.classList.contains("active");
-    });
-    document.getElementById("btn-reset-view").addEventListener("click", () => {
-        engine.adjustCameraFit();
-    });
-    document.getElementById("btn-toggle-autorotate").addEventListener("click", function() {
-        this.classList.toggle("active");
-        engine.autoRotate = this.classList.contains("active");
-    });
+    const btnEq = document.getElementById("btn-toggle-equator");
+    if (btnEq) {
+        btnEq.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.equatorGroup) engine.equatorGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnEc = document.getElementById("btn-toggle-ecliptic");
+    if (btnEc) {
+        btnEc.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.eclipticGroup) engine.eclipticGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnLu = document.getElementById("btn-toggle-lunar");
+    if (btnLu) {
+        btnLu.addEventListener("click", function() {
+            this.classList.toggle("active");
+            if (engine.lunarGroup) engine.lunarGroup.visible = this.classList.contains("active");
+        });
+    }
+    const btnReset = document.getElementById("btn-reset-view");
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            engine.adjustCameraFit();
+        });
+    }
+    const btnRot = document.getElementById("btn-toggle-autorotate");
+    if (btnRot) {
+        btnRot.addEventListener("click", function() {
+            this.classList.toggle("active");
+            engine.autoRotate = this.classList.contains("active");
+        });
+    }
 
-    switchJuModule("12ju"); // 默认模块 1
+    switchJuModule("12ju");
 });

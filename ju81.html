@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v16">
+    <link rel="stylesheet" href="index.css?v=20260804_v18">
 </head>
 <body>
     <div class="app-container">
@@ -28,7 +28,7 @@
                 </div>
             </div>
             
-                                    <nav class="header-nav-tabs">
+            <nav class="header-nav-tabs">
                 <a href="index.html" class="nav-tab">🏠 首页</a>
                 <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
                 <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
@@ -86,7 +86,7 @@
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
                         <div id="ju-badge-title" class="badge-title">一矩至十二矩 3D 螺旋运动拓扑</div>
-                        <div id="ju-badge-desc" class="badge-desc">选择下方解构模块，探索原著《用矩法》的全部数理奥秘</div>
+                        <div id="ju-badge-desc" class="badge-desc">拖动右侧滑动条或点击按钮，实时观测矩数动态改变与 3D 轨迹演变</div>
                     </div>
                 </div>
             </section>
@@ -98,37 +98,59 @@
                         <span>📜</span> 太乙九宫八十一宫阵图 (用矩法降维投影)
                     </div>
                     <div class="law-desc-text">
-                        点击右侧矩数按钮或单元格，太乙 81 宫阵图中对应的降维宫位与 3D 螺旋轨迹同步亮起！
+                        拖动右侧交互控制滑块，太乙 81 宫阵图中对应的降维宫位与 3D 螺旋轨迹同步点亮！
                     </div>
                 </div>
 
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：用矩法四大原书解构模块控制台 (33%) -->
-            <section class="col-right-controls">
+            <!-- 栏三：用矩法四大可交互解构模块控制台 (延长纵向滑动空间) (33%) -->
+            <section class="col-right-controls" style="overflow-y: auto; max-height: calc(100vh - 120px);">
                 <!-- 模块切换选择框 -->
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>📐</span> 原著《用矩法》四大解构主模块
+                        <span>📐</span> 原著《用矩法》四大可交互解构主模块
                     </div>
                     <select id="ju-module-select" class="custom-select" style="margin-top: 4px;">
-                        <option value="12ju">1. 1矩~12矩三际天周运动大表</option>
-                        <option value="four_corners">2. 申巳寅亥“四白定畴”四角分属表</option>
-                        <option value="basket">3. 天门 324“承受天德之筐”与复卦演算法</option>
-                        <option value="square_circle">4. “圆出于方，规出于矩”周天化圆推演</option>
+                        <option value="12ju">1. 1矩~12矩连续可调运动演算器</option>
+                        <option value="four_corners">2. 申巳寅亥“四白定畴”交互选择器</option>
+                        <option value="basket">3. 天门 324“受德之筐”扣节滑动演算器</option>
+                        <option value="square_circle">4. “圆出于方，规出于矩”多边形拟合器</option>
                     </select>
                 </div>
 
-                <!-- 模块 1：1矩~12矩三际天周运动大表 -->
+                <!-- 模块 1：1矩~12矩连续可调运动演算器 (可交互) -->
                 <div id="module-ju-12" class="ju-module-card">
-                    <div class="sanhe-btn-grid" style="margin-top: 4px;">
-                        <button class="sanhe-btn ju-btn active" data-ju="1">1 矩 (81·基本矩)</button>
-                        <button class="sanhe-btn ju-btn" data-ju="2">2 矩 (162·蛊卦已位)</button>
-                        <button class="sanhe-btn ju-btn" data-ju="3">3 矩 (243·白道颐卦)</button>
-                        <button class="sanhe-btn ju-btn" data-ju="4">4 矩 (324·下际天周)</button>
-                        <button class="sanhe-btn ju-btn" data-ju="8">8 矩 (648·中际归妹)</button>
-                        <button class="sanhe-btn ju-btn" data-ju="12">12 矩 (972·上际大圆满)</button>
+                    <div class="glass-panel" style="margin-top: 4px;">
+                        <div class="card-title">
+                            <span>🎚️</span> 矩数连续调节滑块: <span id="ju-slider-val-label" style="color:#ffe066; font-size:15px; font-weight:800;">1 矩 (81 气数)</span>
+                        </div>
+                        <div class="slider-container" style="margin-top: 6px;">
+                            <input type="range" id="ju-slider" min="1" max="12" value="1" step="1" class="custom-slider">
+                            <div class="slider-labels" style="display:flex; justify-between: space-between; font-size:10px; color:#94a3b8;">
+                                <span>1矩(81)</span>
+                                <span>4矩(324)</span>
+                                <span>8矩(648)</span>
+                                <span>12矩(972)</span>
+                            </div>
+                        </div>
+
+                        <!-- 快捷矩数按钮网格 -->
+                        <div class="sanhe-btn-grid" style="margin-top: 8px; grid-template-columns: repeat(4, 1fr);">
+                            <button class="sanhe-btn ju-btn active" data-ju="1">1 矩 (81)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="2">2 矩 (162)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="3">3 矩 (243)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="4">4 矩 (324)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="5">5 矩 (405)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="6">6 矩 (486)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="7">7 矩 (567)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="8">8 矩 (648)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="9">9 矩 (729)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="10">10 矩(810)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="11">11 矩(891)</button>
+                            <button class="sanhe-btn ju-btn" data-ju="12">12 矩(972)</button>
+                        </div>
                     </div>
 
                     <div id="ju-detail-box" class="hexagram-detail-box" style="margin-top: 6px;">
@@ -136,64 +158,92 @@
                     </div>
                 </div>
 
-                <!-- 模块 2：申巳寅亥四白分属表 -->
-                <div id="module-ju-corners" class="ju-module-card" style="display:none;">
-                    <div class="glass-panel" style="margin-top: 4px;">
-                        <div class="card-title"><span>四角</span> 申巳寅亥四白定畴属性表</div>
-                        <div class="sequence-table-container" style="max-height: 180px;">
-                            <table class="seq-table">
-                                <thead>
-                                    <tr>
-                                        <th>四方位</th>
-                                        <th>包含矩数</th>
-                                        <th>对应卦象/宫位</th>
-                                        <th>数理功能定位</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td style="color:#4dabf7; font-weight:700;">申位 (水)</td><td>1, 5, 9 矩</td><td>9九1小畜 / 45九萃 / 81九矩</td><td>白道开局主轴（坎离水火）</td></tr>
-                                    <tr><td style="color:#40c057; font-weight:700;">寅位 (木)</td><td>3, 7, 11 矩</td><td>27九3颐卦 / 63九既济</td><td>奇数演进主轴（寅顺申逆）</td></tr>
-                                    <tr><td style="color:#ffe066; font-weight:700;">巳位 (火)</td><td>2, 6, 10 矩</td><td>18九2蛊卦 / 54九6归妹卦</td><td>90° 质变交点（地户）</td></tr>
-                                    <tr><td style="color:#ff5252; font-weight:700;">亥位 (金)</td><td>4, 8, 12 矩</td><td>36九4明夷 / 72九 / 81九9</td><td>天门三际周天归宿点</td></tr>
-                                </tbody>
-                            </table>
+                <!-- 模块 2：申巳寅亥四白定畴交互选择器 (可交互) -->
+                <div id="module-ju-corners" class="ju-module-card" style="display:none; margin-top: 4px;">
+                    <div class="glass-panel">
+                        <div class="card-title"><span>四角</span> 点击选择四白方位剖析</div>
+                        <div class="sanhe-btn-grid" style="grid-template-columns: repeat(2, 1fr); margin-top:6px;">
+                            <button class="sanhe-btn corner-btn active" data-corner="shen" style="color:#4dabf7;">💧 申位 (水/1,5,9矩)</button>
+                            <button class="sanhe-btn corner-btn" data-corner="yin" style="color:#40c057;">🌿 寅位 (木/3,7,11矩)</button>
+                            <button class="sanhe-btn corner-btn" data-corner="si" style="color:#ffe066;">🔥 巳位 (火/2,6,10矩)</button>
+                            <button class="sanhe-btn corner-btn" data-corner="hai" style="color:#ff5252;">⚔️ 亥位 (金/4,8,12矩)</button>
                         </div>
+                    </div>
+
+                    <div id="corner-detail-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                        <!-- 动态渲染 -->
+                    </div>
+
+                    <div class="sequence-table-container" style="margin-top: 6px; max-height: 180px;">
+                        <table class="seq-table">
+                            <thead>
+                                <tr>
+                                    <th>四方位</th>
+                                    <th>包含矩数</th>
+                                    <th>对应卦象/宫位</th>
+                                    <th>数理功能定位</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="row-shen"><td style="color:#4dabf7; font-weight:700;">申位 (水)</td><td>1, 5, 9 矩</td><td>9九1小畜 / 45九萃 / 81九矩</td><td>白道开局主轴（坎离水火）</td></tr>
+                                <tr id="row-yin"><td style="color:#40c057; font-weight:700;">寅位 (木)</td><td>3, 7, 11 矩</td><td>27九3颐卦 / 63九既济</td><td>奇数演进主轴（寅顺申逆）</td></tr>
+                                <tr id="row-si"><td style="color:#ffe066; font-weight:700;">巳位 (火)</td><td>2, 6, 10 矩</td><td>18九2蛊卦 / 54九6归妹卦</td><td>90° 质变交点（地户）</td></tr>
+                                <tr id="row-hai"><td style="color:#ff5252; font-weight:700;">亥位 (金)</td><td>4, 8, 12 矩</td><td>36九4明夷 / 72九 / 81九9</td><td>天门三际周天归宿点</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- 模块 3：天门 324“承受天德之筐”与复卦演算法 -->
-                <div id="module-ju-basket" class="ju-module-card" style="display:none;">
-                    <div class="hexagram-detail-box" style="margin-top: 4px;">
-                        <div style="font-size: 13px; font-weight: 800; color: #ff5252; margin-bottom: 4px;">
-                            🧺 天门 324“承受天德之筐”数理推演
+                <!-- 模块 3：天门 324“承受天德之筐”扣节滑动演算器 (可交互) -->
+                <div id="module-ju-basket" class="ju-module-card" style="display:none; margin-top: 4px;">
+                    <div class="glass-panel">
+                        <div class="card-title">
+                            <span>🧺</span> 扣除 60° 节卦滑动控制: <span id="basket-slider-val-label" style="color:#ff5252; font-size:15px; font-weight:800;">5 个节卦 (300°)</span>
                         </div>
-                        <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
-                            原著 P677 论述：“归妹六爻交六次，气数为 54 × 6 = 324，正是天门 4 个矩（324 = 81 × 4）。此 4 矩如承受天德之筐！”<br>
-                            • <strong>节律演算式</strong>：324 - 60 × 5 = 24<br>
-                            • <strong>对应卦象</strong>：24 六复卦（“复其见天地之心乎”）。<br>
-                            • <strong>奥理</strong>：扣除 5 个 60° 节卦周转后，恰好显现天地之心 24！
+                        <div class="slider-container" style="margin-top: 6px;">
+                            <input type="range" id="basket-slider" min="1" max="6" value="5" step="1" class="custom-slider">
+                            <div class="slider-labels" style="display:flex; justify-content: space-between; font-size:10px; color:#94a3b8;">
+                                <span>1节(60°)</span>
+                                <span>2节(120°)</span>
+                                <span>3节(180°)</span>
+                                <span>4节(240°)</span>
+                                <span>5节(300°)</span>
+                                <span>6节(360°)</span>
+                            </div>
                         </div>
+                    </div>
+
+                    <div id="basket-detail-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                        <!-- 动态渲染 324 - 60×m 结果 -->
                     </div>
                 </div>
 
-                <!-- 模块 4：“圆出于方，规出于矩”周天化圆推演 -->
-                <div id="module-ju-square" class="ju-module-card" style="display:none;">
-                    <div class="hexagram-detail-box" style="margin-top: 4px;">
-                        <div style="font-size: 13px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
-                            ☯ “圆出于方，规出于矩”周天化圆推演
+                <!-- 模块 4：“圆出于方，规出于矩”多边形拟合器 (可交互) -->
+                <div id="module-ju-square" class="ju-module-card" style="display:none; margin-top: 4px;">
+                    <div class="glass-panel">
+                        <div class="card-title">
+                            <span>☯</span> 多边形细分拟合: <span id="polygon-slider-val-label" style="color:#ffe066; font-size:15px; font-weight:800;">60 边形 (花甲子节律)</span>
                         </div>
-                        <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
-                            • <strong>方矩基石</strong>：1 矩 = 81 宫（方阵定域）。<br>
-                            • <strong>化圆节律</strong>：6 × 60° = 360°（圆规内切）。<br>
-                            • <strong>三际归一</strong>：81 矩经 27 行（颐卦）、54 行（归妹卦）至 81 行（大矩），实现从方阵到周天化圆的完整收敛！
+                        <div class="slider-container" style="margin-top: 6px;">
+                            <input type="range" id="polygon-slider" min="4" max="81" value="60" step="1" class="custom-slider">
+                            <div class="slider-labels" style="display:flex; justify-content: space-between; font-size:10px; color:#94a3b8;">
+                                <span>4 (正方形/矩)</span>
+                                <span>12 (地支)</span>
+                                <span>60 (花甲)</span>
+                                <span>81 (太乙)</span>
+                            </div>
                         </div>
+                    </div>
+
+                    <div id="polygon-detail-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                        <!-- 动态渲染多边形逼近数据 -->
                     </div>
                 </div>
 
-                <!-- 矩数运动规律完整表格 -->
-                <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title"><span>📋</span> 原著 1~12 矩天际行数与归属总表</div>
-                    <div class="sequence-table-container" style="max-height: 180px;">
+                <!-- 矩数运动规律完整大表 (拉长纵向滑动空间) -->
+                <div class="glass-panel" style="margin-top: 8px; margin-bottom: 20px;">
+                    <div class="card-title"><span>📋</span> 原著 1~12 矩天际行数与归属总表 (下滑探索更多)</div>
+                    <div class="sequence-table-container" style="max-height: 320px;">
                         <table class="seq-table">
                             <thead>
                                 <tr>
@@ -227,6 +277,6 @@
     </div>
 
     <!-- 用矩法全景引擎 (带版本防缓存) -->
-    <script src="ju81.js?v=20260804_v15"></script>
+    <script src="ju81.js?v=20260804_v18"></script>
 </body>
 </html>
