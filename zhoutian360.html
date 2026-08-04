@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v16">
+    <link rel="stylesheet" href="index.css?v=20260804_v30">
 </head>
 <body>
     <div class="app-container">
@@ -28,17 +28,18 @@
                 </div>
             </div>
             
-                        <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab">🏠 首页</a>
-                <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
-                <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
-                <a href="laws.html" class="nav-tab">✨ 5大定律</a>
-                <a href="wuxing.html" class="nav-tab">☯ 五行三元</a>
-                <a href="jiugong_qi.html" class="nav-tab">📜 九宫七输入</a>
+            <nav class="header-nav-tabs">
+                <a href="index.html" class="nav-tab ">🏠 首页</a>
+                <a href="pipeline.html" class="nav-tab ">⚡ 流水线</a>
+                <a href="hexagrams.html" class="nav-tab ">☰ 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab ">✨ 5大定律</a>
+                <a href="wuxing.html" class="nav-tab ">☯ 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab ">📜 九宫七输入</a>
                 <a href="zhoutian360.html" class="nav-tab active">🌀 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
-                <a href="coordinates12.html" class="nav-tab">🌌 12方位3坐标</a>
-                <a href="ju81.html" class="nav-tab">📐 用矩81</a>
+                <a href="qishu939697.html" class="nav-tab ">🔢 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab ">🌌 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab ">📐 用矩81</a>
+                <a href="jiugong_tables.html" class="nav-tab ">📊 九宫纪气大表</a>
             </nav>
         </header>
 
@@ -85,8 +86,8 @@
 
                     <!-- 动态状态标签 (包含准确 ID) -->
                     <div class="trajectory-badge">
-                        <div id="zhoutian-badge-title" class="badge-title">周天 360° 4 大原书解构表格</div>
-                        <div id="zhoutian-badge-desc" class="badge-desc">包含 4 象 90° 质变表、6×60° 节卦周转表、81 矩表与归九收敛表</div>
+                        <div id="zhoutian-badge-title" class="badge-title">原书《九宫纪周天(360°)气数一览大表》</div>
+                        <div id="zhoutian-badge-desc" class="badge-desc">包含 9 宫周天气数倍积巨型大表、4 象 90° 质变表、6×60° 节卦表、81 矩表与归九表</div>
                     </div>
                 </div>
             </section>
@@ -105,22 +106,63 @@
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：周天 360° 原书 4 大表格解构控制台 (33%) -->
-            <section class="col-right-controls">
+            <!-- 栏三：周天 360° 原书 5 大表格解构控制台 (33%) -->
+            <section class="col-right-controls" style="overflow-y: auto; max-height: calc(100vh - 120px);">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>🌀</span> 原著《周天 360°》4 大解构表格
+                        <span>🌀</span> 原著《周天 360°》5 大解构表格切选
                     </div>
-                    <div class="sanhe-btn-grid" style="margin-top: 6px;">
-                        <button class="sanhe-btn zhoutian-tab-btn active" data-target="panel-table-1">1. 4象90°质变表</button>
+                    <div class="sanhe-btn-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 6px; gap: 4px;">
+                        <button class="sanhe-btn zhoutian-tab-btn active" data-target="panel-table-5" style="color:#ffe066;">📜 周天360°大表</button>
+                        <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-1">1. 4象90°质变表</button>
                         <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-2">2. 6×60°节卦表</button>
                         <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-3">3. 81矩归属表</button>
                         <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-4">4. 归九收敛表</button>
                     </div>
                 </div>
 
+                <!-- 选定宫位原书页码与数理概述横幅 -->
+                <div id="zt-banner" class="glass-panel" style="margin-top: 4px; border-left: 5px solid #ffe066;">
+                    <div style="font-size:13px; font-weight:800; color:#ffe066;">
+                        📜 原著《九宫纪周天(360°)气数一览大表》(原书 P315-320)
+                    </div>
+                    <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px; line-height:1.4;">
+                        包含一宫(+90°)、二宫(+180°)、三宫(+270°)、四宫(+360°)、五宫(+450°)...九宫全量周天气数。点击单格可精准高亮与计算！
+                    </div>
+                </div>
+
+                <!-- 表格 5：原书《九宫纪周天 (360°) 气数一览大表》 (原书 P315-320 巨型大表) -->
+                <div id="panel-table-5" class="zhoutian-content-panel" style="margin-top: 4px;">
+                    <div class="glass-panel">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div id="zt-table-title" class="card-title"><span>📊</span> 九宫纪周天 (360°) 9x9 倍积气数大表</div>
+                        </div>
+                        
+                        <!-- 3x3 九宫切选按钮 -->
+                        <div class="sanhe-btn-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 6px; gap: 4px;">
+                            <button class="sanhe-btn zt-palace-tab active" data-palace="1" style="color:#4dabf7;">一宫 (+90°)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="2" style="color:#e5c07b;">二宫 (+180°)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="3" style="color:#40c057;">三宫 (+270°)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="4" style="color:#40c057;">四宫 (+360°)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="5" style="color:#ffe066;">五宫 (+450°)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="6" style="color:#dee2e6;">六宫 (+540°)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="7" style="color:#dee2e6;">七宫 (+630°)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="8" style="color:#e5c07b;">八宫 (+720°)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="9" style="color:#ff5252;">九宫 (+810°)</button>
+                        </div>
+
+                        <!-- 周天大表渲染区 -->
+                        <div class="sequence-table-container" style="margin-top: 6px;">
+                            <table class="seq-table">
+                                <thead id="zt-table-head"></thead>
+                                <tbody id="zt-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 表格 1：4 象 90° 质变与 4 个 81 矩映射表 -->
-                <div id="panel-table-1" class="zhoutian-content-panel" style="margin-top: 4px;">
+                <div id="panel-table-1" class="zhoutian-content-panel" style="display:none; margin-top: 4px;">
                     <div class="glass-panel">
                         <div class="card-title"><span>表1</span> 4 象 90° 质变与 4 个 81 矩映射表</div>
                         <div class="sequence-table-container">
@@ -136,10 +178,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>第一象</td><td>90°</td><td>81 矩</td><td>81 号宫</td><td style="color:#ff5252; font-weight:700;">巳位</td><td>白道 (地户)</td></tr>
-                                    <tr><td>第二象</td><td>180°</td><td>162 矩</td><td>81 号宫</td><td style="color:#ff5252; font-weight:700;">午/未位</td><td>赤道/黄道</td></tr>
-                                    <tr><td>第三象</td><td>270°</td><td>243 矩</td><td>81 号宫</td><td style="color:#4dabf7; font-weight:700;">酉位</td><td>赤道 (正西)</td></tr>
-                                    <tr><td>第四象</td><td>360°</td><td>324 矩</td><td>81 号宫</td><td style="color:#40c057; font-weight:700;">亥位</td><td>白道 (天门)</td></tr>
+                                    <tr class="interactive-row"><td>第一象</td><td>90°</td><td>81 矩</td><td>81 号宫</td><td style="color:#ff5252; font-weight:700;">巳位</td><td>白道 (地户)</td></tr>
+                                    <tr class="interactive-row"><td>第二象</td><td>180°</td><td>162 矩</td><td>81 号宫</td><td style="color:#ff5252; font-weight:700;">午/未位</td><td>赤道/黄道</td></tr>
+                                    <tr class="interactive-row"><td>第三象</td><td>270°</td><td>243 矩</td><td>81 号宫</td><td style="color:#4dabf7; font-weight:700;">酉位</td><td>赤道 (正西)</td></tr>
+                                    <tr class="interactive-row"><td>第四象</td><td>360°</td><td>324 矩</td><td>81 号宫</td><td style="color:#40c057; font-weight:700;">亥位</td><td>白道 (天门)</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -162,12 +204,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>第 1 步</td><td>60° × 1 = 60°</td><td>甲子 ~ 癸亥</td><td>黄钟 (子)</td><td>开局 60 花甲子</td></tr>
-                                    <tr><td>第 2 步</td><td>60° × 2 = 120°</td><td>甲戌 ~ 癸酉</td><td>太簇 (寅)</td><td>双甲子运转</td></tr>
-                                    <tr><td>第 3 步</td><td>60° × 3 = 180°</td><td>甲申 ~ 癸未</td><td>姑洗 (辰)</td><td>半周天 (阴阳交感)</td></tr>
-                                    <tr><td>第 4 步</td><td>60° × 4 = 240°</td><td>甲午 ~ 癸巳</td><td>蕤宾 (午)</td><td>四象进退</td></tr>
-                                    <tr><td>第 5 步</td><td>60° × 5 = 300°</td><td>甲辰 ~ 癸卯</td><td>夷则 (申)</td><td>五行环周</td></tr>
-                                    <tr><td>第 6 步</td><td>60° × 6 = 360°</td><td>甲寅 ~ 癸丑</td><td>无射 (戌)</td><td>360° 大圆满</td></tr>
+                                    <tr class="interactive-row"><td>第 1 步</td><td>60° × 1 = 60°</td><td>甲子 ~ 癸亥</td><td>黄钟 (子)</td><td>开局 60 花甲子</td></tr>
+                                    <tr class="interactive-row"><td>第 2 步</td><td>60° × 2 = 120°</td><td>甲戌 ~ 癸酉</td><td>太簇 (寅)</td><td>双甲子运转</td></tr>
+                                    <tr class="interactive-row"><td>第 3 步</td><td>60° × 3 = 180°</td><td>甲申 ~ 癸未</td><td>姑洗 (辰)</td><td>半周天 (阴阳交感)</td></tr>
+                                    <tr class="interactive-row"><td>第 4 步</td><td>60° × 4 = 240°</td><td>甲午 ~ 癸巳</td><td>蕤宾 (午)</td><td>四象进退</td></tr>
+                                    <tr class="interactive-row"><td>第 5 步</td><td>60° × 5 = 300°</td><td>甲辰 ~ 癸卯</td><td>夷则 (申)</td><td>五行环周</td></tr>
+                                    <tr class="interactive-row"><td>第 6 步</td><td>60° × 6 = 360°</td><td>甲寅 ~ 癸丑</td><td>无射 (戌)</td><td>360° 大圆满</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -190,15 +232,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>坎一宫</td><td>1</td><td>1, 10, 19, 28, 37, 46, 55, 64, 73</td><td>子位</td><td style="color:#4dabf7;">水</td></tr>
-                                    <tr><td>坤二宫</td><td>2</td><td>2, 11, 20, 29, 38, 47, 56, 65, 74</td><td>未/申位</td><td style="color:#ffe066;">土</td></tr>
-                                    <tr><td>震三宫</td><td>3</td><td>3, 12, 21, 30, 39, 48, 57, 66, 75</td><td>卯位</td><td style="color:#40c057;">木</td></tr>
-                                    <tr><td>巽四宫</td><td>4</td><td>4, 13, 22, 31, 40, 49, 58, 67, 76</td><td>辰/巳位</td><td style="color:#40c057;">木</td></tr>
-                                    <tr><td>中五宫</td><td>5</td><td>5, 14, 23, 32, 41, 50, 59, 68, 77</td><td>中宫</td><td style="color:#ffe066;">土</td></tr>
-                                    <tr><td>乾六宫</td><td>6</td><td>6, 15, 24, 33, 42, 51, 60, 69, 78</td><td>戌/亥位</td><td style="color:#dee2e6;">金</td></tr>
-                                    <tr><td>兑七宫</td><td>7</td><td>7, 16, 25, 34, 43, 52, 61, 70, 79</td><td>酉位</td><td style="color:#dee2e6;">金</td></tr>
-                                    <tr><td>艮八宫</td><td>8</td><td>8, 17, 26, 35, 44, 53, 62, 71, 80</td><td>丑/寅位</td><td style="color:#ffe066;">土</td></tr>
-                                    <tr><td>离九宫</td><td>9</td><td>9, 18, 27, 36, 45, 54, 63, 72, 81</td><td>午位</td><td style="color:#ff5252;">火</td></tr>
+                                    <tr class="interactive-row"><td>坎一宫</td><td>1</td><td>1, 10, 19, 28, 37, 46, 55, 64, 73</td><td>子位</td><td style="color:#4dabf7;">水</td></tr>
+                                    <tr class="interactive-row"><td>坤二宫</td><td>2</td><td>2, 11, 20, 29, 38, 47, 56, 65, 74</td><td>未/申位</td><td style="color:#ffe066;">土</td></tr>
+                                    <tr class="interactive-row"><td>震三宫</td><td>3</td><td>3, 12, 21, 30, 39, 48, 57, 66, 75</td><td>卯位</td><td style="color:#40c057;">木</td></tr>
+                                    <tr class="interactive-row"><td>巽四宫</td><td>4</td><td>4, 13, 22, 31, 40, 49, 58, 67, 76</td><td>辰/巳位</td><td style="color:#40c057;">木</td></tr>
+                                    <tr class="interactive-row"><td>中五宫</td><td>5</td><td>5, 14, 23, 32, 41, 50, 59, 68, 77</td><td>中宫</td><td style="color:#ffe066;">土</td></tr>
+                                    <tr class="interactive-row"><td>乾六宫</td><td>6</td><td>6, 15, 24, 33, 42, 51, 60, 69, 78</td><td>戌/亥位</td><td style="color:#dee2e6;">金</td></tr>
+                                    <tr class="interactive-row"><td>兑七宫</td><td>7</td><td>7, 16, 25, 34, 43, 52, 61, 70, 79</td><td>酉位</td><td style="color:#dee2e6;">金</td></tr>
+                                    <tr class="interactive-row"><td>艮八宫</td><td>8</td><td>8, 17, 26, 35, 44, 53, 62, 71, 80</td><td>丑/寅位</td><td style="color:#ffe066;">土</td></tr>
+                                    <tr class="interactive-row"><td>离九宫</td><td>9</td><td>9, 18, 27, 36, 45, 54, 63, 72, 81</td><td>午位</td><td style="color:#ff5252;">火</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -220,14 +262,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>初始</td><td>360°</td><td>3 + 6 + 0 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
-                                    <tr><td>1 次</td><td>180°</td><td>1 + 8 + 0 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
-                                    <tr><td>2 次</td><td>90°</td><td>9 + 0 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
-                                    <tr><td>3 次</td><td>45°</td><td>4 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
-                                    <tr><td>4 次</td><td>22.5°</td><td>2 + 2 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
-                                    <tr><td>5 次</td><td>11.25°</td><td>1 + 1 + 2 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
-                                    <tr><td>6 次</td><td>5.625°</td><td>5+6+2+5 = 18 ➔ 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
-                                    <tr><td>7 次</td><td>2.8125°</td><td>2+8+1+2+5 = 18 ➔ 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr class="interactive-row"><td>初始</td><td>360°</td><td>3 + 6 + 0 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr class="interactive-row"><td>1 次</td><td>180°</td><td>1 + 8 + 0 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr class="interactive-row"><td>2 次</td><td>90°</td><td>9 + 0 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr class="interactive-row"><td>3 次</td><td>45°</td><td>4 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (搁九宫)</td></tr>
+                                    <tr class="interactive-row"><td>4 次</td><td>22.5°</td><td>2 + 2 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr class="interactive-row"><td>5 次</td><td>11.25°</td><td>1 + 1 + 2 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr class="interactive-row"><td>6 次</td><td>5.625°</td><td>5+6+2+5 = 18 ➔ 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr class="interactive-row"><td>7 次</td><td>2.8125°</td><td>2+8+1+2+5 = 18 ➔ 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -238,6 +280,6 @@
     </div>
 
     <!-- 周天 360° 引擎 (带版本防缓存) -->
-    <script src="zhoutian360.js?v=20260804_v17"></script>
+    <script src="zhoutian360.js?v=20260804_v30"></script>
 </body>
 </html>

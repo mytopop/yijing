@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》周天 360° 气数全景解构馆 - (zhoutian360.js)
-   特点：纯粹数理逻辑 3D 浑天坐标体系 + 4 大原书表格交互与防崩防御逻辑
+   特点：包含原书 P315-320《九宫纪周天(360°)气数一览大表》+ 单格/整行弹性晃动震荡与高亮动画 + 全页三向联动
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -33,7 +33,7 @@ const LUOSHU_PALACES_EXACT = [
 const TAIYI_81_SUB_LABELS = {
     31: "(四₄)", 76: "(四₉)", 13: "(四₂)", 22: "(四₃)", 40: "(四₅)", 58: "(四₇)", 67: "(四₈)", 4: "(四₁)", 49: "(四₆)",
     36: "(九₄)", 81: "(九₉)", 18: "(九₂)", 27: "(九₃)", 45: "(九₅)", 63: "(九₇)", 72: "(九₈)", 9: "(九₁)", 54: "(九₆)",
-    29: "(二₄)", 74: "(二₉)", 11: "(二₂)", 20: "(二₃)", 38: "(二₅)", 56: "(二₇)", 65: "(二₈)", 2: "(二₁)", 47: "(二₆)",
+    29: "(二₄)", 74: "(二₉)", 11: "(二₂)", 20: "(二₃)", 38: "(二₅)", 56: "(二₇)", 65: "(二∯)", 2: "(二₁)", 47: "(二₆)",
     30: "(三₄)", 75: "(三₉)", 12: "(三₂)", 21: "(三₃)", 39: "(三₅)", 57: "(三₇)", 66: "(三₈)", 3: "(三₁)", 48: "(三₆)",
     32: "(五₄)", 77: "(五₉)", 14: "(五₂)", 23: "(五₃)", 41: "(五₅)", 59: "(五₇)", 68: "(五₈)", 5: "(五₁)", 50: "(五₆)",
     34: "(七₄)", 79: "(七₉)", 16: "(七₂)", 25: "(七₃)", 43: "(七₅)", 61: "(七₇)", 70: "(七₈)", 7: "(七₁)", 52: "(七₆)",
@@ -42,6 +42,20 @@ const TAIYI_81_SUB_LABELS = {
     33: "(六₄)", 78: "(六₉)", 15: "(六₂)", 24: "(六₃)", 42: "(六₅)", 60: "(六₇)", 69: "(六₈)", 6: "(六₁)", 51: "(六₆)"
 };
 
+// 修复 typo
+TAIYI_81_SUB_LABELS[65] = "(二₈)";
+
+const ZHOUTIAN_360_PALACES_INFO = {
+    1: { name: "一宫表 (坎一水)", degStep: 90,  baseSeq: [10, 100, 190, 280, 370, 460, 550, 640, 730], desc: "原书 P315 【一宫表】：自 2 行 10 纪起，每级递进 90九₁ (90°)，纪得周天一象限 (90°)。" },
+    2: { name: "二宫表 (坤二土)", degStep: 180, baseSeq: [40, 220, 400, 580, 760, 940, 1120, 1300, 1480], desc: "原书 P315 【二宫表】：自 3 行 40 纪起，每级递进 180九₂ (180°)，纪得阴阳两判天地定位大圆直径。" },
+    3: { name: "三宫表 (震三木)", degStep: 270, baseSeq: [90, 360, 630, 900, 1170, 1440, 1710, 1980, 2250], desc: "原书 P315 【三宫表】：自 4 行 90 纪起，每级递进 270九₃ (270°)，纪得 27 颐卦全养。" },
+    4: { name: "四宫表 (巽四木)", degStep: 360, baseSeq: [160, 520, 880, 1240, 1600, 1960, 2320, 2680, 3040], desc: "原书 P315 【四宫表】：自 5 行 160 纪起，每级递进 360九₄ (周天 360°)，完全包揽周天大圆度数！" },
+    5: { name: "五宫表 (中五土)", degStep: 450, baseSeq: [250, 700, 1150, 1600, 2050, 2500, 2950, 3400, 3850], desc: "原书 P315 【五宫表】：自 6 行 250 纪起，每级递进 450九₅ (450°)，黄赤相交皇极立极。" },
+    6: { name: "六宫表 (乾六金)", degStep: 540, baseSeq: [360, 900, 1440, 1980, 2520, 3060, 3600, 4140, 4680], desc: "原书 P315 【六宫表】：自 7 行 360 纪起，每级递进 540九₆ (540°)，归妹成数刚健生生。" },
+    7: { name: "七宫表 (兑七金)", degStep: 630, baseSeq: [490, 1120, 1750, 2380, 3010, 3640, 4270, 4900, 5530], desc: "原书 P315 【七宫表】：自 8 行 490 纪起，每级递进 630九₇ (630°)，既济亨小游行九畴。" },
+    8: { name: "八宫表 (艮八土)", degStep: 720, baseSeq: [640, 1360, 2080, 2800, 3520, 4240, 4960, 5680, 6400], desc: "原书 P315 【八宫表】：自 9 行 640 纪起，每级递进 720九₈ (720°)，双周天大归结。" },
+    9: { name: "九宫表 (离九火)", degStep: 810, baseSeq: [810, 1620, 2430, 3240, 4050, 4860, 5670, 6480, 7290], desc: "原书 P315 【九宫表】：九宫方数 81 矩总枢，每级递进 810九₉/900°，归宗太虚象数大源。" }
+};
 
 function getBranch3DPos(branchIdx, radius = 6.0) {
     const angle = THREE.MathUtils.degToRad(90 - branchIdx * 30);
@@ -239,48 +253,45 @@ class ZhoutianPureMath3DEngine {
 
     clearTrajectoryGroup() {
         while (this.trajectoryGroup.children.length > 0) {
-            const obj = this.trajectoryGroup.children.pop();
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) obj.material.dispose();
+            const obj = this.trajectoryGroup.children[0];
+            this.trajectoryGroup.remove(obj);
         }
     }
 
     render4XiangSquare() {
         this.clearTrajectoryGroup();
-        const branchIndices = [5, 6, 9, 11, 5]; // 巳(5), 午(6), 酉(9), 亥(11)
-        const points = branchIndices.map(idx => getBranch3DPos(idx));
+        const branchIndices = [5, 6, 9, 11]; // 巳(5)、午(6)、酉(9)、亥(11)
+        const pts = branchIndices.map(i => getBranch3DPos(i));
+        pts.push(pts[0]);
 
-        const geom = new THREE.BufferGeometry().setFromPoints(points);
-        const mat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
-        const line = new THREE.Line(geom, mat);
+        const lineGeom = new THREE.BufferGeometry().setFromPoints(pts);
+        const lineMat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 2 });
+        const line = new THREE.Line(lineGeom, lineMat);
         this.trajectoryGroup.add(line);
-
-        points.slice(0, 4).forEach(p => {
-            const sGeom = new THREE.SphereGeometry(0.45, 16, 16);
-            const sMat = new THREE.MeshStandardMaterial({ color: 0xff5252, emissive: 0xff5252 });
-            const sMesh = new THREE.Mesh(sGeom, sMat);
-            sMesh.position.copy(p);
-            this.trajectoryGroup.add(sMesh);
-        });
     }
 
     render60JieHexagon() {
         this.clearTrajectoryGroup();
-        const hexIndices = [0, 2, 4, 6, 8, 10, 0]; // 子, 寅, 辰, 午, 申, 戌
-        const points = hexIndices.map(idx => getBranch3DPos(idx));
+        const branchIndices = [0, 2, 4, 6, 8, 10]; // 子, 寅, 辰, 午, 申, 戌
+        const pts = branchIndices.map(i => getBranch3DPos(i));
+        pts.push(pts[0]);
 
-        const geom = new THREE.BufferGeometry().setFromPoints(points);
-        const mat = new THREE.LineBasicMaterial({ color: 0x40c057, linewidth: 3 });
-        const line = new THREE.Line(geom, mat);
+        const lineGeom = new THREE.BufferGeometry().setFromPoints(pts);
+        const lineMat = new THREE.LineDashedMaterial({ color: 0x40c057, dashSize: 0.3, gapSize: 0.15, linewidth: 2 });
+        const line = new THREE.Line(lineGeom, lineMat);
+        line.computeLineDistances();
         this.trajectoryGroup.add(line);
+    }
 
-        points.slice(0, 6).forEach(p => {
-            const sGeom = new THREE.SphereGeometry(0.4, 16, 16);
-            const sMat = new THREE.MeshStandardMaterial({ color: 0x40c057, emissive: 0x006600 });
-            const sMesh = new THREE.Mesh(sGeom, sMat);
-            sMesh.position.copy(p);
-            this.trajectoryGroup.add(sMesh);
-        });
+    highlightSingleBranch(bIdx) {
+        this.clearTrajectoryGroup();
+        const pos = getBranch3DPos(bIdx);
+
+        const pulseGeom = new THREE.SphereGeometry(0.5, 32, 32);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.8 });
+        const pulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
+        pulseMesh.position.copy(pos);
+        this.trajectoryGroup.add(pulseMesh);
     }
 
     animate() {
@@ -299,7 +310,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const engine = new ZhoutianPureMath3DEngine("three-canvas-zhoutian360");
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
+    const badgeTitle = document.getElementById("zhoutian-badge-title");
+    const badgeDesc = document.getElementById("zhoutian-badge-desc");
+    const tabBtns = document.querySelectorAll(".zhoutian-tab-btn");
+    const contentPanels = document.querySelectorAll(".zhoutian-content-panel");
+    const ztBanner = document.getElementById("zt-banner");
 
+    // 渲染太乙 81 宫阵图 (双行角标位号匹配原图)
     function initLuoshuTaiyi9x9Matrix() {
         if (!matrixContainer) return;
         matrixContainer.className = "luoshu-taiyi-9x9-container";
@@ -322,8 +339,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.className = "taiyi-81-cell";
                 cell.dataset.pos = num;
                 cell.title = `数值 ${num} (${palace.name})`;
-                const subTag = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[num]) ? TAIYI_81_SUB_LABELS[num] : "";
+                const subTag = TAIYI_81_SUB_LABELS[num] || "";
                 cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-sub">${subTag}</div>`;
+                cell.addEventListener("click", () => {
+                    const isAlreadyActive = cell.classList.contains("active-pos");
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                    
+                    if (!isAlreadyActive) {
+                        cell.classList.add("active-pos");
+                        const rem12 = num % 12 === 0 ? 12 : num % 12;
+                        engine.highlightSingleBranch(rem12 - 1);
+                    }
+                });
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -333,26 +360,180 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
-    const badgeTitle = document.getElementById("zhoutian-badge-title");
-    const badgeDesc = document.getElementById("zhoutian-badge-desc");
+    // 渲染原书《九宫纪周天(360°)气数一览大表》 (支持行/单格弹性晃动与高亮动画 + Toggle Off)
+    function renderZhoutian360MasterTable(palaceKey = "1") {
+        const tableHead = document.getElementById("zt-table-head");
+        const tableBody = document.getElementById("zt-table-body");
+        const tableTitle = document.getElementById("zt-table-title");
 
-    const tabBtns = document.querySelectorAll(".zhoutian-tab-btn");
-    const panels = document.querySelectorAll(".zhoutian-content-panel");
+        if (!tableHead || !tableBody) return;
+        tableHead.innerHTML = "";
+        tableBody.innerHTML = "";
+
+        const pNum = parseInt(palaceKey, 10) || 1;
+        const pInfo = ZHOUTIAN_360_PALACES_INFO[pNum] || ZHOUTIAN_360_PALACES_INFO[1];
+
+        if (tableTitle) {
+            tableTitle.innerText = `📜 原书【${pInfo.name}】9x9 周天 360° 气数大表 (步长 +${pInfo.degStep}°)`;
+        }
+
+        if (ztBanner) {
+            ztBanner.innerHTML = `
+                <div style="font-size:13px; font-weight:800; color:#ffe066;">
+                    📜 原著【${pInfo.name}】周天 360° 气数解构
+                </div>
+                <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px; line-height:1.4;">
+                    ${pInfo.desc} (支持点击单格与全行高亮，弹性晃动与 3D/81 宫三向联动)
+                </div>
+            `;
+        }
+
+        // 表头
+        const trHead = document.createElement("tr");
+        trHead.innerHTML = `
+            <th style="color:#ffe066;">基数 N</th>
+            <th>1级</th>
+            <th>2级</th>
+            <th>3级</th>
+            <th>4级</th>
+            <th>5级</th>
+            <th>6级</th>
+            <th>7级</th>
+            <th>8级</th>
+            <th>9级</th>
+            <th style="color:#ff5252;">周天度数 (N×9)</th>
+            <th>模360°</th>
+            <th>地支</th>
+        `;
+        tableHead.appendChild(trHead);
+
+        pInfo.baseSeq.forEach((baseNum) => {
+            const tr = document.createElement("tr");
+            tr.className = "interactive-row";
+            tr.dataset.num = baseNum;
+
+            let cellsHtml = `<td class="interactive-cell base-num-cell" data-val="${baseNum}" style="font-weight:800; color:#ffe066; font-family:var(--font-times);">${baseNum}</td>`;
+
+            for (let k = 1; k <= 9; k++) {
+                const prod = baseNum + (k - 1) * pInfo.degStep;
+                cellsHtml += `<td class="interactive-cell prod-cell" data-base="${baseNum}" data-k="${k}" data-val="${prod}" style="font-family:var(--font-times);">${prod}</td>`;
+            }
+
+            const totalDeg = baseNum + 8 * pInfo.degStep;
+            const degMod = totalDeg % 360;
+            const rem12 = totalDeg % 12 === 0 ? 12 : totalDeg % 12;
+            const branch = EARTHLY_BRANCHES[rem12 - 1];
+
+            cellsHtml += `<td class="interactive-cell carry-cell" data-val="${totalDeg}" style="font-weight:800; color:#ff5252; font-family:var(--font-times);">${totalDeg}°</td>`;
+            cellsHtml += `<td style="font-family:var(--font-times); color:#ffe066;">${degMod}°</td>`;
+            cellsHtml += `<td style="color:${branch.color}; font-weight:800;">${branch.name}位</td>`;
+
+            tr.innerHTML = cellsHtml;
+
+            // 行点击 (使用受好评的 rowBounceShake 震荡晃动)
+            tr.addEventListener("click", (e) => {
+                if (e.target.classList.contains("interactive-cell")) return;
+
+                const isAlreadyActive = tr.classList.contains("active-row");
+                document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+                document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+
+                if (isAlreadyActive) {
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                    return;
+                }
+
+                tr.classList.add("active-row");
+                tr.classList.add("row-click-flash");
+                setTimeout(() => tr.classList.remove("row-click-flash"), 450);
+
+                highlightZtCell(baseNum, baseNum, 1, pInfo);
+            });
+
+            // 单格点击 (使用受好评的弹性晃动震荡与高亮)
+            tr.querySelectorAll(".interactive-cell").forEach(cellTd => {
+                cellTd.addEventListener("click", (e) => {
+                    e.stopPropagation();
+
+                    const isCellActive = cellTd.classList.contains("active-cell");
+                    document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+                    document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+
+                    if (isCellActive) {
+                        document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
+                        return;
+                    }
+
+                    cellTd.classList.add("active-cell");
+                    tr.classList.add("active-row");
+                    tr.classList.add("row-click-flash");
+                    setTimeout(() => tr.classList.remove("row-click-flash"), 450);
+
+                    const val = parseInt(cellTd.dataset.val, 10);
+                    const bNum = parseInt(cellTd.dataset.base || baseNum, 10);
+                    const kStep = parseInt(cellTd.dataset.k || 1, 10);
+
+                    highlightZtCell(val, bNum, kStep, pInfo);
+                });
+            });
+
+            tableBody.appendChild(tr);
+        });
+    }
+
+    function highlightZtCell(val, baseNum, kStep, pInfo) {
+        const degMod = val % 360;
+        const rem81 = val % 81 === 0 ? 81 : val % 81;
+        const rem12 = val % 12 === 0 ? 12 : val % 12;
+        const branch = EARTHLY_BRANCHES[rem12 - 1];
+        const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
+
+        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+            cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === rem81);
+        });
+
+        engine.highlightSingleBranch(rem12 - 1);
+
+        if (badgeTitle) badgeTitle.innerText = `周天单格: ${baseNum} + (${kStep}-1)×${pInfo.degStep}° = ${val}°`;
+        if (badgeDesc) badgeDesc.innerText = `模 360° 余 ${degMod}° | 降维太乙 81 阵图: 第 ${rem81} 宫 ${subTag} | 定位地支: 【${branch.name}位】`;
+    }
+
+    // 绑定 3x3 九宫切换按钮
+    document.querySelectorAll(".zt-palace-tab").forEach(btn => {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(".zt-palace-tab").forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+
+            this.classList.add("row-click-flash");
+            setTimeout(() => this.classList.remove("row-click-flash"), 450);
+
+            const palaceKey = this.dataset.palace;
+            renderZhoutian360MasterTable(palaceKey);
+        });
+    });
+
+    // 为 Tab 1 ~ 4 中的表格行也赋予受好评的 rowBounceShake 震荡晃动
+    document.querySelectorAll(".interactive-row").forEach(tr => {
+        tr.addEventListener("click", function() {
+            const isAlreadyActive = this.classList.contains("active-row");
+            document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+
+            if (!isAlreadyActive) {
+                this.classList.add("active-row");
+                this.classList.add("row-click-flash");
+                setTimeout(() => this.classList.remove("row-click-flash"), 450);
+            }
+        });
+    });
 
     function switchTablePanel(targetId) {
-        panels.forEach(p => p.style.display = "none");
-        tabBtns.forEach(b => b.classList.remove("active"));
+        tabBtns.forEach(b => b.classList.toggle("active", b.dataset.target === targetId));
+        contentPanels.forEach(p => p.style.display = p.id === targetId ? "block" : "none");
 
-        const activeBtn = document.querySelector(`.zhoutian-tab-btn[data-target="${targetId}"]`);
-        if (activeBtn) activeBtn.classList.add("active");
-
-        const targetPanel = document.getElementById(targetId);
-        if (targetPanel) targetPanel.style.display = "block";
-
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
-
-        if (targetId === "panel-table-1") {
-            if (badgeTitle) badgeTitle.innerText = "表1 · 4 象 90° 质变与 4 个 81 矩映射";
+        if (targetId === "panel-table-5") {
+            renderZhoutian360MasterTable("1");
+        } else if (targetId === "panel-table-1") {
+            if (badgeTitle) badgeTitle.innerText = "表1 · 4 象 90° 质变与 4 个 81 矩映射表";
             if (badgeDesc) badgeDesc.innerText = "90° 巳位(地户)、180° 午/未位、270° 酉位、360° 亥位(天门)";
             engine.render4XiangSquare();
             highlightPositions([81]);
@@ -439,19 +620,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    switchTablePanel("panel-table-1");
-});
-
-/* 全局屏幕点击金彩粒子波纹火花特效 (Click Visual Spark Listener) */
-document.addEventListener("click", (e) => {
-    const spark = document.createElement("div");
-    spark.className = "click-spark-efx";
-    spark.style.left = `${e.clientX}px`;
-    spark.style.top = `${e.clientY}px`;
-    document.body.appendChild(spark);
-    setTimeout(() => {
-        if (spark.parentNode) {
-            spark.parentNode.removeChild(spark);
-        }
-    }, 450);
+    switchTablePanel("panel-table-5");
 });
