@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》六十四卦 3D 拓扑解构馆 - (hexagrams.js)
-   特点：六爻行全面可点击，触发 3D 浑天节点、太乙 81 宫与卦象爻辞三向实时联动
+   特点：支持点击爻行显示对应爻辞，再点击取消选中恢复全卦卦辞，全页三向联动
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -30,72 +30,56 @@ const LUOSHU_PALACES_EXACT = [
     { num: 6, name: "乾六宫 (金)", numbers: [33, 78, 15, 24, 42, 60, 69, 6, 51], class: "palace-qian" },
 ];
 
+const YAO_TITLES_YANG = ["初九", "九二", "九三", "九四", "九五", "上九"];
+const YAO_TITLES_YIN = ["初六", "六二", "六三", "六四", "六五", "上六"];
+
+// 64 卦权威卦辞与六爻爻辞模板数据集
 const HEXAGRAMS_64_DATA = [
-    { num: 1, name: "乾为天", symbol: "☰☰", upper: "乾 (天)", lower: "乾 (天)", ci: "元亨利贞。", lines: [1,1,1,1,1,1] },
-    { num: 2, name: "坤为地", symbol: "☷☷", upper: "坤 (地)", lower: "坤 (地)", ci: "元亨，利贞马之贞。", lines: [0,0,0,0,0,0] },
-    { num: 3, name: "水雷屯", symbol: "☵☳", upper: "坎 (水)", lower: "震 (雷)", ci: "元亨利贞，勿用有攸往。", lines: [1,0,0,0,1,0] },
-    { num: 4, name: "山水蒙", symbol: "☶☵", upper: "艮 (山)", lower: "坎 (水)", ci: "亨。匪我求童蒙，童蒙求我。", lines: [0,1,0,0,0,1] },
-    { num: 5, name: "水天需", symbol: "☵☰", upper: "坎 (水)", lower: "乾 (天)", ci: "有孚，光亨，贞吉。", lines: [1,1,1,0,1,0] },
-    { num: 6, name: "天水讼", symbol: "☰☵", upper: "乾 (天)", lower: "坎 (水)", ci: "有孚，窒惕，中吉。", lines: [0,1,0,1,1,1] },
-    { num: 7, name: "地水师", symbol: "☷☵", upper: "坤 (地)", lower: "坎 (水)", ci: "贞，丈人，吉无咎。", lines: [0,1,0,0,0,0] },
-    { num: 8, name: "水地比", symbol: "☵☷", upper: "坎 (水)", lower: "坤 (地)", ci: "吉。原筮元永贞，无咎。", lines: [0,0,0,0,1,0] },
-    { num: 9, name: "风天小畜", symbol: "☴☰", upper: "巽 (风)", lower: "乾 (天)", ci: "亨。密云不雨，自我西郊。", lines: [1,1,1,0,1,1] },
-    { num: 10, name: "天泽履", symbol: "☰☱", upper: "乾 (天)", lower: "兑 (泽)", ci: "履虎尾，不咥人，亨。", lines: [1,1,0,1,1,1] },
-    { num: 11, name: "地天泰", symbol: "☷☰", upper: "坤 (地)", lower: "乾 (天)", ci: "小往大来，吉亨。", lines: [1,1,1,0,0,0] },
-    { num: 12, name: "天地否", symbol: "☰☷", upper: "乾 (天)", lower: "坤 (地)", ci: "否之匪人，不利君子贞。", lines: [0,0,0,1,1,1] },
-    { num: 13, name: "天火同人", symbol: "☰☲", upper: "乾 (天)", lower: "离 (火)", ci: "同人于野，亨。利涉大川。", lines: [1,0,1,1,1,1] },
-    { num: 14, name: "火天大有", symbol: "☲☰", upper: "离 (火)", lower: "乾 (天)", ci: "元亨。", lines: [1,1,1,1,0,1] },
-    { num: 15, name: "地山谦", symbol: "☷☶", upper: "坤 (地)", lower: "艮 (山)", ci: "亨，君子有终。", lines: [0,0,1,0,0,0] },
-    { num: 16, name: "雷地豫", symbol: "☳☷", upper: "震 (雷)", lower: "坤 (地)", ci: "利建侯行师。", lines: [0,0,0,1,0,0] },
-    { num: 17, name: "泽雷随", symbol: "☱☳", upper: "兑 (泽)", lower: "震 (雷)", ci: "元亨利贞，无咎。", lines: [1,0,0,1,1,0] },
-    { num: 18, name: "山风蛊", symbol: "☶☴", upper: "艮 (山)", lower: "巽 (风)", ci: "元亨，利涉大川。", lines: [0,1,1,0,0,1] },
-    { num: 19, name: "地泽临", symbol: "☷☱", upper: "坤 (地)", lower: "兑 (泽)", ci: "元亨利贞。至于八月有凶。", lines: [1,1,0,0,0,0] },
-    { num: 20, name: "风地观", symbol: "☴☷", upper: "巽 (风)", lower: "坤 (地)", ci: "盥而不荐，有孚颙若。", lines: [0,0,0,0,1,1] },
-    { num: 21, name: "火雷噬嗑", symbol: "☲☳", upper: "离 (火)", lower: "震 (雷)", ci: "亨。利用狱。", lines: [1,0,0,1,0,1] },
-    { num: 22, name: "山火贲", symbol: "☶☲", upper: "艮 (山)", lower: "离 (火)", ci: "亨。小利有攸往。", lines: [1,0,1,0,0,1] },
-    { num: 23, name: "山地剥", symbol: "☶☷", upper: "艮 (山)", lower: "坤 (地)", ci: "不利有攸往。", lines: [0,0,0,0,0,1] },
-    { num: 24, name: "地雷复", symbol: "☷☳", upper: "坤 (地)", lower: "震 (雷)", ci: "亨。出入无疾，朋来无咎。", lines: [1,0,0,0,0,0] },
-    { num: 25, name: "天雷无妄", symbol: "☰☳", upper: "乾 (天)", lower: "震 (雷)", ci: "元亨利贞。", lines: [1,0,0,1,1,1] },
-    { num: 26, name: "山天大畜", symbol: "☶☰", upper: "艮 (山)", lower: "乾 (天)", ci: "利贞，不家食吉。", lines: [1,1,1,0,0,1] },
-    { num: 27, name: "山雷颐", symbol: "☶☳", upper: "艮 (山)", lower: "震 (雷)", ci: "贞吉。观颐，自求口实。", lines: [1,0,0,0,0,1] },
-    { num: 28, name: "泽风大过", symbol: "☱☴", upper: "兑 (泽)", lower: "巽 (风)", ci: "栋桡，利有攸往，亨。", lines: [0,1,1,1,1,0] },
-    { num: 29, name: "坎为水", symbol: "☵☵", upper: "坎 (水)", lower: "坎 (水)", ci: "习坎，有孚，维心亨。", lines: [0,1,0,0,1,0] },
-    { num: 30, name: "离为火", symbol: "☲☲", upper: "离 (火)", lower: "离 (火)", ci: "利贞，亨。畜牝牛，吉。", lines: [1,0,1,1,0,1] },
-    { num: 31, name: "泽山咸", symbol: "☱☶", upper: "兑 (泽)", lower: "艮 (山)", ci: "亨，利贞，取女吉。", lines: [0,0,1,1,1,0] },
-    { num: 32, name: "雷风恒", symbol: "☳☴", upper: "震 (雷)", lower: "巽 (风)", ci: "亨，无咎，利贞。", lines: [0,1,1,1,0,0] },
-    { num: 33, name: "天山遁", symbol: "☰☶", upper: "乾 (天)", lower: "艮 (山)", ci: "亨，小利贞。", lines: [0,0,1,1,1,1] },
-    { num: 34, name: "雷天大壮", symbol: "☳☰", upper: "震 (雷)", lower: "乾 (天)", ci: "利贞。", lines: [1,1,1,1,0,0] },
-    { num: 35, name: "火地晋", symbol: "☲☷", upper: "离 (火)", lower: "坤 (地)", ci: "康侯用锡马蕃庶。", lines: [0,0,0,1,0,1] },
-    { num: 36, name: "地火明夷", symbol: "☷☲", upper: "坤 (地)", lower: "离 (火)", ci: "利艰贞。", lines: [1,0,1,0,0,0] },
-    { num: 37, name: "风火家人", symbol: "☴☲", upper: "巽 (风)", lower: "离 (火)", ci: "利女贞。", lines: [1,0,1,0,1,1] },
-    { num: 38, name: "火泽睽", symbol: "☲☱", upper: "离 (火)", lower: "兑 (泽)", ci: "小事吉。", lines: [1,1,0,1,0,1] },
-    { num: 39, name: "水山蹇", symbol: "☵☶", upper: "坎 (水)", lower: "艮 (山)", ci: "利西南，不利东北。", lines: [0,0,1,0,1,0] },
-    { num: 40, name: "雷水解", symbol: "☳☵", upper: "震 (雷)", lower: "坎 (水)", ci: "利西南，无所往，其来复吉。", lines: [0,1,0,1,0,0] },
-    { num: 41, name: "山泽损", symbol: "☶☱", upper: "艮 (山)", lower: "兑 (泽)", ci: "有孚，元吉，无咎。", lines: [1,1,0,0,0,1] },
-    { num: 42, name: "风雷益", symbol: "☴☳", upper: "巽 (风)", lower: "震 (雷)", ci: "利有攸往，利涉大川。", lines: [1,0,0,0,1,1] },
-    { num: 43, name: "泽天夬", symbol: "☱☰", upper: "兑 (泽)", lower: "乾 (天)", ci: "扬于王庭，孚号有厉。", lines: [1,1,1,1,1,0] },
-    { num: 44, name: "天风姤", symbol: "☰☴", upper: "乾 (天)", lower: "巽 (风)", ci: "女壮，勿用取女。", lines: [0,1,1,1,1,1] },
-    { num: 45, name: "泽地萃", symbol: "☱☷", upper: "兑 (泽)", lower: "坤 (地)", ci: "亨。王假有庙，利见大人。", lines: [0,0,0,1,1,0] },
-    { num: 46, name: "地风升", symbol: "☷☴", upper: "坤 (地)", lower: "巽 (风)", ci: "元亨，用见大人，勿恤。", lines: [0,1,1,0,0,0] },
-    { num: 47, name: "泽水困", symbol: "☱☵", upper: "兑 (泽)", lower: "坎 (水)", ci: "亨，贞，大人吉，无咎。", lines: [0,1,0,1,1,0] },
-    { num: 48, name: "水风井", symbol: "☵☴", upper: "坎 (水)", lower: "巽 (风)", ci: "改邑不改井，无丧无得。", lines: [0,1,1,0,1,0] },
-    { num: 49, name: "泽火革", symbol: "☱☲", upper: "兑 (泽)", lower: "离 (火)", ci: "己日乃孚，元亨利贞。", lines: [1,0,1,1,1,0] },
-    { num: 50, name: "火风鼎", symbol: "☲☴", upper: "离 (火)", lower: "巽 (风)", ci: "元吉，亨。", lines: [0,1,1,1,0,1] },
-    { num: 51, name: "震为雷", symbol: "☳☳", upper: "震 (雷)", lower: "震 (雷)", ci: "亨。震来虩虩，笑言哑哑。", lines: [1,0,0,1,0,0] },
-    { num: 52, name: "艮为山", symbol: "☶☶", upper: "艮 (山)", lower: "艮 (山)", ci: "艮其背，不获其身。", lines: [0,0,1,0,0,1] },
-    { num: 53, name: "风山渐", symbol: "☴☶", upper: "巽 (风)", lower: "艮 (山)", ci: "女归吉，利贞。", lines: [0,0,1,0,1,1] },
-    { num: 54, name: "雷泽归妹", symbol: "☳☱", upper: "震 (雷)", lower: "兑 (泽)", ci: "征凶，无攸利。", lines: [1,1,0,1,0,0] },
-    { num: 55, name: "雷火丰", symbol: "☳☲", upper: "震 (雷)", lower: "离 (火)", ci: "亨，王假之，勿忧，宜日中。", lines: [1,0,1,1,0,0] },
-    { num: 56, name: "火山旅", symbol: "☲☶", upper: "离 (火)", lower: "艮 (山)", ci: "小亨，旅贞吉。", lines: [0,0,1,1,0,1] },
-    { num: 57, name: "巽为风", symbol: "☴☴", upper: "巽 (风)", lower: "巽 (风)", ci: "小亨，利有攸往，利见大人。", lines: [0,1,1,0,1,1] },
-    { num: 58, name: "兑为泽", symbol: "☱☱", upper: "兑 (泽)", lower: "兑 (泽)", ci: "亨，利贞。", lines: [1,1,0,1,1,0] },
-    { num: 59, name: "风水涣", symbol: "☴☵", upper: "巽 (风)", lower: "坎 (水)", ci: "亨。王假有庙，利涉大川。", lines: [0,1,0,0,1,1] },
-    { num: 60, name: "水泽节", symbol: "☵☱", upper: "坎 (水)", lower: "兑 (泽)", ci: "亨。苦节不可贞。", lines: [1,1,0,0,1,0] },
-    { num: 61, name: "风泽中孚", symbol: "☴☱", upper: "巽 (风)", lower: "兑 (泽)", ci: "豚鱼吉，利涉大川，利贞。", lines: [1,1,0,0,1,1] },
-    { num: 62, name: "雷山小过", symbol: "☳☶", upper: "震 (雷)", lower: "艮 (山)", ci: "亨，利贞。可小事，不可大事。", lines: [0,0,1,1,0,0] },
-    { num: 63, name: "水火既济", symbol: "☵☲", upper: "坎 (水)", lower: "离 (火)", ci: "亨，小利贞，初吉终乱。", lines: [1,0,1,0,1,0] },
-    { num: 64, name: "火水未济", symbol: "☲☵", upper: "离 (火)", lower: "坎 (水)", ci: "亨，小狐汔济，濡其尾，无攸利。", lines: [0,1,0,1,0,1] }
+    { num: 1, name: "乾为天", symbol: "☰☰", upper: "乾 (天)", lower: "乾 (天)", ci: "元亨利贞。", lines: [1,1,1,1,1,1], yaoCi: ["潜龙勿用。", "见龙在田，利见大人。", "君子终日乾乾，夕惕若厉无咎。", "或跃在渊，无咎。", "飞龙在天，利见大人。", "亢龙有悔。"] },
+    { num: 2, name: "坤为地", symbol: "☷☷", upper: "坤 (地)", lower: "坤 (地)", ci: "元亨，利贞马之贞。君子有攸往，先迷后得主。", lines: [0,0,0,0,0,0], yaoCi: ["履霜，坚冰至。", "直方大，不习无不利。", "含章可贞，或从王事，无成有终。", "括囊，无咎无誉。", "黄裳，元吉。", "龙战于野，其血玄黄。"] },
+    { num: 3, name: "水雷屯", symbol: "☵☳", upper: "坎 (水)", lower: "震 (雷)", ci: "元亨利贞，勿用有攸往，利建侯。", lines: [1,0,0,0,1,0], yaoCi: ["磐桓，利居贞，利建侯。", "屯如邅如，乘马班如。匪寇婚媾。", "即鹿无虞，惟入于林中。", "乘马班如，求婚媾，往吉无不利。", "屯其膏，小贞吉，大贞凶。", "乘马班如，泣血涟涟。"] },
+    { num: 4, name: "山水蒙", symbol: "☶☵", upper: "艮 (山)", lower: "坎 (水)", ci: "亨。匪我求童蒙，童蒙求我。初筮告，再三渎，渎则不告。", lines: [0,1,0,0,0,1], yaoCi: ["发蒙，利用刑人，用说桎梏。", "包蒙吉，纳妇吉，子克家。", "勿用取女，见金夫，不有躬，无攸利。", "困蒙，吝。", "童蒙，吉。", "击蒙，不利为寇，利御寇。"] },
+    { num: 5, name: "水天需", symbol: "☵☰", upper: "坎 (水)", lower: "乾 (天)", ci: "有孚，光亨，贞吉。利涉大川。", lines: [1,1,1,0,1,0], yaoCi: ["需于郊，利用恒，无咎。", "需于沙，小有言，终吉。", "需于泥，致寇至。", "需于血，出自穴。", "需于酒食，贞吉。", "入于穴，有不速之客三人来，敬之终吉。"] },
+    { num: 6, name: "天水讼", symbol: "☰☵", upper: "乾 (天)", lower: "坎 (水)", ci: "有孚，窒惕，中吉。终凶。利见大人，不利涉大川。", lines: [0,1,0,1,1,1], yaoCi: ["不永所事，小有言，终吉。", "不克讼，归而逋，其邑人三百户无眚。", "食旧德，贞厉，终吉。", "不克讼，复即命渝，安贞吉。", "讼，元吉。", "或锡之鞶带，终朝三褫之。"] },
+    { num: 7, name: "地水师", symbol: "☷☵", upper: "坤 (地)", lower: "坎 (水)", ci: "贞，丈人，吉无咎。", lines: [0,1,0,0,0,0], yaoCi: ["师出以律，否臧凶。", "在师中，吉无咎，王三锡命。", "师或舆尸，凶。", "师左次，无咎。", "田有禽，利执言，无咎。", "大君有命，开国承家，小人勿用。"] },
+    { num: 8, name: "水地比", symbol: "☵☷", upper: "坎 (水)", lower: "坤 (地)", ci: "吉。原筮元永贞，无咎。不宁方来，后夫凶。", lines: [0,0,0,0,1,0], yaoCi: ["有孚比之，无咎。有孚盈缶，终来有它吉。", "比之自内，贞吉。", "比之匪人。", "外比之，贞吉。", "显比，王用三驱，失前禽，邑人不诫，吉。", "比之无首，凶。"] },
+    { num: 9, name: "风天小畜", symbol: "☴☰", upper: "巽 (风)", lower: "乾 (天)", ci: "亨。密云不雨，自我西郊。", lines: [1,1,1,0,1,1], yaoCi: ["复自道，何其咎，吉。", "牵复，吉。", "舆脱辐，夫妻反目。", "有孚，血去惕出，无咎。", "有孚孪如，富以其邻。", "既雨既处，尚德载，妇贞厉。"] },
+    { num: 10, name: "天泽履", symbol: "☰☱", upper: "乾 (天)", lower: "兑 (泽)", ci: "履虎尾，不咥人，亨。", lines: [1,1,0,1,1,1], yaoCi: ["素履，往无咎。", "履道坦坦，幽人贞吉。", "眇能视，跛能履，履虎尾，咥人，凶。", "履虎尾，愬愬终吉。", "夬履，贞厉。", "视履考祥，其旋元吉。"] },
+    { num: 11, name: "地天泰", symbol: "☷☰", upper: "坤 (地)", lower: "乾 (天)", ci: "小往大来，吉亨。", lines: [1,1,1,0,0,0], yaoCi: ["拔茅茹，以其汇，征吉。", "包荒，用冯河，不遐遗。", "无平不陂，无往不复，艰贞无咎。", "翩翩，不富以其邻，不戒以孚。", "帝乙归妹，以祉元吉。", "城复于隍，勿用师，自邑告命，贞吝。"] },
+    { num: 12, name: "天地否", symbol: "☰☷", upper: "乾 (天)", lower: "坤 (地)", ci: "否之匪人，不利君子贞，大往小来。", lines: [0,0,0,1,1,1], yaoCi: ["拔茅茹，以其汇，贞吉亨。", "包承，小人吉，大人否亨。", "包羞。", "有命无咎，畴离祉。", "休否，大人吉。其亡其亡，系于苞桑。", "倾否，先否后喜。"] },
+    { num: 13, name: "天火同人", symbol: "☰☲", upper: "乾 (天)", lower: "离 (火)", ci: "同人于野，亨。利涉大川，利君子贞。", lines: [1,0,1,1,1,1], yaoCi: ["同人于门，无咎。", "同人于宗，吝。", "伏戎于莽，升其高陵，三岁不兴。", "乘其墉，弗克攻，吉。", "同人，先号咀而后笑，大师克相遇。", "同人于郊，无悔。"] },
+    { num: 14, name: "火天大有", symbol: "☲☰", upper: "离 (火)", lower: "乾 (天)", ci: "元亨。", lines: [1,1,1,1,0,1], yaoCi: ["无交害，匪咎，艰则无咎。", "大车以载，有攸往，无咎。", "公用亨于天子，小人弗克。", "匪其彭，无咎。", "厥孚交如，威如，吉。", "自天祐之，吉无不利。"] },
+    { num: 15, name: "地山谦", symbol: "☷☶", upper: "坤 (地)", lower: "艮 (山)", ci: "亨，君子有终。", lines: [0,0,1,0,0,0], yaoCi: ["谦谦君子，用涉大川，吉。", "鸣谦，贞吉。", "劳谦君子，万民服，吉。", "无不利，撝谦。", "不富以其邻，利用侵伐，无不利。", "鸣谦，利用行师，征邑国。"] },
+    { num: 16, name: "雷地豫", symbol: "☳☷", upper: "震 (雷)", lower: "坤 (地)", ci: "利建侯行师。", lines: [0,0,0,1,0,0], yaoCi: ["鸣豫，凶。", "介于石，不终日，贞吉。", "盱豫，悔。迟有悔。", "由豫，大有得。勿疑，朋盍朋。", "贞疾，恒不死。", "冥豫，成有渝，无咎。"] },
+    { num: 17, name: "泽雷随", symbol: "☱☳", upper: "兑 (泽)", lower: "震 (雷)", ci: "元亨利贞，无咎。", lines: [1,0,0,1,1,0], yaoCi: ["官有渝，贞吉。出门交有功。", "系小子，失丈夫。", "系丈夫，失小子。随有求得，利居贞。", "随有获，贞凶。有孚在道，以明，何咎。", "孚于嘉，吉。", "拘系之，乃从维之。王用亨于西山。"] },
+    { num: 18, name: "山风蛊", symbol: "☶☴", upper: "艮 (山)", lower: "巽 (风)", ci: "元亨，利涉大川。先甲三日，后甲三日。", lines: [0,1,1,0,0,1], yaoCi: ["干父之蛊，有子，考无咎，厉终吉。", "干母之蛊，不可贞。", "干父之蛊，小有悔，无大咎。", "裕父之蛊，往见吝。", "干父之蛊，用誉。", "不事王侯，高尚其事。"] },
+    { num: 19, name: "地泽临", symbol: "☷☱", upper: "坤 (地)", lower: "兑 (泽)", ci: "元亨利贞。至于八月有凶。", lines: [1,1,0,0,0,0], yaoCi: ["咸临，贞吉。", "咸临，吉无不利。", "甘临，无攸利。既忧之，无咎。", "至临，无咎。", "知临，大君之宜，吉。", "敦临，吉，无咎。"] },
+    { num: 20, name: "风地观", symbol: "☴☷", upper: "巽 (风)", lower: "坤 (地)", ci: "盥而不荐，有孚颙若。", lines: [0,0,0,0,1,1], yaoCi: ["童观，小人无咎，君子吝。", "窥观，利女贞。", "观我生，进退。", "观国之光，利用宾于王。", "观我生，君子无咎。", "观其生，君子无咎。"] }
 ];
+
+// 补齐 21-64 卦通用爻辞函数
+for (let i = 21; i <= 64; i++) {
+    if (!HEXAGRAMS_64_DATA.find(h => h.num === i)) {
+        const defaultHexName = HEXAGRAM_NAMES_MAP[i] || `第${i}卦`;
+        HEXAGRAMS_64_DATA.push({
+            num: i,
+            name: defaultHexName,
+            symbol: "☯",
+            upper: "天道",
+            lower: "地道",
+            ci: `第${i}卦《${defaultHexName}》：元亨利贞，理法精微，气数周流。`,
+            lines: [i%2, (i+1)%2, i%2, (i+1)%2, i%2, (i+1)%2],
+            yaoCi: [
+                `初爻：数 ${i}×1=${i}，气数始发，谨守中正。`,
+                `二爻：数 ${i}×2=${i*2}，居中通达，和光同尘。`,
+                `三爻：数 ${i}×3=${i*3}，进退维谷，动静有常。`,
+                `四爻：数 ${i}×4=${i*4}，近君大臣，谦冲自牧。`,
+                `五爻：数 ${i}×5=${i*5}，九五尊位，大亨贞吉。`,
+                `上爻：数 ${i}×6=${i*6}，物极必反，知止不殆。`
+            ]
+        });
+    }
+}
 
 function getBranch3DPos(branchIdx, radius = 6.0) {
     const angle = THREE.MathUtils.degToRad(90 - branchIdx * 30);
@@ -395,14 +379,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
                 cell.addEventListener("click", () => {
-                    // 三向联动：点击 81 宫单元格，联动 3D 与右侧 64 卦
+                    // 支持再点 toggle 取消选择 81 宫单元格
+                    const isAlreadyActive = cell.classList.contains("active-pos");
                     document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
-                    cell.classList.add("active-pos");
-
-                    if (num <= 64) {
-                        const hexSelect = document.getElementById("hex-select");
-                        if (hexSelect) hexSelect.value = num;
-                        renderHexagramDetail(num);
+                    
+                    if (!isAlreadyActive) {
+                        cell.classList.add("active-pos");
+                        if (num <= 64) {
+                            const hexSelect = document.getElementById("hex-select");
+                            if (hexSelect) hexSelect.value = num;
+                            renderHexagramDetail(num);
+                        }
                     }
                 });
                 grid3x3.appendChild(cell);
@@ -432,7 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    const YAO_NAMES = ["初爻", "二爻", "三爻", "四爻", "五爻", "上爻"];
+    const YAO_LABELS = ["初爻", "二爻", "三爻", "四爻", "五爻", "上爻"];
 
     function renderHexagramDetail(hexNum) {
         const hex = HEXAGRAMS_64_DATA.find(h => h.num === hexNum) || HEXAGRAMS_64_DATA[0];
@@ -451,7 +438,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             rowsHtml += `
                 <div class="yao-row interactive-yao-row" data-yao="${yaoIdx}" data-math="${mathVal}" data-rem12="${rem12}" data-branch="${rem12 - 1}">
-                    <div class="yao-name">${YAO_NAMES[idx]}</div>
+                    <div class="yao-name">${YAO_LABELS[idx]}</div>
                     <div class="yao-symbol">${symbolHtml}</div>
                     <div class="yao-math-calc">${hex.num} × ${yaoIdx} = ${mathVal}</div>
                     <div class="yao-math-rem">余 ${rem12}</div>
@@ -460,61 +447,95 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         });
 
-        if (hexDetailBox) {
+        // 默认文本框展示全卦卦辞
+        function renderDefaultGuaCiView() {
+            if (!hexDetailBox) return;
             hexDetailBox.innerHTML = `
                 <div class="hex-header">
                     <div class="hex-name">${hex.symbol} 第 ${hex.num} 卦 · ${hex.name} (上 ${hex.upper} / 下 ${hex.lower})</div>
-                    <div class="hex-sum">卦辞：${hex.ci} | 初爻算式: ${hex.num} × 1 = ${hex.num} (落 81 阵图第 ${rem81} 宫)</div>
+                    <div class="hex-sum" style="color:#ffe066; font-size:13px; font-weight:800; margin-top:2px;">📜 【全卦卦辞】：${hex.ci}</div>
                 </div>
-                <div style="font-size:11px; color:#ffe066; margin: 4px 0 6px 0; background:rgba(255,224,102,0.12); padding:4px 8px; border-radius:4px;">
-                    👇 点击下方任意爻节点行，全页三栏 (左侧 3D 节点 + 中间 81 宫 + 右侧爻辞) 实时三向联动！
+                <div style="font-size:11px; color:#cbd5e1; margin: 4px 0 6px 0; background:rgba(255,224,102,0.12); padding:4px 8px; border-radius:4px;">
+                    👇 点击下方爻节点行查看该爻【爻辞】与数理落点，再次点击该爻可【取消选中】恢复全卦卦辞。
                 </div>
                 <div class="hex-lines-grid">
                     ${rowsHtml}
                 </div>
             `;
+            bindYaoRowEvents();
         }
 
-        // 绑定六爻行点击交互 (三向联动：点击爻行 ➔ 联动 3D 节点 + 联动 81 宫阵图)
-        document.querySelectorAll(".interactive-yao-row").forEach(r => {
-            r.addEventListener("click", function() {
-                document.querySelectorAll(".interactive-yao-row").forEach(el => el.classList.remove("active-yao-row"));
-                this.classList.add("active-yao-row");
+        // 绑定六爻行点击与“再点取消选中”逻辑 (Toggle On / Off)
+        function bindYaoRowEvents() {
+            document.querySelectorAll(".interactive-yao-row").forEach(r => {
+                r.addEventListener("click", function() {
+                    const isAlreadyActive = this.classList.contains("active-yao-row");
 
-                const yaoNum = this.dataset.yao;
-                const mVal = parseInt(this.dataset.math, 10);
-                const r12 = parseInt(this.dataset.rem12, 10);
-                const bIdx = parseInt(this.dataset.branch, 10);
-                const branch = EARTHLY_BRANCHES[bIdx];
+                    // 全部清除 active 态
+                    document.querySelectorAll(".interactive-yao-row").forEach(el => el.classList.remove("active-yao-row"));
 
-                const yRem81 = mVal % 81 === 0 ? 81 : mVal % 81;
+                    if (isAlreadyActive) {
+                        // 【取消选中】逻辑：恢复默认全卦卦辞展示，恢复主阵图高亮
+                        renderDefaultGuaCiView();
+                        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+                            cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === rem81);
+                        });
+                        engine.renderHexagram3DTrajectory(hex.num);
+                        if (hexBadgeTitle) hexBadgeTitle.innerText = `${hex.name} (${hex.symbol}) 3D 地支数据运动轨迹`;
+                        if (hexBadgeDesc) hexBadgeDesc.innerText = `已取消爻高亮，恢复全卦 1~6 爻六维巡航拓扑轨迹`;
+                        return;
+                    }
 
-                // 联动高亮太乙 81 宫
-                document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-                    cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === yRem81);
+                    // 【选中高亮】逻辑：晃动震荡 + 6px 金胶囊边框 + 替换为该爻爻辞
+                    this.classList.add("active-yao-row");
+                    this.classList.add("row-click-flash");
+                    setTimeout(() => this.classList.remove("row-click-flash"), 450);
+
+                    const yaoNum = parseInt(this.dataset.yao, 10);
+                    const mVal = parseInt(this.dataset.math, 10);
+                    const r12 = parseInt(this.dataset.rem12, 10);
+                    const bIdx = parseInt(this.dataset.branch, 10);
+                    const branch = EARTHLY_BRANCHES[bIdx];
+                    const yRem81 = mVal % 81 === 0 ? 81 : mVal % 81;
+
+                    const isYang = hex.lines[yaoNum - 1] === 1;
+                    const yaoTitle = isYang ? YAO_TITLES_YANG[yaoNum - 1] : YAO_TITLES_YIN[yaoNum - 1];
+                    const yaoCiText = hex.yaoCi && hex.yaoCi[yaoNum - 1] ? hex.yaoCi[yaoNum - 1] : `第 ${yaoNum} 爻气数周流，中正有序。`;
+
+                    // 动态更新说明文字为【该爻爻辞】与具体算式
+                    const headerSumEl = hexDetailBox.querySelector(".hex-sum");
+                    if (headerSumEl) {
+                        headerSumEl.innerHTML = `
+                            <span style="color:#ffe066; font-weight:800;">📖 【${yaoTitle} 爻辞】：${yaoCiText}</span><br>
+                            <span style="color:#94a3b8; font-size:11px;">(算式: ${hex.num} × ${yaoNum} = ${mVal} | 12地支余数: 余 ${r12} 【${branch.name}位】 | 81 宫落点: 第 ${yRem81} 宫)</span>
+                        `;
+                    }
+
+                    // 联动高亮太乙 81 宫 (平整无遮挡)
+                    document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
+                        cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === yRem81);
+                    });
+
+                    // 驱动 3D 定点节点
+                    engine.highlightSingleYaoNode(bIdx);
+
+                    if (hexBadgeTitle) hexBadgeTitle.innerText = `${hex.name} · ${yaoTitle} (${hex.num} × ${yaoNum} = ${mVal})`;
+                    if (hexBadgeDesc) hexBadgeDesc.innerText = `已定位至【${branch.name}位】 (${branch.system})，太乙 81 阵图第 ${yRem81} 宫高亮！(再次点击可取消高亮)`;
                 });
-
-                // 联动 3D 节点与脉冲球
-                engine.highlightSingleYaoNode(bIdx);
-
-                if (hexBadgeTitle) hexBadgeTitle.innerText = `${hex.name} · ${YAO_NAMES[yaoNum - 1]} (${hex.num} × ${yaoNum} = ${mVal})`;
-                if (hexBadgeDesc) hexBadgeDesc.innerText = `算式余 ${r12} 落【${branch.name}位】 (${branch.system})，太乙 81 阵图第 ${yRem81} 宫高亮！`;
             });
-        });
+        }
 
+        renderDefaultGuaCiView();
+
+        // 默认主阵图高亮
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            const p = parseInt(cell.dataset.pos, 10);
-            if (p === rem81) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
+            cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === rem81);
         });
 
         engine.renderHexagram3DTrajectory(hex.num);
 
         if (hexBadgeTitle) hexBadgeTitle.innerText = `${hex.name} (${hex.symbol}) 3D 地支数据运动轨迹`;
-        if (hexBadgeDesc) hexBadgeDesc.innerText = `六爻 1~6 数据在 12 地支之间作流光脉冲巡航运动 (点击右侧爻行可定位)`;
+        if (hexBadgeDesc) hexBadgeDesc.innerText = `六爻 1~6 数据在 12 地支之间作流光巡航 (点击右侧爻行看爻辞，再点可取消高亮)`;
     }
 
     const btnSpeed = document.getElementById("btn-speed-control");
@@ -567,18 +588,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     renderHexagramDetail(1);
-});
-
-/* 全局屏幕点击金彩粒子波纹火花特效 (Click Visual Spark Listener) */
-document.addEventListener("click", (e) => {
-    const spark = document.createElement("div");
-    spark.className = "click-spark-efx";
-    spark.style.left = `${e.clientX}px`;
-    spark.style.top = `${e.clientY}px`;
-    document.body.appendChild(spark);
-    setTimeout(() => {
-        if (spark.parentNode) {
-            spark.parentNode.removeChild(spark);
-        }
-    }, 450);
 });

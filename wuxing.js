@@ -477,30 +477,58 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 绑定 4 大三合局按钮点击 (更新文字 + 高亮右侧按钮闪烁 + 3D/81宫联动)
+    // 绑定 4 大三合局按钮点击 (支持点击高亮，再次点击取消高亮恢复默认)
     document.querySelectorAll(".sanhe-btn").forEach(btn => {
         btn.addEventListener("click", function() {
+            const isAlreadyActive = this.classList.contains("active");
             document.querySelectorAll(".sanhe-btn").forEach(b => b.classList.remove("active"));
+
+            if (isAlreadyActive) {
+                // 取消高亮
+                document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+                if (sanheDetailCard) {
+                    sanheDetailCard.innerHTML = `
+                        <div style="font-size: 13px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
+                            ☯【五行三元大纲】地支三合与天文月出预报 (原书 P246-252)
+                        </div>
+                        <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
+                            点击下方 4 大三合局按钮或表格行，探查申子辰水局、巳酉丑金局、亥卯未木局与寅午戌火局的详细月相气数！再次点击可取消选择。
+                        </div>
+                    `;
+                }
+                engine.clearWuxing3DGroup();
+                return;
+            }
+
             this.classList.add("active");
 
-            // 右侧按钮闪光冲击动画
+            // 右侧按钮闪光冲击与晃动动画
             this.classList.add("row-click-flash");
-            setTimeout(() => this.classList.remove("row-click-flash"), 400);
+            setTimeout(() => this.classList.remove("row-click-flash"), 450);
 
             const key = this.dataset.sanhe;
             updateSanheDetail(key);
         });
     });
 
-    // 天干五合与三元九运表格行点击高亮动画与三向联动
+    // 天干五合与三元九运表格行点击高亮动画与三向联动 (支持再点取消高亮)
     document.querySelectorAll(".interactive-row").forEach(row => {
         row.addEventListener("click", function() {
+            const isAlreadyActive = this.classList.contains("active-row");
             document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+
+            if (isAlreadyActive) {
+                // 取消高亮
+                document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+                engine.clearWuxing3DGroup();
+                return;
+            }
+
             this.classList.add("active-row");
 
-            // 闪光冲击视觉动画
+            // 闪光与晃动动画
             this.classList.add("row-click-flash");
-            setTimeout(() => this.classList.remove("row-click-flash"), 400);
+            setTimeout(() => this.classList.remove("row-click-flash"), 450);
 
             if (this.dataset.tg) {
                 const tgId = parseInt(this.dataset.tg, 10);

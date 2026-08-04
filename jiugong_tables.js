@@ -478,7 +478,25 @@ document.addEventListener("DOMContentLoaded", () => {
             tr.innerHTML = cellsHtml;
 
             tr.addEventListener("click", () => {
+                const isAlreadyActive = tr.classList.contains("active-row");
                 document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+
+                if (isAlreadyActive) {
+                    // 取消高亮
+                    document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+                    if (detailCard) {
+                        detailCard.innerHTML = `
+                            <div style="font-size: 13px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
+                                📜 原著【${pInfo ? pInfo.name : '九宫'}】九级倍积大表全景 (P342-350)
+                            </div>
+                            <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
+                                点击表中任意行查看该数倍积、进位数与 12 地支落点；再次点击可【取消选中】恢复全表概览。
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
                 tr.classList.add("active-row");
 
                 // 点击瞬间平移晃动震荡与闪光
