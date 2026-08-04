@@ -28,17 +28,17 @@
                 </div>
             </div>
             
-                        <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab ">🏠 首页</a>
-                <a href="pipeline.html" class="nav-tab ">⚡ 流水线</a>
-                <a href="hexagrams.html" class="nav-tab ">☰ 64卦拓扑</a>
-                <a href="laws.html" class="nav-tab ">✨ 5大定律</a>
-                <a href="wuxing.html" class="nav-tab ">☯ 五行三元</a>
-                <a href="jiugong_qi.html" class="nav-tab ">📜 九宫七输入</a>
-                <a href="zhoutian360.html" class="nav-tab ">🌀 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab ">🔢 939697七数</a>
-                <a href="coordinates12.html" class="nav-tab ">🌌 12方位3坐标</a>
-                <a href="ju81.html" class="nav-tab ">📐 用矩81</a>
+            <nav class="header-nav-tabs">
+                <a href="index.html" class="nav-tab">🏠 首页</a>
+                <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
+                <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab">✨ 5大定律</a>
+                <a href="wuxing.html" class="nav-tab">☯ 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab">📜 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab">🌀 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab">🌌 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab">📐 用矩81</a>
                 <a href="jiugong_tables.html" class="nav-tab active">📊 九宫纪气大表</a>
             </nav>
         </header>
@@ -86,8 +86,8 @@
 
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
-                        <div id="jgt-badge-title" class="badge-title">九宫纪气数 9 大宫 3D 拓扑全景</div>
-                        <div id="jgt-badge-desc" class="badge-desc">选择右侧 9 大宫按钮或点击表格行，全页三栏实现双向同步联动</div>
+                        <div id="jgt-badge-title" class="badge-title">九宫纪气数 9 大宫 729 矩 3D 拓扑全景</div>
+                        <div id="jgt-badge-desc" class="badge-desc">选择右侧 9 大宫切选按钮或点击大表任意行，全页三栏实现双向同步联动</div>
                     </div>
                 </div>
             </section>
@@ -106,15 +106,20 @@
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：九宫纪气数 9 大宫全景交互大表控制台 (33%) -->
+            <!-- 栏三：九宫纪气数 9 大宫 729 矩全景交互大表控制台 (33%) -->
             <section class="col-right-controls" style="overflow-y: auto; max-height: calc(100vh - 120px);">
-                <!-- 九宫快速切选面板 -->
+                <!-- 九宫快速切选与模式切换面板 -->
                 <div class="glass-panel">
-                    <div class="card-title">
-                        <span>📊</span> 九宫纪气数一览表 (9大宫快速切选)
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="card-title"><span>📊</span> 九宫纪气数 9 大宫切选</div>
+                        <div style="display:flex; gap:4px;">
+                            <button id="btn-mode-81" class="sanhe-btn active" style="font-size:10px; padding:2px 6px;">81宫主表</button>
+                            <button id="btn-mode-729" class="sanhe-btn" style="font-size:10px; padding:2px 6px;">729矩大阵</button>
+                        </div>
                     </div>
+                    
                     <div class="sanhe-btn-grid" style="grid-template-columns: repeat(5, 1fr); margin-top: 6px;">
-                        <button class="sanhe-btn palace-tab-btn active" data-palace="all">全81宫</button>
+                        <button class="sanhe-btn palace-tab-btn active" data-palace="all">全九宫</button>
                         <button class="sanhe-btn palace-tab-btn" data-palace="1" style="color:#4dabf7;">坎一宫</button>
                         <button class="sanhe-btn palace-tab-btn" data-palace="2" style="color:#e5c07b;">坤二宫</button>
                         <button class="sanhe-btn palace-tab-btn" data-palace="3" style="color:#40c057;">震三宫</button>
@@ -127,18 +132,23 @@
                     </div>
                 </div>
 
+                <!-- 选定宫位宏观概述横幅 -->
+                <div id="jgt-palace-banner" class="glass-panel" style="margin-top: 4px; border-left: 4px solid #ffe066;">
+                    <!-- JS 动态渲染当前选定宫位的原书数理法则 -->
+                </div>
+
                 <!-- 搜索与筛选工具条 -->
-                <div class="glass-panel" style="margin-top: 6px;">
+                <div class="glass-panel" style="margin-top: 4px;">
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="text" id="jgt-search-input" class="custom-select" placeholder="🔍 输入数值、卦名或地支搜索..." style="flex:1; font-size:12px; padding:4px 8px;">
+                        <input type="text" id="jgt-search-input" class="custom-select" placeholder="🔍 输入数值、算式、易卦或地支搜索..." style="flex:1; font-size:12px; padding:4px 8px;">
                         <button id="jgt-reset-search" class="action-btn" style="padding:4px 12px; font-size:12px;">重置</button>
                     </div>
                 </div>
 
                 <!-- 九宫纪气数巨型大表 -->
-                <div class="glass-panel" style="margin-top: 6px;">
+                <div class="glass-panel" style="margin-top: 4px;">
                     <div class="card-title">
-                        <span id="jgt-table-title">📋 全九宫 81 纪气数明细巨表 (点击行三向联动)</span>
+                        <span id="jgt-table-title">📋 九宫纪气数巨型明细大表 (点击任意行全页三向联动)</span>
                     </div>
                     <div class="sequence-table-container" style="max-height: 380px;">
                         <table class="seq-table">
@@ -146,7 +156,7 @@
                                 <tr>
                                     <th>宫位</th>
                                     <th>降维数</th>
-                                    <th>对应卦象</th>
+                                    <th>对应易卦</th>
                                     <th>纪气数算式</th>
                                     <th>周天角度</th>
                                     <th>地支</th>
@@ -154,14 +164,14 @@
                                 </tr>
                             </thead>
                             <tbody id="jgt-table-body">
-                                <!-- JS 动态填入 81 宫完整数据 -->
+                                <!-- JS 动态填入 81 宫/729 矩完整巨表数据 -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- 选定宫位与行解析卡片 -->
-                <div id="jgt-detail-card" class="hexagram-detail-box" style="margin-top: 6px; margin-bottom: 20px;">
+                <div id="jgt-detail-card" class="hexagram-detail-box" style="margin-top: 4px; margin-bottom: 20px;">
                     <!-- JS 动态填入 -->
                 </div>
             </section>

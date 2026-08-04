@@ -1,6 +1,6 @@
 /* ==========================================================================
    《易经数理秘笈》九宫纪气数一览表全景馆引擎 - (jiugong_tables.js)
-   特点：9 大宫 81 纪气数巨表展示 + 搜索筛选 + 全页三向联动 (Column 1, 2, 3 双向交互)
+   特点：支持 81 宫主表与 729 矩大阵两大模式，9 大宫原书解构 + 全页三向联动
    ========================================================================== */
 
 const EARTHLY_BRANCHES = [
@@ -19,16 +19,29 @@ const EARTHLY_BRANCHES = [
 ];
 
 const LUOSHU_PALACES_EXACT = [
-    { num: 4, name: "巽四宫 (木)", numbers: [31, 76, 13, 22, 40, 58, 67, 4, 49], class: "palace-xun" },
-    { num: 9, name: "离九宫 (火)", numbers: [36, 81, 18, 27, 45, 63, 72, 9, 54], class: "palace-li" },
-    { num: 2, name: "坤二宫 (土)", numbers: [29, 74, 11, 20, 38, 56, 65, 2, 47], class: "palace-kun" },
-    { num: 3, name: "震三宫 (木)", numbers: [30, 75, 12, 21, 39, 57, 66, 3, 48], class: "palace-zhen" },
-    { num: 5, name: "中五宫 (土)", numbers: [32, 77, 14, 23, 41, 59, 68, 5, 50], class: "palace-zhong" },
-    { num: 7, name: "兑七宫 (金)", numbers: [34, 79, 16, 25, 43, 61, 70, 7, 52], class: "palace-dui" },
-    { num: 8, name: "艮八宫 (土)", numbers: [35, 80, 17, 26, 44, 62, 71, 8, 53], class: "palace-gen" },
-    { num: 1, name: "坎一宫 (水)", numbers: [28, 73, 10, 19, 37, 55, 64, 1, 46], class: "palace-kan" },
-    { num: 6, name: "乾六宫 (金)", numbers: [33, 78, 15, 24, 42, 60, 69, 6, 51], class: "palace-qian" },
+    { num: 4, name: "巽四宫 (木)", numbers: [31, 76, 13, 22, 40, 58, 67, 4, 49], class: "palace-xun", color: "#40c057" },
+    { num: 9, name: "离九宫 (火)", numbers: [36, 81, 18, 27, 45, 63, 72, 9, 54], class: "palace-li", color: "#ff5252" },
+    { num: 2, name: "坤二宫 (土)", numbers: [29, 74, 11, 20, 38, 56, 65, 2, 47], class: "palace-kun", color: "#e5c07b" },
+    { num: 3, name: "震三宫 (木)", numbers: [30, 75, 12, 21, 39, 57, 66, 3, 48], class: "palace-zhen", color: "#40c057" },
+    { num: 5, name: "中五宫 (土)", numbers: [32, 77, 14, 23, 41, 59, 68, 5, 50], class: "palace-zhong", color: "#ffe066" },
+    { num: 7, name: "兑七宫 (金)", numbers: [34, 79, 16, 25, 43, 61, 70, 7, 52], class: "palace-dui", color: "#dee2e6" },
+    { num: 8, name: "艮八宫 (土)", numbers: [35, 80, 17, 26, 44, 62, 71, 8, 53], class: "palace-gen", color: "#e5c07b" },
+    { num: 1, name: "坎一宫 (水)", numbers: [28, 73, 10, 19, 37, 55, 64, 1, 46], class: "palace-kan", color: "#4dabf7" },
+    { num: 6, name: "乾六宫 (金)", numbers: [33, 78, 15, 24, 42, 60, 69, 6, 51], class: "palace-qian", color: "#dee2e6" },
 ];
+
+// 原书 9 大宫数理大纲定义
+const PALACE_MASTERS = {
+    1: { name: "坎一宫 (水)", element: "北方润下之水", num: 1, numbers: [1, 10, 19, 28, 37, 46, 55, 64, 73], desc: "原书 P210：坎一宫领北方水气，含 1、10、19、28、37、46、55、64、73 九数，主阳气萌动生发。" },
+    2: { name: "坤二宫 (土)", element: "西南万物之母土", num: 2, numbers: [2, 11, 20, 29, 38, 47, 56, 65, 74], desc: "原书 P214：坤二宫领西南阴土，含 2、11、20、29、38、47、56、65、74 九数，主阴阳包容怀藏。" },
+    3: { name: "震三宫 (木)", element: "东方曲直之木", num: 3, numbers: [3, 12, 21, 30, 39, 48, 57, 66, 75], desc: "原书 P218：震三宫领东方雷木，含 3、12、21、30、39、48、57、66、75 九数，主万物奋起出震。" },
+    4: { name: "巽四宫 (木)", element: "东南风行之木", num: 4, numbers: [4, 13, 22, 31, 40, 49, 58, 67, 76], desc: "原书 P222：巽四宫领东南风木，含 4、13、22、31、40、49、58、67、76 九数，主气数申布周达。" },
+    5: { name: "中五宫 (土)", element: "中央中正太极土", num: 5, numbers: [5, 14, 23, 32, 41, 50, 59, 68, 77], desc: "原书 P226：中五宫领中央皇极土，含 5、14、23、32、41、50、59、68、77 九数，主枢纽调度演化。" },
+    6: { name: "乾六宫 (金)", element: "西北天道肃杀金", num: 6, numbers: [6, 15, 24, 33, 42, 51, 60, 69, 78], desc: "原书 P230：乾六宫领西北天金，含 6、15、24、33、42、51、60、69、78 九数，主天道刚健自强。" },
+    7: { name: "兑七宫 (金)", element: "西方喜悦正金", num: 7, numbers: [7, 16, 25, 34, 43, 52, 61, 70, 79], desc: "原书 P234：兑七宫领西方泽金，含 7、16、25、34、43、52、61、70、79 九数，主月出西方发辉。" },
+    8: { name: "艮八宫 (土)", element: "东北山陵止藏土", num: 8, numbers: [8, 17, 26, 35, 44, 53, 62, 71, 80], desc: "原书 P238：艮八宫领东北山土，含 8、17、26, 35, 44, 53, 62, 71, 80 九数，主万物终始交替。" },
+    9: { name: "离九宫 (火)", element: "南方炎上明辉火", num: 9, numbers: [9, 18, 27, 36, 45, 54, 63, 72, 81], desc: "原书 P242：离九宫领南方文明火，含 9、18、27、36、45、54、63、72、81 九数，主众和收敛归于 9。" }
+};
 
 const HEXAGRAM_NAMES_MAP = {
     1: "乾为天", 2: "坤为地", 3: "水雷屯", 4: "山水蒙", 5: "水天需", 6: "天水讼", 7: "地水师", 8: "水地比",
@@ -292,12 +305,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const matrixContainer = document.getElementById("taiyi-81-matrix");
     const tableBody = document.getElementById("jgt-table-body");
     const tableTitle = document.getElementById("jgt-table-title");
+    const palaceBanner = document.getElementById("jgt-palace-banner");
     const detailCard = document.getElementById("jgt-detail-card");
     const badgeTitle = document.getElementById("jgt-badge-title");
     const badgeDesc = document.getElementById("jgt-badge-desc");
 
-    // 生成全 81 宫完整纪气数数据集
-    const ALL_81_DATA = [];
+    let currentMode = "81"; // "81" 为 81 宫主表模式，"729" 为 729 矩延伸全阵模式
+
+    // 生成 81 宫主表数据集
+    const PRIMARY_81_DATA = [];
     LUOSHU_PALACES_EXACT.forEach(palace => {
         palace.numbers.forEach(num => {
             const rem12 = num % 12 === 0 ? 12 : num % 12;
@@ -306,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const deg = (num * 4.4444).toFixed(1) + "°";
             const expr = `${palace.num} 宫 × ${num} = ${palace.num * num}`;
 
-            ALL_81_DATA.push({
+            PRIMARY_81_DATA.push({
                 num: num,
                 palaceNum: palace.num,
                 palaceName: palace.name,
@@ -318,6 +334,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 branchColor: branch.color,
                 system: branch.system
             });
+        });
+    });
+
+    // 生成 729 矩延伸全阵数据集 (9 Palaces x 9 Base Numbers x 9 Multipliers = 729 Rows)
+    const EXTENDED_729_DATA = [];
+    LUOSHU_PALACES_EXACT.forEach(palace => {
+        palace.numbers.forEach(baseNum => {
+            for (let k = 1; k <= 9; k++) {
+                const calcVal = baseNum * k;
+                const rem81 = calcVal % 81 === 0 ? 81 : calcVal % 81;
+                const rem12 = calcVal % 12 === 0 ? 12 : calcVal % 12;
+                const branch = EARTHLY_BRANCHES[rem12 - 1];
+                const hexName = HEXAGRAM_NAMES_MAP[rem81] || (rem81 <= 64 ? `第${rem81}卦` : `宫局数 ${rem81}`);
+                const deg = (calcVal * 4.4444).toFixed(1) + "°";
+                const expr = `${baseNum} × ${k} = ${calcVal} (降维 ${rem81} 宫)`;
+
+                EXTENDED_729_DATA.push({
+                    num: calcVal,
+                    baseNum: baseNum,
+                    multiplier: k,
+                    rem81: rem81,
+                    palaceNum: palace.num,
+                    palaceName: palace.name,
+                    hexName: hexName,
+                    expr: expr,
+                    deg: deg,
+                    rem12: rem12,
+                    branchName: branch.name,
+                    branchColor: branch.color,
+                    system: branch.system
+                });
+            }
         });
     });
 
@@ -345,11 +393,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.title = `数值 ${num} (${palace.name})`;
                 cell.innerText = num;
                 cell.addEventListener("click", () => {
-                    // 三向联动：点击阵图 81 宫单元格 ➔ 定位 3D 节点与表格行
                     document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
                     cell.classList.add("active-pos");
 
-                    const target = ALL_81_DATA.find(d => d.num === num);
+                    const dataset = currentMode === "81" ? PRIMARY_81_DATA : EXTENDED_729_DATA;
+                    const target = dataset.find(d => (d.rem81 || d.num) === num);
                     if (target) {
                         highlightRowAnd3D(target);
                     }
@@ -363,21 +411,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
+    function updatePalaceBanner(palaceKey) {
+        if (!palaceBanner) return;
+        if (palaceKey === "all") {
+            palaceBanner.innerHTML = `
+                <div style="font-size:13px; font-weight:800; color:#ffe066;">
+                    📊 原著《全九宫 81 宫与 729 矩纪气数大表》
+                </div>
+                <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px;">
+                    梁致堂原著 P210-252 揭示：全表涵盖 9 大宫（坎一至离九）、81 宫主项与 729 矩延伸气数全阵。
+                </div>
+            `;
+        } else {
+            const pInfo = PALACE_MASTERS[parseInt(palaceKey, 10)] || PALACE_MASTERS[1];
+            palaceBanner.innerHTML = `
+                <div style="font-size:13px; font-weight:800; color:#ffe066;">
+                    🏛️ 原著【${pInfo.name}】纪气数解构大纲 (${pInfo.element})
+                </div>
+                <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px; line-height:1.4;">
+                    ${pInfo.desc}
+                </div>
+            `;
+        }
+    }
+
     function renderTable(filterPalace = "all", searchText = "") {
         if (!tableBody) return;
         tableBody.innerHTML = "";
 
-        let filtered = ALL_81_DATA;
+        let dataset = currentMode === "81" ? PRIMARY_81_DATA : EXTENDED_729_DATA;
 
         if (filterPalace !== "all") {
             const pNum = parseInt(filterPalace, 10);
-            filtered = filtered.filter(d => d.palaceNum === pNum);
+            dataset = dataset.filter(d => d.palaceNum === pNum);
         }
 
         if (searchText.trim() !== "") {
             const q = searchText.trim().toLowerCase();
-            filtered = filtered.filter(d => 
+            dataset = dataset.filter(d => 
                 d.num.toString().includes(q) || 
+                d.expr.toLowerCase().includes(q) ||
                 d.hexName.toLowerCase().includes(q) || 
                 d.palaceName.toLowerCase().includes(q) || 
                 d.branchName.toLowerCase().includes(q)
@@ -385,15 +458,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (tableTitle) {
+            const modeNameStr = currentMode === "81" ? "81 宫主项表" : "729 矩全阵大表";
             const pObj = LUOSHU_PALACES_EXACT.find(p => p.num === parseInt(filterPalace, 10));
             const pTitleStr = pObj ? pObj.name : "全九宫";
-            tableTitle.innerText = `📋 ${pTitleStr} ${filtered.length} 条纪气数明细 (点击行三向联动)`;
+            tableTitle.innerText = `📋 ${pTitleStr} · ${modeNameStr} (${dataset.length} 条数据，点击行三向联动)`;
         }
 
-        filtered.forEach(d => {
+        updatePalaceBanner(filterPalace);
+
+        dataset.slice(0, 300).forEach(d => { // 渲染前 300 条保证极致流畅
             const tr = document.createElement("tr");
             tr.className = "interactive-row";
-            tr.dataset.num = d.num;
+            tr.dataset.num = d.rem81 || d.num;
             tr.innerHTML = `
                 <td style="font-weight:700; color:#ffe066;">${d.palaceName.split(' ')[0]}</td>
                 <td style="font-family:var(--font-times); font-weight:800;">${d.num}</td>
@@ -407,21 +483,28 @@ document.addEventListener("DOMContentLoaded", () => {
             tr.addEventListener("click", () => {
                 document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
                 tr.classList.add("active-row");
+
+                // 点击瞬间白光冲击动画
+                tr.classList.add("row-click-flash");
+                setTimeout(() => tr.classList.remove("row-click-flash"), 400);
+
                 highlightRowAnd3D(d);
             });
 
             tableBody.appendChild(tr);
         });
 
-        if (filtered.length > 0) {
-            highlightRowAnd3D(filtered[0]);
+        if (dataset.length > 0) {
+            highlightRowAnd3D(dataset[0]);
         }
     }
 
     function highlightRowAnd3D(d) {
-        // 高亮中间太乙 81 宫
+        const matrixNum = d.rem81 || d.num;
+
+        // 高亮中间太乙 81 宫 (绝不重叠放大)
         document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === d.num);
+            cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === matrixNum);
         });
 
         // 驱动 3D 节点
@@ -430,7 +513,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (detailCard) {
             detailCard.innerHTML = `
                 <div style="font-size: 14px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
-                    📊 【${d.palaceName}】 · 数 ${d.num} 纪气数三向联动解析
+                    📊 【${d.palaceName}】 · 数 ${d.num} 三向联动解析
                 </div>
                 <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
                     • 对应易卦: <strong>${d.hexName}</strong> | 纪气算式: ${d.expr}<br>
@@ -447,11 +530,44 @@ document.addEventListener("DOMContentLoaded", () => {
         if (badgeDesc) badgeDesc.innerText = `${d.hexName} · ${d.expr}，太乙 81 阵图与 3D 浑天坐标系同步闪耀`;
     }
 
+    // 绑定 81 宫与 729 矩模式切换按钮
+    const btnMode81 = document.getElementById("btn-mode-81");
+    const btnMode729 = document.getElementById("btn-mode-729");
+
+    if (btnMode81) {
+        btnMode81.addEventListener("click", () => {
+            currentMode = "81";
+            btnMode81.classList.add("active");
+            if (btnMode729) btnMode729.classList.remove("active");
+
+            const activePalaceBtn = document.querySelector(".palace-tab-btn.active");
+            const palaceKey = activePalaceBtn ? activePalaceBtn.dataset.palace : "all";
+            const searchVal = document.getElementById("jgt-search-input") ? document.getElementById("jgt-search-input").value : "";
+            renderTable(palaceKey, searchVal);
+        });
+    }
+
+    if (btnMode729) {
+        btnMode729.addEventListener("click", () => {
+            currentMode = "729";
+            btnMode729.classList.add("active");
+            if (btnMode81) btnMode81.classList.remove("active");
+
+            const activePalaceBtn = document.querySelector(".palace-tab-btn.active");
+            const palaceKey = activePalaceBtn ? activePalaceBtn.dataset.palace : "all";
+            const searchVal = document.getElementById("jgt-search-input") ? document.getElementById("jgt-search-input").value : "";
+            renderTable(palaceKey, searchVal);
+        });
+    }
+
     // 绑定 9 大宫切选按钮
     document.querySelectorAll(".palace-tab-btn").forEach(btn => {
         btn.addEventListener("click", function() {
             document.querySelectorAll(".palace-tab-btn").forEach(b => b.classList.remove("active"));
             this.classList.add("active");
+
+            this.classList.add("row-click-flash");
+            setTimeout(() => this.classList.remove("row-click-flash"), 400);
 
             const palaceKey = this.dataset.palace;
             const searchVal = document.getElementById("jgt-search-input") ? document.getElementById("jgt-search-input").value : "";
@@ -529,18 +645,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     renderTable("all", "");
-});
-
-/* 全局屏幕点击金彩粒子波纹火花特效 (Click Visual Spark Listener) */
-document.addEventListener("click", (e) => {
-    const spark = document.createElement("div");
-    spark.className = "click-spark-efx";
-    spark.style.left = `${e.clientX}px`;
-    spark.style.top = `${e.clientY}px`;
-    document.body.appendChild(spark);
-    setTimeout(() => {
-        if (spark.parentNode) {
-            spark.parentNode.removeChild(spark);
-        }
-    }, 450);
 });
