@@ -514,6 +514,85 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    const law2ResultBox = document.getElementById("law2-result-box");
+    const law2TableBody = document.getElementById("law2-table-body");
+
+    function updateLaw2() {
+        if (law2ResultBox) {
+            law2ResultBox.innerHTML = `
+                <div style="font-size: 13.5px; font-weight: 700; color: #ffe066; margin-bottom: 4px;">
+                    ✨ 7×k 芒星跳跃三元周流法则：
+                </div>
+                <div style="font-size: 12.5px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
+                    • 芒星跳跃算式: <strong>7 × k (k=1~12 步)</strong><br>
+                    • 地支跳跃序列: 午 ➔ 丑 ➔ 申 ➔ 卯 ➔ 戌 ➔ 巳 ➔ 子 ➔ 未 ➔ 寅 ➔ 酉 ➔ 辰 ➔ 亥<br>
+                    • 轨道循环法则: <span style="color:#ff5252;">赤(午)</span> ➔ <span style="color:#40c057;">黄(丑)</span> ➔ <span style="color:#4dabf7;">白(申)</span> ➔ <span style="color:#ff5252;">赤(卯)</span> ➔ ... 依次无缝贯通天、地、万物三元！
+                </div>
+                <div style="margin-top: 6px; font-size: 11.5px; color: #ffffff; background: rgba(255,224,102,0.18); padding: 5px 8px; border-radius: 4px;">
+                    🌟 核心结论：数 7 遍历 12 地支无一重复，交织为 12 角神圣芒星，证明白道天体周流秩序！
+                </div>
+            `;
+        }
+
+        if (law2TableBody) {
+            let html = "";
+            for (let k = 1; k <= 12; k++) {
+                const val = 7 * k;
+                const r12 = val % 12 === 0 ? 12 : val % 12;
+                const r81 = val % 81 === 0 ? 81 : val % 81;
+                const branch = EARTHLY_BRANCHES[r12 - 1];
+                const palaceDesc = getPalacePosDesc(r81);
+
+                html += `
+                    <tr class="interactive-row" data-k="${k}" data-val="${val}" data-rem81="${r81}" data-branch="${r12 - 1}">
+                        <td class="interactive-cell">${k}</td>
+                        <td class="interactive-cell">7×${k}</td>
+                        <td class="interactive-cell"><strong style="color:#ffe066;">${val}</strong></td>
+                        <td class="interactive-cell">${r12}</td>
+                        <td class="interactive-cell" style="color:${branch.color}; font-weight:700;">${branch.name}</td>
+                        <td class="interactive-cell">${branch.system.split('(')[0]}</td>
+                        <td class="interactive-cell">${palaceDesc}</td>
+                    </tr>
+                `;
+            }
+            law2TableBody.innerHTML = html;
+
+            // 绑定表格交互 (受好评的弹簧震荡晃动与 Toggle Off)
+            law2TableBody.querySelectorAll(".interactive-row").forEach(tr => {
+                tr.addEventListener("click", function() {
+                    const isAlreadyActive = this.classList.contains("active-row");
+                    law2TableBody.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+
+                    if (isAlreadyActive) {
+                        document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+                        engine.renderStar7Line();
+                        return;
+                    }
+
+                    this.classList.add("active-row");
+                    this.classList.add("row-click-flash");
+                    setTimeout(() => this.classList.remove("row-click-flash"), 450);
+
+                    const rem81 = parseInt(this.dataset.rem81, 10);
+                    const bIdx = parseInt(this.dataset.branch, 10);
+                    const branch = EARTHLY_BRANCHES[bIdx];
+                    const k = this.dataset.k;
+                    const val = this.dataset.val;
+                    const palaceDesc = getPalacePosDesc(rem81);
+
+                    document.querySelectorAll(".taiyi-81-cell").forEach(c => {
+                        c.classList.toggle("active-pos", parseInt(c.dataset.pos, 10) === rem81);
+                    });
+
+                    engine.highlightBranchPos(bIdx, 0xffe066);
+
+                    if (lawBadgeTitle) lawBadgeTitle.innerText = `芒星第 ${k} 步: 7×${k} = ${val} ➔ ${branch.name}位`;
+                    if (lawBadgeDesc) lawBadgeDesc.innerText = `气数 ${val} 降维落于 ${palaceDesc}，3D 定位至【${branch.name}】(${branch.system})`;
+                });
+            });
+        }
+    }
+
     const btnDemoStar7 = document.getElementById("btn-demo-star7");
     let isStar7Active = false;
 
@@ -521,20 +600,26 @@ document.addEventListener("DOMContentLoaded", () => {
         btnDemoStar7.addEventListener("click", () => {
             isStar7Active = !isStar7Active;
             if (isStar7Active) {
-                btnDemoStar7.classList.add("active");
+                btnDemoStar7.innerText = "🛑 停止芒星脉冲 (再点取消)";
+                btnDemoStar7.style.background = "linear-gradient(135deg, #ff5252 0%, #c92a2a 100%)";
+                btnDemoStar7.style.color = "#ffffff";
                 engine.renderStar7Line();
 
                 document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.add("active-pos"));
                 if (lawBadgeTitle) lawBadgeTitle.innerText = "✨ 数 7 · 12 芒星数据流光脉冲";
                 if (lawBadgeDesc) lawBadgeDesc.innerText = "按 7 × k 顺次环绕 12 地支，数据粒子在芒星阵上光速穿梭";
             } else {
-                btnDemoStar7.classList.remove("active");
+                btnDemoStar7.innerText = "✨ 渲染 12 芒星数据流光脉冲 (再点取消)";
+                btnDemoStar7.style.background = "linear-gradient(135deg, #d4af37 0%, #aa7c11 100%)";
+                btnDemoStar7.style.color = "#0a0e17";
                 engine.clearLaws3DGroup();
                 document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
                 updateLaw1(powerSlider ? parseInt(powerSlider.value, 10) : 3);
             }
         });
     }
+
+    updateLaw2();
 
     const splitSlider = document.getElementById("split-slider");
     const splitValLabel = document.getElementById("split-val-label");

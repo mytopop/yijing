@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v36">
+    <link rel="stylesheet" href="index.css?v=20260804_v37">
 </head>
 <body>
     <div class="app-container">
@@ -138,12 +138,40 @@
                     </div>
                 </div>
 
-                <!-- 定律 2：数 7 北斗七星芒星律 -->
+                <!-- 定律 2：数 7 北斗七星芒星律 (白道七星芒行律) -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title"><span>✨</span> 定律2 · 数 7 · 北斗七星芒星律</div>
-                    <button id="btn-demo-star7" class="action-btn" style="margin-top: 4px; width: 100%;">
-                        ✨ 渲染 12 芒星数据流光脉冲轨迹
+                    <div class="card-title"><span>✨</span> 定律2 · 数 7 · 白道七星芒行律 (12 芒星跳跃)</div>
+                    <div class="law-desc-text" style="margin-top: 2px;">
+                        原书 P334 论述：“数 7 乃白道七星芒行之枢纽，7×k 依次穿梭于赤/黄/白三元，无一重复构造 12 角芒星神圣闭环”。
+                    </div>
+                    <button id="btn-demo-star7" class="action-btn-gold" style="margin-top: 6px; width: 100%;">
+                        ✨ 渲染 12 芒星数据流光脉冲 (再点取消)
                     </button>
+
+                    <!-- 数理解析及递算明细盒 -->
+                    <div id="law2-result-box" class="hexagram-detail-box" style="margin-top: 6px;">
+                        <!-- JS 动态渲染 -->
+                    </div>
+
+                    <!-- 12 芒星跳跃明细表格 -->
+                    <div class="sequence-table-container" style="margin-top: 6px; max-height: 220px;">
+                        <table class="seq-table">
+                            <thead>
+                                <tr>
+                                    <th>步次</th>
+                                    <th>算式</th>
+                                    <th>乘积</th>
+                                    <th>模12</th>
+                                    <th>地支</th>
+                                    <th>三元轨道</th>
+                                    <th>太乙81降维</th>
+                                </tr>
+                            </thead>
+                            <tbody id="law2-table-body">
+                                <!-- JS 动态渲染 -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- 定律 3：周天 360° 切割归九律 (滑块 + 角度按键) -->
@@ -195,6 +223,6 @@
     </div>
 
     <!-- 天象五大定律引擎 (带版本防缓存) -->
-    <script src="laws.js?v=20260804_v36"></script>
+    <script src="laws.js?v=20260804_v37"></script>
 </body>
 </html>
