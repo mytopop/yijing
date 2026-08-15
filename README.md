@@ -128,12 +128,13 @@ python -m http.server 8080
 
 ---
 
-## 📂 项目结构
+## 📂 项目清晰分层结构
+
+为了便于阅读与开发，项目已完成模块化分层整理，**代码与文献资料一目了然**：
 
 ```
 yijing/
-├── assets/               # 📸 系统实景运行截图 (preview.png)
-├── index.html            # 🏠 首页总览
+├── index.html            # 🏠 首页总览与天象拓扑总枢
 ├── home.js               # 首页交互逻辑
 ├── pipeline.html         # ⚡ 任意数据 12 步推演流水线
 ├── pipeline.js           # 流水线算法引擎
@@ -156,6 +157,19 @@ yijing/
 ├── jiugong_tables.html   # 📊 九宫纪气 9x9 大表全解馆
 ├── jiugong_tables.js     # 坎一至离九 9x9 矩阵引擎
 ├── index.css             # 全局统一精美 CSS 样式与动画系统
+│
+├── assets/               # 📸 系统实景运行截图与资产
+│   └── preview.png       # 首页全景高清预览图
+│
+├── tools/                # 🛠️ 离线验算脚本与算法工具
+│   └── 易经数理验算器.py # Python 离线数理批量验算脚本
+│
+├── docs/                 # 📚 易经数理文献资料与原著归档 (一目了然)
+│   ├── papers/           # 英文文献、白皮书与学术论文
+│   ├── articles/         # 专题研究文集与公众号研讨汇编
+│   ├── book_source/      # 梁致堂《易经数理秘笈》原书扫描及 OCR 转写全文
+│   └── book_charts/      # 原书插图、三大坐标系与数理拓扑底图
+│
 ├── .gitignore            # Git 忽略配置
 ├── LICENSE               # MIT 开源许可证
 └── README.md             # 本项目开源说明文档

@@ -19,5 +19,8 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Temporary scratch scripts
+scratch/
+
 # Logs
 *.log
