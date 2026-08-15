@@ -2,11 +2,11 @@
 ### *Yijing Mathematics & Taiyi Celestial Topology Open Source Project*
 
 <p align="center">
-  <img src="01_三大坐标系底图.png" alt="三大天体坐标系底图" width="750" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);" />
+  <img src="assets/01_three_coordinates.png" alt="三大天体坐标系全景" width="850" style="border-radius: 8px; box-shadow: 0 4px 25px rgba(0,0,0,0.6);" />
 </p>
 
 <p align="center">
-  <strong>基于梁致堂先生原著《易经数理秘笈》深度复原 · 纯粹数理逻辑 · 3D浑天天象拓扑 · 太乙八十一宫三向联动矩阵</strong>
+  <strong>基于梁致堂先生原著《易经数理秘笈》深度复原 · 纯粹数理逻辑 · 3D 浑天天象拓扑 · 太乙八十一宫三向联动矩阵</strong>
 </p>
 
 <p align="center">
@@ -16,6 +16,55 @@
   <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen.svg" alt="PRs Welcome" />
   <img src="https://img.shields.io/badge/Math-Modular_81_12_9-gold.svg" alt="Math" />
 </p>
+
+---
+
+## 📸 运行效果截图与系统实景一览
+
+为方便大家直观了解软件的真实运行效果，以下精选系统核心模块的实机运行截图：
+
+### 1. 任意数据 12 步拆解推演流水线 (`pipeline.html`)
+<p align="center">
+  <img src="assets/pipeline_screenshot.png" alt="任意数据12步拆解推演流水线实机截图" width="550" style="border-radius: 8px; border: 1px solid rgba(255,224,102,0.3); box-shadow: 0 8px 30px rgba(0,0,0,0.7);" />
+  <br>
+  <em>图 1：输入任意自然数（如 70000），系统自动执行 5 步降维流水线与 N×k (1~12) 周天跳跃映射明细大表</em>
+</p>
+
+---
+
+### 2. 64卦拓扑与爻辞六爻解构馆 (`hexagrams.html`)
+<p align="center">
+  <img src="assets/media_1785853132088.png" alt="64卦拓扑与爻辞六爻解构馆截图" width="850" style="border-radius: 8px; border: 1px solid rgba(77,171,247,0.3); box-shadow: 0 8px 30px rgba(0,0,0,0.7);" />
+  <br>
+  <em>图 2：64 卦全量交互，初爻至上爻六爻 5 栏直列对齐，单爻点击联动卦爻辞与 3D 浑天仪定点高亮</em>
+</p>
+
+---
+
+### 3. 原书九宫纪气 9x9 大表全解馆 (`jiugong_tables.html`)
+<p align="center">
+  <img src="assets/media_1785852432482.png" alt="九宫纪气大表实机截图" width="850" style="border-radius: 8px; border: 1px solid rgba(255,82,82,0.3); box-shadow: 0 8px 30px rgba(0,0,0,0.7);" />
+  <br>
+  <em>图 3：还原原书 P246-252 坎一宫至离九宫 9 张独立 9x9 气数大表，支持单格精度点击与整行/单格算式推导</em>
+</p>
+
+---
+
+### 4. 太乙九宫八十一宫阵图权威位号角标 (`(宫_位)`)
+<p align="center">
+  <img src="assets/media_1785847844721.png" alt="太乙81宫阵图位号角标排布" width="480" style="border-radius: 8px; border: 1px solid rgba(212,175,55,0.4); box-shadow: 0 8px 30px rgba(0,0,0,0.7);" />
+  <br>
+  <em>图 4：全站 11 个页面绝对统一的太乙 81 宫阵图，每格精确标注数值与汉字位号角标，如 31 (四₄)、16 (七₂)</em>
+</p>
+
+---
+
+### 5. 天象数理定律与天体几何轨迹
+| 3D 周天 1~12 跳跃闭环轨迹 | 数 7 白道北斗十二芒星律 |
+| :---: | :---: |
+| <img src="assets/02_trajectory_1_12.png" width="400" /> | <img src="assets/03_seven_star_12_arms.png" width="400" /> |
+| **用矩 81 常数与矩阵推演** | **周天 360° 切割终极归九律** |
+| <img src="assets/04_ju81_constant.png" width="400" /> | <img src="assets/05_digital_root_9.png" width="400" /> |
 
 ---
 
@@ -161,6 +210,7 @@ server {
 
 ```
 yijing/
+├── assets/               # 📸 核心界面运行截图与天体拓扑图集
 ├── index.html            # 🏠 首页总览
 ├── home.js               # 首页交互逻辑
 ├── pipeline.html         # ⚡ 任意数据 12 步推演流水线
@@ -186,6 +236,7 @@ yijing/
 ├── index.css             # 全局统一精美 CSS 样式与动画系统
 ├── 易经数理验算器.py      # Python 离线数理批量验算脚本
 ├── .gitignore            # Git 忽略配置
+├── LICENSE               # MIT 开源许可证
 └── README.md             # 本项目开源说明文档
 ```
 
