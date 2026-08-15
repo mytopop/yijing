@@ -1,0 +1,23 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# Editor / IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node / NPM
+node_modules/
+npm-debug.log*
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
