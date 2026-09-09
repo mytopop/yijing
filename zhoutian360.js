@@ -46,15 +46,69 @@ const TAIYI_81_SUB_LABELS = {
 TAIYI_81_SUB_LABELS[65] = "(二₈)";
 
 const ZHOUTIAN_360_PALACES_INFO = {
-    1: { name: "一宫表 (坎一水)", degStep: 90,  baseSeq: [10, 100, 190, 280, 370, 460, 550, 640, 730], desc: "原书 P315 【一宫表】：自 2 行 10 纪起，每级递进 90九₁ (90°)，纪得周天一象限 (90°)。" },
-    2: { name: "二宫表 (坤二土)", degStep: 180, baseSeq: [40, 220, 400, 580, 760, 940, 1120, 1300, 1480], desc: "原书 P315 【二宫表】：自 3 行 40 纪起，每级递进 180九₂ (180°)，纪得阴阳两判天地定位大圆直径。" },
-    3: { name: "三宫表 (震三木)", degStep: 270, baseSeq: [90, 360, 630, 900, 1170, 1440, 1710, 1980, 2250], desc: "原书 P315 【三宫表】：自 4 行 90 纪起，每级递进 270九₃ (270°)，纪得 27 颐卦全养。" },
-    4: { name: "四宫表 (巽四木)", degStep: 360, baseSeq: [160, 520, 880, 1240, 1600, 1960, 2320, 2680, 3040], desc: "原书 P315 【四宫表】：自 5 行 160 纪起，每级递进 360九₄ (周天 360°)，完全包揽周天大圆度数！" },
-    5: { name: "五宫表 (中五土)", degStep: 450, baseSeq: [250, 700, 1150, 1600, 2050, 2500, 2950, 3400, 3850], desc: "原书 P315 【五宫表】：自 6 行 250 纪起，每级递进 450九₅ (450°)，黄赤相交皇极立极。" },
-    6: { name: "六宫表 (乾六金)", degStep: 540, baseSeq: [360, 900, 1440, 1980, 2520, 3060, 3600, 4140, 4680], desc: "原书 P315 【六宫表】：自 7 行 360 纪起，每级递进 540九₆ (540°)，归妹成数刚健生生。" },
-    7: { name: "七宫表 (兑七金)", degStep: 630, baseSeq: [490, 1120, 1750, 2380, 3010, 3640, 4270, 4900, 5530], desc: "原书 P315 【七宫表】：自 8 行 490 纪起，每级递进 630九₇ (630°)，既济亨小游行九畴。" },
-    8: { name: "八宫表 (艮八土)", degStep: 720, baseSeq: [640, 1360, 2080, 2800, 3520, 4240, 4960, 5680, 6400], desc: "原书 P315 【八宫表】：自 9 行 640 纪起，每级递进 720九₈ (720°)，双周天大归结。" },
-    9: { name: "九宫表 (离九火)", degStep: 810, baseSeq: [810, 1620, 2430, 3240, 4050, 4860, 5670, 6480, 7290], desc: "原书 P315 【九宫表】：九宫方数 81 矩总枢，每级递进 810九₉/900°，归宗太虚象数大源。" }
+    1: { 
+        name: "赤标一宫 (坎一水)", 
+        sys: "赤道(天)",
+        color: "#ff5252",
+        baseSeq: [1, 10, 19, 28, 37, 46, 55, 64, 73], 
+        desc: "原书 P241 【附表·赤标一宫】：1 行纵横进数为 9，2 行纵横进数为 90，3 行为 171... 自第 2 行 10 履卦之数起纵横衍进，纪得周天 90°(一象限)，主坎水阳气初萌。" 
+    },
+    4: { 
+        name: "赤标四宫 (巽四木)", 
+        sys: "赤道(天)",
+        color: "#ff5252",
+        baseSeq: [4, 13, 22, 31, 40, 49, 58, 67, 76], 
+        desc: "原书 P242 【附表·赤标四宫】：1 行纵横进数为 36，2 行为 117，3 行为 198... 尽为 81 之矩数，总揽周天太虚 360° 之气数，主巽风申布齐洁。" 
+    },
+    7: { 
+        name: "赤标七宫 (兑七金)", 
+        sys: "赤道(天)",
+        color: "#ff5252",
+        baseSeq: [7, 16, 25, 34, 43, 52, 61, 70, 79], 
+        desc: "原书 P242 【附表·赤标七宫】：1 行纵横进数为 63，2 行为 144，3 行为 225... 是既济(63九₇)之卦，应周天 630°，使人物得天时之节而亨通。" 
+    },
+    2: { 
+        name: "黄标二宫 (坤二土)", 
+        sys: "黄道(地)",
+        color: "#40c057",
+        baseSeq: [2, 11, 20, 29, 38, 47, 56, 65, 74], 
+        desc: "原书 P243 【附表·黄标二宫】：1 行进数为 18，2 行为 99，3 行为 180... 以 180° 逐位衍进，形成天周大圆之直径，以见阴阳两判天地定位之局。" 
+    },
+    5: { 
+        name: "黄标五宫 (中五土)", 
+        sys: "黄道(地)",
+        color: "#40c057",
+        baseSeq: [5, 14, 23, 32, 41, 50, 59, 68, 77], 
+        desc: "原书 P243 【附表·黄标五宫】：1 行进数为 45，2 行为 126，3 行为 207... 是黄赤相交之萃卦 45九₅，以 450° 逐位衍进，分初中终三气，中五之极临制四方。" 
+    },
+    8: { 
+        name: "黄标八宫 (艮八土)", 
+        sys: "黄道(地)",
+        color: "#40c057",
+        baseSeq: [8, 17, 26, 35, 44, 53, 62, 71, 80], 
+        desc: "原书 P244 【附表·黄标八宫】：1 行进数为 72，2 行为 153，3 行为 234... 以 720° 逐位衍进，水纪周天 2 倍之数 (720 = 360 × 2)，天地合纪，阴阳互涵。" 
+    },
+    3: { 
+        name: "白标三宫 (震三木)", 
+        sys: "白道(人)",
+        color: "#4dabf7",
+        baseSeq: [3, 12, 21, 30, 39, 48, 57, 66, 75], 
+        desc: "原书 P244 【附表·白标三宫】：1 行进数为 27，2 行为 108，3 行为 189... 以 270° 逐位衍进，以见 27九₃ 之颐卦，全得天度以养也，万物生发。" 
+    },
+    6: { 
+        name: "白标六宫 (乾六金)", 
+        sys: "白道(人)",
+        color: "#4dabf7",
+        baseSeq: [6, 15, 24, 33, 42, 51, 60, 69, 78], 
+        desc: "原书 P245 【附表·白标六宫】：1 行进数为 54，2 行为 135，3 行为 216... 是归妹(54九₆)之卦，以 540° 逐位衍进，应周天 6 个 90°，天地之大义，人之终始。" 
+    },
+    9: { 
+        name: "白标九宫 (离九火)", 
+        sys: "白道(人)",
+        color: "#4dabf7",
+        baseSeq: [9, 18, 27, 36, 45, 54, 63, 72, 81], 
+        desc: "原书 P245 【附表·白标九宫】：1 行进数为 81，2 行为 162，3 行为 243... 9 宫为总枢，方数 81 矩总摄，以 810° 逐位衍进，天地成规，万数归宗。" 
+    }
 };
 
 function getBranch3DPos(branchIdx, radius = 6.0) {
@@ -360,7 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initLuoshuTaiyi9x9Matrix();
 
-    // 渲染原书《九宫纪周天(360°)气数一览大表》 (支持行/单格弹性晃动与高亮动画 + Toggle Off)
+    // 渲染原书《九宫纪周天(360°)气数一览大表》 (真实还原原书 P241-245 9 大表与进位数)
     function renderZhoutian360MasterTable(palaceKey = "1") {
         const tableHead = document.getElementById("zt-table-head");
         const tableBody = document.getElementById("zt-table-body");
@@ -374,65 +428,81 @@ document.addEventListener("DOMContentLoaded", () => {
         const pInfo = ZHOUTIAN_360_PALACES_INFO[pNum] || ZHOUTIAN_360_PALACES_INFO[1];
 
         if (tableTitle) {
-            tableTitle.innerText = `📜 原书【${pInfo.name}】9x9 周天 360° 气数大表 (步长 +${pInfo.degStep}°)`;
+            tableTitle.innerText = `📜 原书【${pInfo.name}】周天 360° 气数矩阵大表 (${pInfo.sys})`;
         }
 
         if (ztBanner) {
             ztBanner.innerHTML = `
-                <div style="font-size:13px; font-weight:800; color:#ffe066;">
-                    📜 原著【${pInfo.name}】周天 360° 气数解构
+                <div style="font-size:13px; font-weight:800; color:${pInfo.color};">
+                    📜 原著【${pInfo.name}】周天 360° 气数解构 · ${pInfo.sys}
                 </div>
                 <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px; line-height:1.4;">
-                    ${pInfo.desc} (支持点击单格与全行高亮，弹性晃动与 3D/81 宫三向联动)
+                    ${pInfo.desc}
                 </div>
             `;
         }
 
-        // 表头
+        const seq = pInfo.baseSeq;
+
+        // 构建原书表头：0 / 基数, s1, s2, ..., s9, 进位数
         const trHead = document.createElement("tr");
-        trHead.innerHTML = `
-            <th style="color:#ffe066;">基数 N</th>
-            <th>1级</th>
-            <th>2级</th>
-            <th>3级</th>
-            <th>4级</th>
-            <th>5级</th>
-            <th>6级</th>
-            <th>7级</th>
-            <th>8级</th>
-            <th>9级</th>
-            <th style="color:#ff5252;">周天度数 (N×9)</th>
-            <th>模360°</th>
-            <th>地支</th>
-        `;
+        let headHtml = `<th style="color:#ffe066; font-size:12px;">0 / 基数</th>`;
+        seq.forEach(colVal => {
+            const sub = TAIYI_81_SUB_LABELS[colVal] || "";
+            headHtml += `
+                <th>
+                    <div class="th-cell-base">${colVal}</div>
+                    <div class="th-cell-sub">${sub}</div>
+                </th>
+            `;
+        });
+        headHtml += `<th style="color:#ff5252; font-size:12px;">进位数</th>`;
+        trHead.innerHTML = headHtml;
         tableHead.appendChild(trHead);
 
-        pInfo.baseSeq.forEach((baseNum) => {
+        // 构建 9 行数据：行首为 s_i，单格为 s_i × s_j，右侧为进位数 s_i × 9
+        seq.forEach(rowVal => {
             const tr = document.createElement("tr");
             tr.className = "interactive-row";
-            tr.dataset.num = baseNum;
+            tr.dataset.num = rowVal;
 
-            let cellsHtml = `<td class="interactive-cell base-num-cell" data-val="${baseNum}" style="font-weight:800; color:#ffe066; font-family:var(--font-times);">${baseNum}</td>`;
+            const rowSub = TAIYI_81_SUB_LABELS[rowVal] || "";
+            let cellsHtml = `
+                <td class="interactive-cell base-num-cell" data-row="${rowVal}" data-col="${rowVal}" data-val="${rowVal}" style="font-weight:800; color:#ffe066; background:rgba(212,175,55,0.12);">
+                    <div class="cell-val">${rowVal}</div>
+                    <div class="cell-tag" style="color:#ffe066;">${rowSub}</div>
+                </td>
+            `;
 
-            for (let k = 1; k <= 9; k++) {
-                const prod = baseNum + (k - 1) * pInfo.degStep;
-                cellsHtml += `<td class="interactive-cell prod-cell" data-base="${baseNum}" data-k="${k}" data-val="${prod}" style="font-family:var(--font-times);">${prod}</td>`;
-            }
+            // 9 列交叉乘积：rowVal × colVal
+            seq.forEach(colVal => {
+                const prod = rowVal * colVal;
+                const rem81 = prod % 81 === 0 ? 81 : prod % 81;
+                const cellTag = TAIYI_81_SUB_LABELS[rem81] || "";
+                cellsHtml += `
+                    <td class="interactive-cell prod-cell" data-row="${rowVal}" data-col="${colVal}" data-val="${prod}">
+                        <div class="cell-val">${prod}</div>
+                        <div class="cell-tag">${cellTag}</div>
+                    </td>
+                `;
+            });
 
-            const totalDeg = baseNum + 8 * pInfo.degStep;
-            const degMod = totalDeg % 360;
-            const rem12 = totalDeg % 12 === 0 ? 12 : totalDeg % 12;
-            const branch = EARTHLY_BRANCHES[rem12 - 1];
-
-            cellsHtml += `<td class="interactive-cell carry-cell" data-val="${totalDeg}" style="font-weight:800; color:#ff5252; font-family:var(--font-times);">${totalDeg}°</td>`;
-            cellsHtml += `<td style="font-family:var(--font-times); color:#ffe066;">${degMod}°</td>`;
-            cellsHtml += `<td style="color:${branch.color}; font-weight:800;">${branch.name}位</td>`;
+            // 行末进位数：rowVal × 9
+            const rowCarry = rowVal * 9;
+            const carryRem81 = rowCarry % 81 === 0 ? 81 : rowCarry % 81;
+            const carryTag = TAIYI_81_SUB_LABELS[carryRem81] || "";
+            cellsHtml += `
+                <td class="interactive-cell carry-cell" data-row="${rowVal}" data-col="9" data-val="${rowCarry}" style="font-weight:800; color:#ff5252; background:rgba(255,82,82,0.12);">
+                    <div class="cell-val">${rowCarry}</div>
+                    <div class="cell-tag" style="color:#ff5252;">${carryTag}</div>
+                </td>
+            `;
 
             tr.innerHTML = cellsHtml;
 
-            // 行点击 (使用受好评的 rowBounceShake 震荡晃动)
+            // 行点击事件
             tr.addEventListener("click", (e) => {
-                if (e.target.classList.contains("interactive-cell")) return;
+                if (e.target.closest(".interactive-cell")) return;
 
                 const isAlreadyActive = tr.classList.contains("active-row");
                 document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
@@ -447,10 +517,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 tr.classList.add("row-click-flash");
                 setTimeout(() => tr.classList.remove("row-click-flash"), 450);
 
-                highlightZtCell(baseNum, baseNum, 1, pInfo);
+                highlightZtCell(rowVal * seq[0], rowVal, seq[0], pInfo);
             });
 
-            // 单格点击 (使用受好评的弹性晃动震荡与高亮)
+            // 单格点击事件
             tr.querySelectorAll(".interactive-cell").forEach(cellTd => {
                 cellTd.addEventListener("click", (e) => {
                     e.stopPropagation();
@@ -470,18 +540,63 @@ document.addEventListener("DOMContentLoaded", () => {
                     setTimeout(() => tr.classList.remove("row-click-flash"), 450);
 
                     const val = parseInt(cellTd.dataset.val, 10);
-                    const bNum = parseInt(cellTd.dataset.base || baseNum, 10);
-                    const kStep = parseInt(cellTd.dataset.k || 1, 10);
+                    const rVal = parseInt(cellTd.dataset.row, 10);
+                    const cVal = parseInt(cellTd.dataset.col, 10);
 
-                    highlightZtCell(val, bNum, kStep, pInfo);
+                    highlightZtCell(val, rVal, cVal, pInfo);
                 });
             });
 
             tableBody.appendChild(tr);
         });
+
+        // 底端进位数汇总行
+        const trBottomCarry = document.createElement("tr");
+        trBottomCarry.className = "carry-bottom-row";
+        let bottomHtml = `<td style="font-weight:800; color:#ff5252; background:rgba(255,82,82,0.18);">进位数</td>`;
+        seq.forEach(colVal => {
+            const colCarry = colVal * 9;
+            const carryRem81 = colCarry % 81 === 0 ? 81 : colCarry % 81;
+            const carryTag = TAIYI_81_SUB_LABELS[carryRem81] || "";
+            bottomHtml += `
+                <td class="interactive-cell carry-cell" data-row="9" data-col="${colVal}" data-val="${colCarry}" style="font-weight:800; color:#ff5252; background:rgba(255,82,82,0.12);">
+                    <div class="cell-val">${colCarry}</div>
+                    <div class="cell-tag" style="color:#ff5252;">${carryTag}</div>
+                </td>
+            `;
+        });
+        const cornerCarry = seq[8] * 9;
+        const cornerTag = TAIYI_81_SUB_LABELS[cornerCarry % 81 === 0 ? 81 : cornerCarry % 81] || "";
+        bottomHtml += `
+            <td class="interactive-cell carry-cell" data-row="9" data-col="9" data-val="${cornerCarry}" style="font-weight:900; color:#ffe066; background:rgba(212,175,55,0.25);">
+                <div class="cell-val">${cornerCarry}</div>
+                <div class="cell-tag" style="color:#ffe066;">${cornerTag}</div>
+            </td>
+        `;
+        trBottomCarry.innerHTML = bottomHtml;
+
+        trBottomCarry.querySelectorAll(".interactive-cell").forEach(cellTd => {
+            cellTd.addEventListener("click", (e) => {
+                e.stopPropagation();
+                document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+                document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+                cellTd.classList.add("active-cell");
+
+                const val = parseInt(cellTd.dataset.val, 10);
+                const rVal = parseInt(cellTd.dataset.row, 10);
+                const cVal = parseInt(cellTd.dataset.col, 10);
+                highlightZtCell(val, rVal, cVal, pInfo);
+            });
+        });
+
+        tableBody.appendChild(trBottomCarry);
+
+        if (seq.length > 0) {
+            highlightZtCell(seq[0] * seq[0], seq[0], seq[0], pInfo);
+        }
     }
 
-    function highlightZtCell(val, baseNum, kStep, pInfo) {
+    function highlightZtCell(val, rowVal, colVal, pInfo) {
         const degMod = val % 360;
         const rem81 = val % 81 === 0 ? 81 : val % 81;
         const rem12 = val % 12 === 0 ? 12 : val % 12;
@@ -494,8 +609,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         engine.highlightSingleBranch(rem12 - 1);
 
-        if (badgeTitle) badgeTitle.innerText = `周天单格: ${baseNum} + (${kStep}-1)×${pInfo.degStep}° = ${val}°`;
-        if (badgeDesc) badgeDesc.innerText = `模 360° 余 ${degMod}° | 降维太乙 81 阵图: 第 ${rem81} 宫 ${subTag} | 定位地支: 【${branch.name}位】`;
+        const formulaText = rowVal === colVal && rowVal === val ? `${val}` : `${rowVal} × ${colVal} = ${val}`;
+
+        if (badgeTitle) badgeTitle.innerText = `周天算式: ${formulaText} ➔ 第 ${rem81} 宫 ${subTag}`;
+        if (badgeDesc) badgeDesc.innerText = `周天气度 ${val}° (模 360° 余 ${degMod}°) | 坐标系: 【${branch.name}位 (${branch.system})】`;
     }
 
     // 绑定 3x3 九宫切换按钮

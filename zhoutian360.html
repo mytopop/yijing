@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v37">
+    <link rel="stylesheet" href="index.css?v=20260804_v39">
 </head>
 <body>
     <div class="app-container">
@@ -138,21 +138,26 @@
                             <div id="zt-table-title" class="card-title"><span>📊</span> 九宫纪周天 (360°) 9x9 倍积气数大表</div>
                         </div>
                         
-                        <!-- 3x3 九宫切选按钮 -->
-                        <div class="sanhe-btn-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 6px; gap: 4px;">
-                            <button class="sanhe-btn zt-palace-tab active" data-palace="1" style="color:#4dabf7;">一宫 (+90°)</button>
-                            <button class="sanhe-btn zt-palace-tab" data-palace="2" style="color:#e5c07b;">二宫 (+180°)</button>
-                            <button class="sanhe-btn zt-palace-tab" data-palace="3" style="color:#40c057;">三宫 (+270°)</button>
-                            <button class="sanhe-btn zt-palace-tab" data-palace="4" style="color:#40c057;">四宫 (+360°)</button>
-                            <button class="sanhe-btn zt-palace-tab" data-palace="5" style="color:#ffe066;">五宫 (+450°)</button>
-                            <button class="sanhe-btn zt-palace-tab" data-palace="6" style="color:#dee2e6;">六宫 (+540°)</button>
-                            <button class="sanhe-btn zt-palace-tab" data-palace="7" style="color:#dee2e6;">七宫 (+630°)</button>
-                            <button class="sanhe-btn zt-palace-tab" data-palace="8" style="color:#e5c07b;">八宫 (+720°)</button>
-                            <button class="sanhe-btn zt-palace-tab" data-palace="9" style="color:#ff5252;">九宫 (+810°)</button>
+                        <!-- 三标体系：赤标 1 4 7，黄标 2 5 8，白标 3 6 9 切选按钮组 -->
+                        <div style="font-size:11px; color:#cbd5e1; margin-top:6px; margin-bottom:2px; font-weight:700;">
+                            🌟 赤标 (天道 1·4·7) · 黄标 (地道 2·5·8) · 白标 (人道 3·6·9)
+                        </div>
+                        <div class="sanhe-btn-grid" style="grid-template-columns: repeat(3, 1fr); gap: 4px;">
+                            <button class="sanhe-btn zt-palace-tab active" data-palace="1" style="color:#ff5252;">赤标一宫 (1行·9)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="4" style="color:#ff5252;">赤标四宫 (4行·36)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="7" style="color:#ff5252;">赤标七宫 (7行·63)</button>
+                            
+                            <button class="sanhe-btn zt-palace-tab" data-palace="2" style="color:#40c057;">黄标二宫 (2行·18)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="5" style="color:#40c057;">黄标五宫 (5行·45)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="8" style="color:#40c057;">黄标八宫 (8行·72)</button>
+                            
+                            <button class="sanhe-btn zt-palace-tab" data-palace="3" style="color:#4dabf7;">白标三宫 (3行·27)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="6" style="color:#4dabf7;">白标六宫 (6行·54)</button>
+                            <button class="sanhe-btn zt-palace-tab" data-palace="9" style="color:#4dabf7;">白标九宫 (9行·81)</button>
                         </div>
 
                         <!-- 周天大表渲染区 -->
-                        <div class="sequence-table-container" style="margin-top: 6px; max-height: calc(100vh - 260px); min-height: 380px;">
+                        <div class="sequence-table-container" style="margin-top: 6px;">
                             <table class="seq-table">
                                 <thead id="zt-table-head"></thead>
                                 <tbody id="zt-table-body"></tbody>
@@ -280,6 +285,6 @@
     </div>
 
     <!-- 周天 360° 引擎 (带版本防缓存) -->
-    <script src="zhoutian360.js?v=20260804_v37"></script>
+    <script src="zhoutian360.js?v=20260804_v38"></script>
 </body>
 </html>

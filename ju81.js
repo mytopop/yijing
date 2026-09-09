@@ -117,7 +117,6 @@ class Ju81Interactive3DEngine {
 
     initScene() {
         this.scene = new THREE.Scene();
-        this.scene.fog = new THREE.FogExp2(0x101628, 0.02);
 
         this.camera = new THREE.PerspectiveCamera(45, this.width / this.height, 0.1, 1000);
 
@@ -161,19 +160,23 @@ class Ju81Interactive3DEngine {
     }
 
     setupLights() {
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
         this.scene.add(ambientLight);
 
-        const goldLight = new THREE.PointLight(0xffe066, 2.5, 60);
-        goldLight.position.set(0, 0, 15);
-        this.scene.add(goldLight);
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight1.position.set(10, 15, 20);
+        this.scene.add(dirLight1);
+
+        const dirLight2 = new THREE.DirectionalLight(0xffe066, 0.8);
+        dirLight2.position.set(-10, -15, 10);
+        this.scene.add(dirLight2);
     }
 
     createCelestialGridAndPoles() {
         const radius = 6.0;
 
         const gridGeom = new THREE.SphereGeometry(radius * 1.02, 24, 18);
-        const gridMat = new THREE.MeshBasicMaterial({ color: 0x4dabf7, wireframe: true, transparent: true, opacity: 0.08 });
+        const gridMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.12 });
         const gridMesh = new THREE.Mesh(gridGeom, gridMat);
         this.celestialGridGroup.add(gridMesh);
 
@@ -190,7 +193,7 @@ class Ju81Interactive3DEngine {
         northStar.position.set(0, 0, 8.5);
         this.celestialGridGroup.add(northStar);
 
-        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
+        const northSprite = this.createTextSprite("北极星", "#ffe066");
         northSprite.position.set(0, 0, 9.8);
         this.celestialGridGroup.add(northSprite);
     }
@@ -198,17 +201,17 @@ class Ju81Interactive3DEngine {
     createArmillaryRings() {
         const radius = 6.0;
 
-        const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
-        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
+        const equatorGeom = new THREE.TorusGeometry(radius, 0.08, 16, 120);
+        const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff4d4f, metalness: 0.3, roughness: 0.3, emissive: 0xff3333, emissiveIntensity: 0.4 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
-        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
+        const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x52c41a, metalness: 0.3, roughness: 0.3, emissive: 0x389e0d, emissiveIntensity: 0.4 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
-        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
+        const lunarMat = new THREE.MeshStandardMaterial({ color: 0x1890ff, metalness: 0.3, roughness: 0.3, emissive: 0x096dd9, emissiveIntensity: 0.4 });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
@@ -216,21 +219,21 @@ class Ju81Interactive3DEngine {
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
-            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
+            const orbGeom = new THREE.SphereGeometry(0.36, 16, 16);
+            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.4, roughness: 0.2, emissive: b.color, emissiveIntensity: 0.6 });
             const orbMesh = new THREE.Mesh(orbGeom, orbMat);
             orbMesh.position.copy(pos);
             this.orbsGroup.add(orbMesh);
 
-            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
+            const ringGeom = new THREE.TorusGeometry(0.52, 0.025, 12, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
             const ringMesh = new THREE.Mesh(ringGeom, ringMat);
             ringMesh.position.copy(pos);
             ringMesh.rotation.x = Math.PI / 2;
             this.orbsGroup.add(ringMesh);
 
             const sprite = this.createTextSprite(b.name, b.color);
-            sprite.position.copy(pos.clone().multiplyScalar(1.18));
+            sprite.position.copy(pos.clone().multiplyScalar(1.2));
             this.orbsGroup.add(sprite);
         });
     }
@@ -241,15 +244,15 @@ class Ju81Interactive3DEngine {
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
+        ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
         ctx.beginPath();
-        ctx.arc(64, 64, 52, 0, Math.PI * 2);
+        ctx.arc(64, 64, 48, 0, Math.PI * 2);
         ctx.fill();
         ctx.strokeStyle = colorHex;
         ctx.lineWidth = 4;
         ctx.stroke();
 
-        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', serif";
+        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', sans-serif";
         ctx.fillStyle = "#ffffff";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -258,7 +261,7 @@ class Ju81Interactive3DEngine {
         const texture = new THREE.CanvasTexture(canvas);
         const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(spriteMat);
-        sprite.scale.set(1.35, 1.35, 1.35);
+        sprite.scale.set(1.4, 1.4, 1.4);
         return sprite;
     }
 
@@ -273,40 +276,95 @@ class Ju81Interactive3DEngine {
     renderJu3DSpiral(juCount = 1) {
         this.clearJuSpiralGroup();
 
-        const points = [];
-        const totalSteps = juCount * 9;
+        // 依据原书《用矩法》天体数理规律：
+        // 1 矩 = 81 气数。81 % 12 = 9 (申位, 白道)
+        // 2 矩 = 162 气数。162 % 12 = 6 (巳位, 白道/地户)
+        // 3 矩 = 243 气数。243 % 12 = 3 (寅位, 白道)
+        // 4 矩 = 324 气数。324 % 12 = 0(12) (亥位, 白道/天门)
+        // 从 1 矩到 12 矩，每矩 81 气数严格按照【申 ➔ 巳 ➔ 寅 ➔ 亥】四白主轴逆时针逐矩跃迁！
+        
+        const branchCycle = [8, 5, 2, 11]; // 申(8), 巳(5), 寅(2), 亥(11)
+        const pathPoints = [];
 
-        for (let i = 0; i <= totalSteps; i++) {
-            const angle = i * 0.4;
-            const radius = 6.0;
-            const z = (i / totalSteps) * 6.0 - 3.0;
-
-            const x = radius * Math.cos(angle);
-            const y = radius * Math.sin(angle);
-            points.push(new THREE.Vector3(x, y, z));
+        for (let i = 1; i <= juCount; i++) {
+            const bIdx = branchCycle[(i - 1) % 4];
+            const pos = getBranch3DPos(bIdx);
+            pathPoints.push(pos);
         }
 
-        const curve = new THREE.CatmullRomCurve3(points);
-        const tubeGeom = new THREE.TubeGeometry(curve, 100, 0.1, 8, false);
-        const tubeMat = new THREE.MeshStandardMaterial({
-            color: 0xffe066,
-            emissive: 0xaa7c11,
-            metalness: 0.9,
-            transparent: true,
-            opacity: 0.85
-        });
-        const tubeMesh = new THREE.Mesh(tubeGeom, tubeMat);
-        this.juSpiralGroup.add(tubeMesh);
-
-        points.forEach((p, idx) => {
-            if (idx % 9 === 0) {
-                const sGeom = new THREE.SphereGeometry(0.38, 16, 16);
-                const sMat = new THREE.MeshStandardMaterial({ color: 0xff5252, emissive: 0xff5252 });
-                const sMesh = new THREE.Mesh(sGeom, sMat);
-                sMesh.position.copy(p);
-                this.juSpiralGroup.add(sMesh);
+        // 1. 若只有 1 矩，绘制从天门亥(起点/初始极点)到申位(1矩)的引导光弧；若多矩，则依次连线
+        const fullPoints = [];
+        if (juCount === 1) {
+            const startPos = getBranch3DPos(11); // 亥位初始
+            const targetPos = getBranch3DPos(8);  // 申位 (1矩)
+            // 构造平滑空间弧线
+            const mid = startPos.clone().add(targetPos).multiplyScalar(0.5).normalize().multiplyScalar(6.5);
+            const curve = new THREE.QuadraticBezierCurve3(startPos, mid, targetPos);
+            fullPoints.push(...curve.getPoints(30));
+        } else {
+            for (let i = 0; i < pathPoints.length - 1; i++) {
+                const p1 = pathPoints[i];
+                const p2 = pathPoints[i + 1];
+                const mid = p1.clone().add(p2).multiplyScalar(0.5).normalize().multiplyScalar(6.3 + (i * 0.1));
+                const curve = new THREE.QuadraticBezierCurve3(p1, mid, p2);
+                fullPoints.push(...curve.getPoints(20));
             }
-        });
+        }
+
+        // 绘制光芒跃迁轨迹线
+        if (fullPoints.length > 0) {
+            const lineGeom = new THREE.BufferGeometry().setFromPoints(fullPoints);
+            const lineMat = new THREE.LineBasicMaterial({
+                color: 0xffe066,
+                linewidth: 3,
+                transparent: true,
+                opacity: 0.95
+            });
+            const lineMesh = new THREE.Line(lineGeom, lineMat);
+            this.juSpiralGroup.add(lineMesh);
+        }
+
+        // 2. 在每个经过的矩数节点上放置高亮金色发光标记与光环
+        for (let i = 1; i <= juCount; i++) {
+            const bIdx = branchCycle[(i - 1) % 4];
+            const pos = getBranch3DPos(bIdx);
+            const isCurrent = (i === juCount);
+
+            // 节点光球
+            const nodeGeom = new THREE.SphereGeometry(isCurrent ? 0.6 : 0.42, 20, 20);
+            const nodeMat = new THREE.MeshStandardMaterial({
+                color: isCurrent ? 0xffe066 : 0xffa940,
+                emissive: isCurrent ? 0xffe066 : 0xd46b08,
+                emissiveIntensity: isCurrent ? 1.0 : 0.6,
+                metalness: 0.2,
+                roughness: 0.1
+            });
+            const nodeMesh = new THREE.Mesh(nodeGeom, nodeMat);
+            nodeMesh.position.copy(pos);
+            this.juSpiralGroup.add(nodeMesh);
+
+            // 当前目标矩增加外围扩散脉冲光环
+            if (isCurrent) {
+                const pulseRingGeom = new THREE.RingGeometry(0.8, 0.95, 32);
+                const pulseRingMat = new THREE.MeshBasicMaterial({
+                    color: 0xffe066,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const pulseRing = new THREE.Mesh(pulseRingGeom, pulseRingMat);
+                pulseRing.position.copy(pos);
+                pulseRing.lookAt(this.camera.position);
+                this.juSpiralGroup.add(pulseRing);
+
+                // 标注入驻文本标牌
+                const bInfo = EARTHLY_BRANCHES[bIdx];
+                const tagSprite = this.createTextSprite(`第${i}矩(${bInfo.name})`, "#ffe066");
+                tagSprite.position.copy(pos.clone().multiplyScalar(1.35));
+                tagSprite.scale.set(1.8, 1.8, 1.8);
+                this.juSpiralGroup.add(tagSprite);
+            }
+        }
     }
 
     renderFourCornersSquare(highlightIdx = null) {
@@ -315,20 +373,35 @@ class Ju81Interactive3DEngine {
         const points = cornerIndices.map(idx => getBranch3DPos(idx));
 
         const geom = new THREE.BufferGeometry().setFromPoints(points);
-        const mat = new THREE.LineBasicMaterial({ color: 0x4dabf7, linewidth: 3 });
+        const mat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 3 });
         const line = new THREE.Line(geom, mat);
         this.juSpiralGroup.add(line);
 
         points.slice(0, 4).forEach((p, idx) => {
             const isTarget = (highlightIdx !== null && cornerIndices[idx] === highlightIdx);
-            const size = isTarget ? 0.65 : 0.45;
-            const color = isTarget ? 0xffe066 : 0x4dabf7;
+            const size = isTarget ? 0.68 : 0.45;
+            const color = isTarget ? 0xffe066 : 0x38bdf8;
 
-            const sGeom = new THREE.SphereGeometry(size, 16, 16);
-            const sMat = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: 0.8 });
+            const sGeom = new THREE.SphereGeometry(size, 20, 20);
+            const sMat = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: isTarget ? 1.0 : 0.6,
+                metalness: 0.3,
+                roughness: 0.2
+            });
             const sMesh = new THREE.Mesh(sGeom, sMat);
             sMesh.position.copy(p);
             this.juSpiralGroup.add(sMesh);
+
+            if (isTarget) {
+                const haloGeom = new THREE.RingGeometry(0.85, 1.0, 32);
+                const haloMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+                const halo = new THREE.Mesh(haloGeom, haloMat);
+                halo.position.copy(p);
+                halo.lookAt(this.camera.position);
+                this.juSpiralGroup.add(halo);
+            }
         });
     }
 
@@ -343,14 +416,14 @@ class Ju81Interactive3DEngine {
         }
 
         const geom = new THREE.BufferGeometry().setFromPoints(points);
-        const mat = new THREE.LineBasicMaterial({ color: 0x40c057, linewidth: 3 });
+        const mat = new THREE.LineBasicMaterial({ color: 0x52c41a, linewidth: 3 });
         const line = new THREE.Line(geom, mat);
         this.juSpiralGroup.add(line);
 
         points.slice(0, sides).forEach((p, idx) => {
             if (idx % Math.max(1, Math.floor(sides / 12)) === 0) {
-                const sGeom = new THREE.SphereGeometry(0.3, 16, 16);
-                const sMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffe066 });
+                const sGeom = new THREE.SphereGeometry(0.32, 16, 16);
+                const sMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffe066, emissiveIntensity: 0.8 });
                 const sMesh = new THREE.Mesh(sGeom, sMat);
                 sMesh.position.copy(p);
                 this.juSpiralGroup.add(sMesh);
@@ -495,8 +568,8 @@ document.addEventListener("DOMContentLoaded", () => {
         highlightMatrixPositions([rem81]);
         engine.renderJu3DSpiral(k);
 
-        if (badgeTitle) badgeTitle.innerText = `${k} 矩 (81 × ${k} = ${juVal}) 3D 动态螺旋拓扑`;
-        if (badgeDesc) badgeDesc.innerText = `包含 ${k} 个 81 矩单元，在天体空间形成 ${k * 9} 步 3D 螺旋展开轨迹`;
+        if (badgeTitle) badgeTitle.innerText = `${k} 矩 (${juVal} 气数) ➔ 锁定【${branch.name}位】(${branch.system.split('(')[0]})`;
+        if (badgeDesc) badgeDesc.innerText = `气数累计 ${juVal}，模 12 余 ${rem12}，在天球上精准跃迁至【${branch.name}位】！四白四方(申➔巳➔寅➔亥)循环演进`;
     }
 
     const CORNER_DATA = {

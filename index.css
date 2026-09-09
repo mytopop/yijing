@@ -620,21 +620,22 @@ input[type="number"] {
 .step-val.badge-green { color: var(--color-huangdao); }
 .step-val.badge-blue { color: var(--color-baidao); }
 
-/* 映射表格 Table */
+/* 映射表格 Table：完全舒展无内层死滚动条 */
 .sequence-table-container {
-    max-height: 200px;
-    overflow-y: auto;
+    max-height: none !important;
+    overflow-y: visible !important;
+    overflow-x: auto;
 }
 
 .seq-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 12px;
     font-family: var(--font-times);
 }
 
 .seq-table th, .seq-table td {
-    padding: 6px 8px;
+    padding: 3px 2px !important;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -736,20 +737,31 @@ input[type="number"] {
    ========================================================================== */
 
 /* 所有可点击元素统一悬浮与过渡 */
-.interactive-row, .interactive-yao-row, .portal-card, .pipeline-step-item, .sanhe-btn, .wuxing-btn, .power-quick-btn, .split-quick-btn, .palace-tab-btn, .sys-filter-btn, tr.interactive-row {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+.interactive-row, .interactive-yao-row, .portal-card, .pipeline-step-item, .sanhe-btn, .wuxing-btn, .power-quick-btn, .split-quick-btn, .palace-tab-btn, .sys-filter-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     cursor: pointer;
     position: relative;
     border-radius: 8px !important;
 }
 
-.interactive-row:hover, .interactive-yao-row:hover, .portal-card:hover, .pipeline-step-item:hover {
+.portal-card:hover, .pipeline-step-item:hover, .interactive-yao-row:hover {
     background: rgba(77, 171, 247, 0.15) !important;
     transform: translateX(4px) !important;
     border-color: rgba(255, 224, 102, 0.4) !important;
 }
 
-/* 点击刹那间的平移晃动与弹簧冲击动画 (rowBounceShake & rowFlashSpark) */
+/* 表格中的行 hover 坚决不使用位移 transform，彻底消灭鼠标放上去一直弹跳的死循环 Bug！ */
+tr.interactive-row {
+    transition: background 0.15s ease, border-color 0.15s ease !important;
+    transform: none !important;
+}
+
+tr.interactive-row:hover {
+    background: rgba(255, 224, 102, 0.15) !important;
+    transform: none !important;
+}
+
+/* 点击刹那间的平移晃动与弹簧冲击动画 (仅对卡片，不对表格行) */
 .row-click-flash {
     animation: rowBounceShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
 }
@@ -778,7 +790,6 @@ input[type="number"] {
 /* 媲美 64 卦六爻行的 100% 金胶囊边框 + 晃动归位 + 渐变金蓝光晕 */
 .interactive-row.active-row, 
 .interactive-yao-row.active-yao-row, 
-tr.interactive-row.active-row,
 .portal-card.active,
 .pipeline-step-item.active {
     background: linear-gradient(90deg, rgba(212, 175, 55, 0.38) 0%, rgba(77, 171, 247, 0.25) 100%) !important;
@@ -790,6 +801,18 @@ tr.interactive-row.active-row,
     transform: translateX(6px) !important;
     font-weight: 700 !important;
     animation: rowBounceShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) 1, activeYaoRowGlowPulse 1.8s infinite alternate 0.45s !important;
+}
+
+/* 表格中的 tr.interactive-row 选中态：纯高亮+左侧金边，严禁 translateX 与弹簧晃动动画 */
+tr.interactive-row.active-row {
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.32) 0%, rgba(77, 171, 247, 0.2) 100%) !important;
+    border-left: 5px solid #ffe066 !important;
+    border-top: 1px solid rgba(255, 224, 102, 0.4) !important;
+    border-right: 1px solid rgba(255, 224, 102, 0.4) !important;
+    border-bottom: 1px solid rgba(255, 224, 102, 0.4) !important;
+    box-shadow: inset 0 0 10px rgba(255, 224, 102, 0.3) !important;
+    transform: none !important;
+    animation: none !important;
 }
 
 @keyframes activeYaoRowGlowPulse {
@@ -861,7 +884,7 @@ tr.interactive-row.active-row,
 /* 9x9 大表单格精准点击高亮 (interactive-cell & active-cell) */
 .interactive-cell {
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
 .interactive-cell:hover {
@@ -874,5 +897,48 @@ tr.interactive-row.active-row,
     color: #000000 !important;
     font-weight: 900 !important;
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 224, 102, 0.8) !important;
-    animation: rowBounceShake 0.45s ease-out 1 !important;
 }
+
+.interactive-cell.active-cell .cell-val {
+    color: #000000 !important;
+    font-weight: 900 !important;
+}
+
+.interactive-cell.active-cell .cell-tag {
+    color: #000000 !important;
+    font-weight: 800 !important;
+}
+
+/* 原书 9x9 纪气数大表单格上下排布样式：紧凑精致，自适应宽度，严禁换行截断与水平挤出 */
+.cell-val {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-family: var(--font-times);
+    white-space: nowrap;
+}
+
+.cell-tag {
+    font-size: 8.5px;
+    color: #94a3b8;
+    line-height: 1.0;
+    margin-top: 1px;
+    font-family: var(--font-serif);
+    white-space: nowrap;
+}
+
+.th-cell-base {
+    font-family: var(--font-times);
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.th-cell-sub {
+    font-size: 8.5px;
+    color: #ffe066;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+

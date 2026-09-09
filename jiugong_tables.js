@@ -393,7 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 渲染原书 9x9 纪气数倍积大表 (支持行选择与单格精准选择)
+    // 渲染原书 9x9 纪气数倍积大表 (真实还原原书 9x9 自身交叉乘积矩阵与进位数)
     function renderOriginal9x9Table(palaceKey = "1", searchText = "") {
         if (!tableHead || !tableBody) return;
         tableHead.innerHTML = "";
@@ -408,54 +408,68 @@ document.addEventListener("DOMContentLoaded", () => {
             tableTitle.innerText = `📜 原书【${pInfo.name}】9x9 纪气数倍积大表 (${pInfo.page})`;
         }
 
-        // 构建原书表头
+        const seq = pInfo.baseSeq;
+
+        // 构建原书表头：0, s1, s2, s3, s4, s5, s6, s7, s8, s9, 进位数
         const trHead = document.createElement("tr");
-        trHead.innerHTML = `
-            <th style="color:#ffe066;">基数 N</th>
-            <th>×1</th>
-            <th>×2</th>
-            <th>×3</th>
-            <th>×4</th>
-            <th>×5</th>
-            <th>×6</th>
-            <th>×7</th>
-            <th>×8</th>
-            <th>×9</th>
-            <th style="color:#ff5252;">进位数 (N×9)</th>
-            <th>归宫</th>
-            <th>地支</th>
-        `;
+        let headHtml = `<th style="color:#ffe066; font-size:12px;">0 / 基数</th>`;
+        seq.forEach((colVal, colIdx) => {
+            const sub = TAIYI_81_SUB_LABELS[colVal] || "";
+            headHtml += `
+                <th>
+                    <div class="th-cell-base">${colVal}</div>
+                    <div class="th-cell-sub">${sub}</div>
+                </th>
+            `;
+        });
+        headHtml += `<th style="color:#ff5252; font-size:12px;">进位数</th>`;
+        trHead.innerHTML = headHtml;
         tableHead.appendChild(trHead);
 
-        pInfo.baseSeq.forEach(baseNum => {
+        // 构建 9 行数据：行首为 s_i，单格为 s_i × s_j，右侧为进位数 s_i × 9
+        seq.forEach((rowVal, rowIdx) => {
             const tr = document.createElement("tr");
             tr.className = "interactive-row";
-            tr.dataset.num = baseNum;
+            tr.dataset.num = rowVal;
 
-            // 基数单元格
-            let cellsHtml = `<td class="interactive-cell base-num-cell" data-val="${baseNum}" style="font-weight:800; color:#ffe066; font-family:var(--font-times);">${baseNum}</td>`;
-            
-            // ×1 ~ ×9 单格
-            for (let k = 1; k <= 9; k++) {
-                const prod = baseNum * k;
-                cellsHtml += `<td class="interactive-cell prod-cell" data-base="${baseNum}" data-k="${k}" data-val="${prod}" style="font-family:var(--font-times);">${prod}</td>`;
-            }
+            const rowSub = TAIYI_81_SUB_LABELS[rowVal] || "";
+            // 行首基数单元格
+            let cellsHtml = `
+                <td class="interactive-cell base-num-cell" data-row="${rowVal}" data-col="${rowVal}" data-val="${rowVal}" style="font-weight:800; color:#ffe066; background:rgba(212,175,55,0.12);">
+                    <div class="cell-val">${rowVal}</div>
+                    <div class="cell-tag" style="color:#ffe066;">${rowSub}</div>
+                </td>
+            `;
 
-            const carry = baseNum * 9;
-            const rem81 = baseNum % 81 === 0 ? 81 : baseNum % 81;
-            const rem12 = baseNum % 12 === 0 ? 12 : baseNum % 12;
-            const branch = EARTHLY_BRANCHES[rem12 - 1];
+            // 9 列交叉乘积：rowVal × colVal
+            seq.forEach((colVal, colIdx) => {
+                const prod = rowVal * colVal;
+                const rem81 = prod % 81 === 0 ? 81 : prod % 81;
+                const cellTag = TAIYI_81_SUB_LABELS[rem81] || "";
+                cellsHtml += `
+                    <td class="interactive-cell prod-cell" data-row="${rowVal}" data-col="${colVal}" data-val="${prod}">
+                        <div class="cell-val">${prod}</div>
+                        <div class="cell-tag">${cellTag}</div>
+                    </td>
+                `;
+            });
 
-            cellsHtml += `<td class="interactive-cell carry-cell" data-val="${carry}" style="font-weight:800; color:#ff5252; font-family:var(--font-times);">${carry}</td>`;
-            cellsHtml += `<td style="font-family:var(--font-times);">${rem81}宫</td>`;
-            cellsHtml += `<td style="color:${branch.color}; font-weight:800;">${branch.name}位</td>`;
+            // 行末进位数：rowVal × 9
+            const rowCarry = rowVal * 9;
+            const carryRem81 = rowCarry % 81 === 0 ? 81 : rowCarry % 81;
+            const carryTag = TAIYI_81_SUB_LABELS[carryRem81] || "";
+            cellsHtml += `
+                <td class="interactive-cell carry-cell" data-row="${rowVal}" data-col="9" data-val="${rowCarry}" style="font-weight:800; color:#ff5252; background:rgba(255,82,82,0.12);">
+                    <div class="cell-val">${rowCarry}</div>
+                    <div class="cell-tag" style="color:#ff5252;">${carryTag}</div>
+                </td>
+            `;
 
             tr.innerHTML = cellsHtml;
 
             // 行级别点击 (全行高亮)
             tr.addEventListener("click", (e) => {
-                // 如果点击的是具体单元格，由单元格事件处理
-                if (e.target.classList.contains("interactive-cell")) {
+                if (e.target.closest(".interactive-cell")) {
                     return;
                 }
 
@@ -472,7 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 tr.classList.add("row-click-flash");
                 setTimeout(() => tr.classList.remove("row-click-flash"), 450);
 
-                highlightCellAnd3D(baseNum, baseNum, 1, pInfo);
+                highlightCellAnd3D(rowVal * seq[0], rowVal, seq[0], pInfo);
             });
 
             // 给每一个单格绑定精准点击事件 (Exact Cell Clicking)
@@ -489,10 +503,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (detailCard) {
                             detailCard.innerHTML = `
                                 <div style="font-size: 13px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
-                                    📜 原书【${pInfo ? pInfo.name : '九宫'}】九级倍积大表全景 (P342-350)
+                                    📜 原书【${pInfo ? pInfo.name : '九宫'}】9x9 纪气数倍积大表全景 (P342-350)
                                 </div>
                                 <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
-                                    点击大表中任意单元格查看该格单项算式、倍积与 81 宫位号；再次点击可【取消选中】。
+                                    点击大表中任意单元格查看该格单项算式、太乙 81 位号与天体坐标；再次点击可【取消选中】。
                                 </div>
                             `;
                         }
@@ -503,22 +517,64 @@ document.addEventListener("DOMContentLoaded", () => {
                     tr.classList.add("active-row");
 
                     const val = parseInt(cellTd.dataset.val, 10);
-                    const bNum = parseInt(cellTd.dataset.base || baseNum, 10);
-                    const multiplier = parseInt(cellTd.dataset.k || 1, 10);
+                    const rVal = parseInt(cellTd.dataset.row, 10);
+                    const cVal = parseInt(cellTd.dataset.col, 10);
 
-                    highlightCellAnd3D(val, bNum, multiplier, pInfo);
+                    highlightCellAnd3D(val, rVal, cVal, pInfo);
                 });
             });
 
             tableBody.appendChild(tr);
         });
 
-        if (pInfo.baseSeq.length > 0) {
-            highlightCellAnd3D(pInfo.baseSeq[0], pInfo.baseSeq[0], 1, pInfo);
+        // 添加原书底部的【进位数】汇总行
+        const trBottomCarry = document.createElement("tr");
+        trBottomCarry.className = "carry-bottom-row";
+        let bottomHtml = `<td style="font-weight:800; color:#ff5252; background:rgba(255,82,82,0.18);">进位数</td>`;
+        seq.forEach(colVal => {
+            const colCarry = colVal * 9;
+            const carryRem81 = colCarry % 81 === 0 ? 81 : colCarry % 81;
+            const carryTag = TAIYI_81_SUB_LABELS[carryRem81] || "";
+            bottomHtml += `
+                <td class="interactive-cell carry-cell" data-row="9" data-col="${colVal}" data-val="${colCarry}" style="font-weight:800; color:#ff5252; background:rgba(255,82,82,0.12);">
+                    <div class="cell-val">${colCarry}</div>
+                    <div class="cell-tag" style="color:#ff5252;">${carryTag}</div>
+                </td>
+            `;
+        });
+        // 右下角交叉点：(进位之总/最后进位)
+        const cornerCarry = seq[8] * 9;
+        const cornerTag = TAIYI_81_SUB_LABELS[cornerCarry % 81 === 0 ? 81 : cornerCarry % 81] || "";
+        bottomHtml += `
+            <td class="interactive-cell carry-cell" data-row="9" data-col="9" data-val="${cornerCarry}" style="font-weight:900; color:#ffe066; background:rgba(212,175,55,0.25);">
+                <div class="cell-val">${cornerCarry}</div>
+                <div class="cell-tag" style="color:#ffe066;">${cornerTag}</div>
+            </td>
+        `;
+        trBottomCarry.innerHTML = bottomHtml;
+
+        trBottomCarry.querySelectorAll(".interactive-cell").forEach(cellTd => {
+            cellTd.addEventListener("click", (e) => {
+                e.stopPropagation();
+                document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
+                document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+                cellTd.classList.add("active-cell");
+
+                const val = parseInt(cellTd.dataset.val, 10);
+                const rVal = parseInt(cellTd.dataset.row, 10);
+                const cVal = parseInt(cellTd.dataset.col, 10);
+                highlightCellAnd3D(val, rVal, cVal, pInfo);
+            });
+        });
+
+        tableBody.appendChild(trBottomCarry);
+
+        if (seq.length > 0) {
+            highlightCellAnd3D(seq[0] * seq[0], seq[0], seq[0], pInfo);
         }
     }
 
-    function highlightCellAnd3D(val, baseNum, multiplier, pInfo) {
+    function highlightCellAnd3D(val, rowVal, colVal, pInfo) {
         const rem81 = val % 81 === 0 ? 81 : val % 81;
         const rem12 = val % 12 === 0 ? 12 : val % 12;
         const branch = EARTHLY_BRANCHES[rem12 - 1];
@@ -534,24 +590,27 @@ document.addEventListener("DOMContentLoaded", () => {
         // 驱动 3D 节点
         engine.highlightBranchPos(rem12 - 1);
 
+        const formulaText = rowVal === colVal && rowVal === val ? `${val}` : `${rowVal} × ${colVal} = ${val}`;
+
         if (detailCard) {
             detailCard.innerHTML = `
                 <div style="font-size: 14px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
-                    🎯 【${pInfo ? pInfo.name : '九宫'}】单格精准算式: ${baseNum} × ${multiplier} = <span style="font-size:16px;">${val}</span>
+                    🎯 【${pInfo ? pInfo.name : '九宫'}】原书单格精准算式: <span style="color:#ffffff;">${formulaText}</span>
                 </div>
                 <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
                     • 单格计算值: <strong>${val}</strong> | 归太乙 81 阵图: <strong style="color:#ffe066;">第 ${rem81} 宫 ${subTag}</strong> | 对应易卦: <strong>${hexName}</strong><br>
                     • 周天角度: <strong>${deg}</strong> | 12地支余数: 余 ${rem12} | 坐标系: <span style="color:${branch.color}; font-weight:800;">${branch.name}位 (${branch.system})</span>
                 </div>
                 <div style="margin-top: 6px; font-size: 11px; color: #ffffff; background: rgba(77,171,247,0.18); padding: 4px 8px; border-radius: 4px;">
-                    数理学术解析：单格乘积 ${baseNum}×${multiplier}=${val} 降维归入【第 ${rem81} 宫 ${subTag}】，3D 脉冲定位至【${branch.name}位】！
+                    数理学术解析：原书大表单元格算式为行基数与列基数交叉相乘 ${formulaText}，经模 81 映射为【第 ${rem81} 宫 ${subTag}】，3D 脉冲精准定位至【${branch.name}位】！
                 </div>
             `;
         }
 
-        if (badgeTitle) badgeTitle.innerText = `单格 ${baseNum}×${multiplier}=${val} ➔ 第 ${rem81} 宫 ${subTag} (${branch.name}位)`;
+        if (badgeTitle) badgeTitle.innerText = `单格 ${formulaText} ➔ 第 ${rem81} 宫 ${subTag} (${branch.name}位)`;
         if (badgeDesc) badgeDesc.innerText = `对应 ${hexName} · ${deg}，太乙 81 阵图 ${subTag} 位与 3D 坐标系同步高亮`;
     }
+
 
     // 绑定 9 大张表格切选按钮
     document.querySelectorAll(".palace-tab-btn").forEach(btn => {

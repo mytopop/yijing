@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v37">
+    <link rel="stylesheet" href="index.css?v=20260804_v39">
 </head>
 <body>
     <div class="app-container">
@@ -145,12 +145,12 @@
                 </div>
 
                 <!-- 原书九宫纪气数 9x9 巨型大表渲染区 -->
-                <div class="glass-panel" style="margin-top: 4px;">
+                <div class="glass-panel" style="margin-top: 4px; padding: 4px 6px;">
                     <div class="card-title">
                         <span id="jgt-table-title">📜 原书【一宫】9x9 纪气数倍积巨型大表 (点击行/单元格三向联动)</span>
                     </div>
-                    <div class="sequence-table-container" style="max-height: 400px; overflow-x: auto;">
-                        <table id="jgt-master-table" class="seq-table" style="font-size: 11px;">
+                    <div class="sequence-table-container">
+                        <table id="jgt-master-table" class="seq-table">
                             <thead id="jgt-table-head">
                                 <!-- JS 动态填入表头 -->
                             </thead>
@@ -170,6 +170,6 @@
     </div>
 
     <!-- 九宫纪气大表引擎 (带版本防缓存) -->
-    <script src="jiugong_tables.js?v=20260804_v37"></script>
+    <script src="jiugong_tables.js?v=20260804_v38"></script>
 </body>
 </html>
