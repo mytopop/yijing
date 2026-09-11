@@ -24,3 +24,8 @@ scratch/
 
 # Logs
 *.log
+
+# WikiSkill 本地沉淀目录 (不追踪同步到远程仓库)
+raw/
+skills/
+wiki/
