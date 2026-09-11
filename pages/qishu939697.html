@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>易经数理秘笈 - 六十四卦 3D 拓扑解构馆</title>
+    <title>易经数理秘笈 - 939697 七数解构馆</title>
     <!-- 引入 Google 字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v37">
+    <link rel="stylesheet" href="../css/index.css?v=20260804_v37">
 </head>
 <body>
     <div class="app-container">
@@ -24,19 +24,19 @@
                 <div class="logo-icon"></div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
-                    <span class="subtitle">根据梁致堂原著解构 · 六十四卦 3D 拓扑解构馆</span>
+                    <span class="subtitle">根据梁致堂原著解构 · 939697 七数解构馆</span>
                 </div>
             </div>
             
-                                                            <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab "> 首页</a>
+                                    <nav class="header-nav-tabs">
+                <a href="../index.html" class="nav-tab "> 首页</a>
                 <a href="pipeline.html" class="nav-tab "> 流水线</a>
-                <a href="hexagrams.html" class="nav-tab active"> 64卦拓扑</a>
+                <a href="hexagrams.html" class="nav-tab "> 64卦拓扑</a>
                 <a href="laws.html" class="nav-tab "> 5大定律</a>
                 <a href="wuxing.html" class="nav-tab "> 五行三元</a>
                 <a href="jiugong_qi.html" class="nav-tab "> 九宫七输入</a>
                 <a href="zhoutian360.html" class="nav-tab "> 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab "> 939697七数</a>
+                <a href="qishu939697.html" class="nav-tab active"> 939697七数</a>
                 <a href="coordinates12.html" class="nav-tab "> 12方位3坐标</a>
                 <a href="ju81.html" class="nav-tab "> 用矩81</a>
                 <a href="jiugong_tables.html" class="nav-tab "> 九宫纪气大表</a>
@@ -81,13 +81,13 @@
                         </button>
                     </div>
 
-                    <!-- Three.js 渲染画布 -->
-                    <div id="three-canvas-hex" style="width:100%; height:100%;"></div>
+                    <!-- Three.js 渲染画布 (正确匹配 ID) -->
+                    <div id="three-canvas-qishu939697" style="width:100%; height:100%;"></div>
 
                     <!-- 动态状态标签 -->
                     <div class="trajectory-badge">
-                        <div id="hex-badge-title" class="badge-title">64 卦 3D 闭环图谱</div>
-                        <div id="hex-badge-desc" class="badge-desc">选择右侧卦象，观察六爻 1~6 在天体坐标系中的闭环连线</div>
+                        <div id="qishu-badge-title" class="badge-title">939697 七数白道 243 矩 3D 拓扑</div>
+                        <div id="qishu-badge-desc" class="badge-desc">点击右侧表格行、3D 天极点或 81 宫单元格，全页三栏实现双向同步联动</div>
                     </div>
                 </div>
             </section>
@@ -97,14 +97,14 @@
                 <div class="glass-panel" style="margin-bottom: 6px;">
                     <div class="card-title">
                         <i class="fa-solid fa-table-cells"></i>
-                        <span>太乙九宫八十一宫阵图 (六爻时空投影)</span>
+                        <span>太乙九宫八十一宫阵图 (白道七数时空投影)</span>
                     </div>
                     <div class="law-desc-text">
-                        选中卦象及各爻降维投影至太乙 81 宫；点击右侧爻节点动态跃迁至对应矩并高亮真实数值。
+                        点击右侧表格行或单格，太乙 81 宫自动跃迁至对应矩并精准点亮；支持反向点击联动。
                     </div>
                 </div>
 
-                <!-- 矩度时空控制器 (切换矩度或跳转当前值所在矩) -->
+                <!-- 矩度时空控制器 (切换 1~9 矩或跳转当前值所在矩) -->
                 <div class="ju-tier-controller" style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 215, 0, 0.25); border-radius: 6px; padding: 5px 8px; margin-bottom: 6px;">
                     <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: #cbd5e1;">
                         <span style="color: #ffd700; font-weight: 700;">矩度时空:</span>
@@ -112,10 +112,9 @@
                     </div>
                     <div id="ju-btn-group" class="ju-btn-group" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
                         <button type="button" class="ju-tier-btn active" data-ju="0">1矩基数</button>
-                        <button type="button" class="ju-tier-btn" data-ju="1">2矩(+81)</button>
-                        <button type="button" class="ju-tier-btn" data-ju="2">3矩(+162)</button>
-                        <button type="button" class="ju-tier-btn" data-ju="3">4矩(+243)</button>
-                        <button type="button" class="ju-tier-btn" data-ju="4">5矩(+324)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="1">2矩(162)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="2">3矩(243)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="8">9矩(729)</button>
                         <button type="button" id="btn-ju-current-val" class="ju-tier-btn" data-ju="auto">当前值所在矩</button>
                     </div>
                 </div>
@@ -123,26 +122,68 @@
                 <div id="taiyi-81-matrix" class="luoshu-taiyi-9x9-container"></div>
             </section>
 
-            <!-- 栏三：64 卦六爻 5 栏网格解构控制台 (33%) -->
+            <!-- 栏三：939697 七数解构控制台 (三向联动) (33%) -->
             <section class="col-right-controls" style="overflow-y: auto; max-height: calc(100vh - 120px);">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span></span> 六十四卦全景解构选择器
+                        <span></span> 原著《939697 七数与白道 243 矩》
                     </div>
-                    <select id="hex-select" class="custom-select" style="margin-top: 6px;">
-                        <!-- JS 动态填入 64 卦 -->
-                    </select>
+                    <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5; margin-top: 4px;">
+                        原书 P355-356 揭示：数 <strong>9、3、9、6、9、7</strong> 为白道坐标系 243 矩（81 × 3）在申、巳、寅、亥四白方位的七数周天演化。点击表格行可联动作图！
+                    </div>
                 </div>
 
-                <!-- 六爻 5 栏直列网格展示框 -->
-                <div id="hex-detail-box" class="hexagram-detail-box" style="margin-top: 6px;">
-                    <!-- JS 动态渲染 6 爻 5 栏网格 -->
+                <!-- 7 数分步推演大表 (可点击行) -->
+                <div class="glass-panel" style="margin-top: 6px;">
+                    <div class="card-title"><span></span> 939697 七数周天降维明细表 (点击表格行联动)</div>
+                    <div class="sequence-table-container" style="max-height: 300px;">
+                        <table class="seq-table">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>七数算式</th>
+                                    <th>降维数</th>
+                                    <th>太乙81宫</th>
+                                    <th>地支方位</th>
+                                    <th>坐标归属</th>
+                                </tr>
+                            </thead>
+                            <tbody id="qishu-table-body">
+                                <tr class="interactive-row active-row" data-seq="1" data-num="9" data-rem81="9" data-branch="9">
+                                    <td>1</td><td>数 9 (开局)</td><td>9</td><td>9 号宫</td><td style="color:#ff5252; font-weight:700;">酉位</td><td>赤道 (天)</td>
+                                </tr>
+                                <tr class="interactive-row" data-seq="2" data-num="3" data-rem81="27" data-branch="3">
+                                    <td>2</td><td>数 3 (颐卦)</td><td>27</td><td>27 号宫</td><td style="color:#4dabf7; font-weight:700;">寅位</td><td>白道 (万物)</td>
+                                </tr>
+                                <tr class="interactive-row" data-seq="3" data-num="9" data-rem81="81" data-branch="9">
+                                    <td>3</td><td>数 9 (太乙矩)</td><td>81</td><td>81 号宫</td><td style="color:#ff5252; font-weight:700;">申位</td><td>白道 (地)</td>
+                                </tr>
+                                <tr class="interactive-row" data-seq="4" data-num="6" data-rem81="54" data-branch="6">
+                                    <td>4</td><td>数 6 (归妹卦)</td><td>54</td><td>54 号宫</td><td style="color:#ffe066; font-weight:700;">巳位</td><td>白道 (地户)</td>
+                                </tr>
+                                <tr class="interactive-row" data-seq="5" data-num="729" data-realval="729" data-rem81="81" data-branch="9">
+                                    <td>5</td><td>数 9 (大矩)</td><td>729  81</td><td>81 号宫</td><td style="color:#ff5252; font-weight:700;">申位</td><td>白道 (顶峰)</td>
+                                </tr>
+                                <tr class="interactive-row" data-seq="6" data-num="7" data-rem81="63" data-branch="7">
+                                    <td>6</td><td>数 7 (既济卦)</td><td>63</td><td>63 号宫</td><td style="color:#40c057; font-weight:700;">午位</td><td>赤道 (天)</td>
+                                </tr>
+                                <tr class="interactive-row" data-seq="7" data-num="243" data-realval="243" data-rem81="81" data-branch="3">
+                                    <td>7</td><td>243 矩 (白道主轴)</td><td>243  81</td><td>81 号宫</td><td style="color:#4dabf7; font-weight:700;">寅/申位</td><td>白道 (大圆满)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 选定数据剖析卡片 -->
+                <div id="qishu-detail-card" class="hexagram-detail-box" style="margin-top: 6px;">
+                    <!-- JS 动态填入 -->
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- 64 卦引擎 (带版本防缓存) -->
-    <script src="hexagrams.js?v=20260911_v48"></script>
+    <!-- 939697 七数引擎 (带版本防缓存) -->
+    <script src="../js/qishu939697.js?v=20260911_v48"></script>
 </body>
 </html>
