@@ -21,7 +21,7 @@
         <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
-                <div class="logo-icon">☯</div>
+                <div class="logo-icon"></div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
                     <span class="subtitle">根据梁致堂原著解构 · 用矩法·一矩至十二矩全景解构馆</span>
@@ -29,17 +29,17 @@
             </div>
             
                                                 <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab ">🏠 首页</a>
-                <a href="pipeline.html" class="nav-tab ">⚡ 流水线</a>
-                <a href="hexagrams.html" class="nav-tab ">☰ 64卦拓扑</a>
-                <a href="laws.html" class="nav-tab ">✨ 5大定律</a>
-                <a href="wuxing.html" class="nav-tab ">☯ 五行三元</a>
-                <a href="jiugong_qi.html" class="nav-tab ">📜 九宫七输入</a>
-                <a href="zhoutian360.html" class="nav-tab ">🌀 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab ">🔢 939697七数</a>
-                <a href="coordinates12.html" class="nav-tab ">🌌 12方位3坐标</a>
-                <a href="ju81.html" class="nav-tab active">📐 用矩81</a>
-                <a href="jiugong_tables.html" class="nav-tab ">📊 九宫纪气大表</a>
+                <a href="index.html" class="nav-tab "> 首页</a>
+                <a href="pipeline.html" class="nav-tab "> 流水线</a>
+                <a href="hexagrams.html" class="nav-tab "> 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab "> 5大定律</a>
+                <a href="wuxing.html" class="nav-tab "> 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab "> 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab "> 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab "> 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab "> 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab active"> 用矩81</a>
+                <a href="jiugong_tables.html" class="nav-tab "> 九宫纪气大表</a>
             </nav>
         </header>
 
@@ -49,7 +49,7 @@
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 矩数螺旋空间运动仪 (纯粹数理逻辑)
+                        <span></span> 3D 矩数螺旋空间运动仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
                         <span class="legend-item equator">● 赤道(0°)</span>
@@ -71,13 +71,13 @@
                             <span class="dot blue"></span> 白道
                         </button>
                         <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
-                            ⚡ 速度: <span id="speed-val">1x</span>
+                             速度: <span id="speed-val">1x</span>
                         </button>
                         <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
-                            🎯 复位视角
+                             复位视角
                         </button>
                         <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
-                            🔄 旋转
+                             旋转
                         </button>
                     </div>
 
@@ -94,12 +94,30 @@
 
             <!-- 栏二：太乙九宫八十一宫阵图 (全页 100% 绝对统一) (33%) -->
             <section class="col-middle-taiyi">
-                <div class="glass-panel">
+                <div class="glass-panel" style="margin-bottom: 6px;">
                     <div class="card-title">
-                        <span>📜</span> 太乙九宫八十一宫阵图 (用矩法降维投影)
+                        <i class="fa-solid fa-table-cells"></i>
+                        <span>太乙九宫八十一宫阵图 (用矩法时空投影)</span>
                     </div>
                     <div class="law-desc-text">
-                        拖动右侧交互控制滑块，太乙 81 宫阵图中对应的降维宫位与 3D 螺旋轨迹同步点亮！
+                        根据当前所选矩度动态呈现气数落点；支持点击单格反向高亮 3D 天球与右侧控制台。
+                    </div>
+                </div>
+
+                <!-- 矩度时空控制器 (切换 1~12 矩或跳转当前值所在矩) -->
+                <div class="ju-tier-controller" style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 215, 0, 0.25); border-radius: 6px; padding: 5px 8px; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: #cbd5e1;">
+                        <span style="color: #ffd700; font-weight: 700;">矩度时空:</span>
+                        <span id="current-ju-badge" style="background: rgba(255, 215, 0, 0.18); border: 1px solid rgba(255, 215, 0, 0.4); color: #ffe066; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 800; display: inline-block;">第 1 矩 (1~81)</span>
+                    </div>
+                    <div id="ju-btn-group" class="ju-btn-group" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                        <button type="button" class="ju-tier-btn active" data-ju="0">1矩基数</button>
+                        <button type="button" class="ju-tier-btn" data-ju="1">2矩(162)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="2">3矩(243)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="3">4矩(324)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="8">9矩(729)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="11">12矩(972)</button>
+                        <button type="button" id="btn-ju-current-val" class="ju-tier-btn" data-ju="auto">当前值所在矩</button>
                     </div>
                 </div>
 
@@ -111,7 +129,7 @@
                 <!-- 模块切换选择框 -->
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>📐</span> 原著《用矩法》四大可交互解构主模块
+                        <span></span> 原著《用矩法》四大可交互解构主模块
                     </div>
                     <select id="ju-module-select" class="custom-select" style="margin-top: 4px;">
                         <option value="12ju">1. 1矩~12矩连续可调运动演算器</option>
@@ -125,7 +143,7 @@
                 <div id="module-ju-12" class="ju-module-card">
                     <div class="glass-panel" style="margin-top: 4px;">
                         <div class="card-title">
-                            <span>🎚️</span> 矩数连续调节滑块: <span id="ju-slider-val-label" style="color:#ffe066; font-size:15px; font-weight:800;">1 矩 (81 气数)</span>
+                            <span></span> 矩数连续调节滑块: <span id="ju-slider-val-label" style="color:#ffe066; font-size:15px; font-weight:800;">1 矩 (81 气数)</span>
                         </div>
                         <div class="slider-container" style="margin-top: 6px;">
                             <input type="range" id="ju-slider" min="1" max="12" value="1" step="1" class="custom-slider">
@@ -164,10 +182,10 @@
                     <div class="glass-panel">
                         <div class="card-title"><span>四角</span> 点击选择四白方位剖析</div>
                         <div class="sanhe-btn-grid" style="grid-template-columns: repeat(2, 1fr); margin-top:6px;">
-                            <button class="sanhe-btn corner-btn active" data-corner="shen" style="color:#4dabf7;">💧 申位 (水/1,5,9矩)</button>
-                            <button class="sanhe-btn corner-btn" data-corner="yin" style="color:#40c057;">🌿 寅位 (木/3,7,11矩)</button>
-                            <button class="sanhe-btn corner-btn" data-corner="si" style="color:#ffe066;">🔥 巳位 (火/2,6,10矩)</button>
-                            <button class="sanhe-btn corner-btn" data-corner="hai" style="color:#ff5252;">⚔️ 亥位 (金/4,8,12矩)</button>
+                            <button class="sanhe-btn corner-btn active" data-corner="shen" style="color:#4dabf7;"> 申位 (水/1,5,9矩)</button>
+                            <button class="sanhe-btn corner-btn" data-corner="yin" style="color:#40c057;"> 寅位 (木/3,7,11矩)</button>
+                            <button class="sanhe-btn corner-btn" data-corner="si" style="color:#ffe066;"> 巳位 (火/2,6,10矩)</button>
+                            <button class="sanhe-btn corner-btn" data-corner="hai" style="color:#ff5252;"> 亥位 (金/4,8,12矩)</button>
                         </div>
                     </div>
 
@@ -199,7 +217,7 @@
                 <div id="module-ju-basket" class="ju-module-card" style="display:none; margin-top: 4px;">
                     <div class="glass-panel">
                         <div class="card-title">
-                            <span>🧺</span> 扣除 60° 节卦滑动控制: <span id="basket-slider-val-label" style="color:#ff5252; font-size:15px; font-weight:800;">5 个节卦 (300°)</span>
+                            <span></span> 扣除 60° 节卦滑动控制: <span id="basket-slider-val-label" style="color:#ff5252; font-size:15px; font-weight:800;">5 个节卦 (300°)</span>
                         </div>
                         <div class="slider-container" style="margin-top: 6px;">
                             <input type="range" id="basket-slider" min="1" max="6" value="5" step="1" class="custom-slider">
@@ -223,7 +241,7 @@
                 <div id="module-ju-square" class="ju-module-card" style="display:none; margin-top: 4px;">
                     <div class="glass-panel">
                         <div class="card-title">
-                            <span>☯</span> 多边形细分拟合: <span id="polygon-slider-val-label" style="color:#ffe066; font-size:15px; font-weight:800;">60 边形 (花甲子节律)</span>
+                            <span></span> 多边形细分拟合: <span id="polygon-slider-val-label" style="color:#ffe066; font-size:15px; font-weight:800;">60 边形 (花甲子节律)</span>
                         </div>
                         <div class="slider-container" style="margin-top: 6px;">
                             <input type="range" id="polygon-slider" min="4" max="81" value="60" step="1" class="custom-slider">
@@ -243,7 +261,7 @@
 
                 <!-- 矩数运动规律完整大表 (拉长纵向滑动空间) -->
                 <div class="glass-panel" style="margin-top: 8px; margin-bottom: 20px;">
-                    <div class="card-title"><span>📋</span> 原著 1~12 矩天际行数与归属总表 (下滑探索更多)</div>
+                    <div class="card-title"><span></span> 原著 1~12 矩天际行数与归属总表 (下滑探索更多)</div>
                     <div class="sequence-table-container" style="max-height: 320px;">
                         <table class="seq-table">
                             <thead>
@@ -257,18 +275,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>1 矩</td><td>81 × 1</td><td>81</td><td>第 9 行</td><td>81九 (太乙矩)</td><td>基本方阵单元</td></tr>
-                                <tr><td>2 矩</td><td>81 × 2</td><td>162</td><td>第 18 行</td><td>18九2 (蛊卦)</td><td>巳亥地户天门交会</td></tr>
-                                <tr><td>3 矩</td><td>81 × 3</td><td>243</td><td>第 27 行</td><td>27九3 (颐卦)</td><td>白道坐标系主轴</td></tr>
-                                <tr><td>4 矩</td><td>81 × 4</td><td>324</td><td>第 27 行下</td><td>36九4 (明夷卦)</td><td style="color:#40c057; font-weight:700;">下际天周 (324+36=360°)</td></tr>
-                                <tr><td>5 矩</td><td>81 × 5</td><td>405</td><td>第 45 行</td><td>45九 (萃卦)</td><td>申位中数主轴</td></tr>
-                                <tr><td>6 矩</td><td>81 × 6</td><td>486</td><td>第 54 行</td><td>54九6 (归妹卦)</td><td>巳位 90° 质变交点</td></tr>
-                                <tr><td>7 矩</td><td>81 × 7</td><td>567</td><td>第 63 行</td><td>63九 (既济卦)</td><td>寅位奇数演进</td></tr>
-                                <tr><td>8 矩</td><td>81 × 8</td><td>648</td><td>第 54 行中</td><td>54九6 (归妹卦)</td><td style="color:#ffe066; font-weight:700;">中际天周 (天地大义)</td></tr>
-                                <tr><td>9 矩</td><td>81 × 9</td><td>729</td><td>第 81 行</td><td>81九 (大大矩)</td><td>申位白道顶峰</td></tr>
-                                <tr><td>10 矩</td><td>81 × 10</td><td>810</td><td>第 90 行</td><td>90九 (质变矩)</td><td>巳位 90° 终极质变</td></tr>
-                                <tr><td>11 矩</td><td>81 × 11</td><td>891</td><td>第 99 行</td><td>99九</td><td>寅位高阶奇数</td></tr>
-                                <tr><td>12 矩</td><td>81 × 12</td><td>972</td><td>第 81 行上</td><td>81九9 (大矩)</td><td style="color:#ff5252; font-weight:700;">上际天周 (12矩大圆满)</td></tr>
+                                <tr class="interactive-row" data-ju="1"><td>1 矩</td><td>81 × 1</td><td>81</td><td>第 9 行</td><td>81九 (太乙矩)</td><td>基本方阵单元</td></tr>
+                                <tr class="interactive-row" data-ju="2"><td>2 矩</td><td>81 × 2</td><td>162</td><td>第 18 行</td><td>18九2 (蛊卦)</td><td>巳亥地户天门交会</td></tr>
+                                <tr class="interactive-row" data-ju="3"><td>3 矩</td><td>81 × 3</td><td>243</td><td>第 27 行</td><td>27九3 (颐卦)</td><td>白道坐标系主轴</td></tr>
+                                <tr class="interactive-row" data-ju="4"><td>4 矩</td><td>81 × 4</td><td>324</td><td>第 27 行下</td><td>36九4 (明夷卦)</td><td style="color:#40c057; font-weight:700;">下际天周 (324+36=360°)</td></tr>
+                                <tr class="interactive-row" data-ju="5"><td>5 矩</td><td>81 × 5</td><td>405</td><td>第 45 行</td><td>45九 (萃卦)</td><td>申位中数主轴</td></tr>
+                                <tr class="interactive-row" data-ju="6"><td>6 矩</td><td>81 × 6</td><td>486</td><td>第 54 行</td><td>54九6 (归妹卦)</td><td>巳位 90° 质变交点</td></tr>
+                                <tr class="interactive-row" data-ju="7"><td>7 矩</td><td>81 × 7</td><td>567</td><td>第 63 行</td><td>63九 (既济卦)</td><td>寅位奇数演进</td></tr>
+                                <tr class="interactive-row" data-ju="8"><td>8 矩</td><td>81 × 8</td><td>648</td><td>第 54 行中</td><td>54九6 (归妹卦)</td><td style="color:#ffe066; font-weight:700;">中际天周 (天地大义)</td></tr>
+                                <tr class="interactive-row" data-ju="9"><td>9 矩</td><td>81 × 9</td><td>729</td><td>第 81 行</td><td>81九 (大大矩)</td><td>申位白道顶峰</td></tr>
+                                <tr class="interactive-row" data-ju="10"><td>10 矩</td><td>81 × 10</td><td>810</td><td>第 90 行</td><td>90九 (质变矩)</td><td>巳位 90° 终极质变</td></tr>
+                                <tr class="interactive-row" data-ju="11"><td>11 矩</td><td>81 × 11</td><td>891</td><td>第 99 行</td><td>99九</td><td>寅位高阶奇数</td></tr>
+                                <tr class="interactive-row" data-ju="12"><td>12 矩</td><td>81 × 12</td><td>972</td><td>第 81 行上</td><td>81九9 (大矩)</td><td style="color:#ff5252; font-weight:700;">上际天周 (12矩大圆满)</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -278,6 +296,6 @@
     </div>
 
     <!-- 用矩法全景引擎 (带版本防缓存) -->
-    <script src="ju81.js?v=20260804_v40"></script>
+    <script src="ju81.js?v=20260911_v48"></script>
 </body>
 </html>

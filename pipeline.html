@@ -14,14 +14,14 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v37">
+    <link rel="stylesheet" href="index.css?v=20260911_v42">
 </head>
 <body>
     <div class="app-container">
         <!-- 统一 100% 结构固定 Header 顶栏 -->
         <header class="app-header">
             <div class="header-brand">
-                <div class="logo-icon">☯</div>
+                <div class="logo-icon"></div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
                     <span class="subtitle">根据梁致堂原著解构 · 任意数据 12 步拆解推演流水线</span>
@@ -29,17 +29,17 @@
             </div>
             
             <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab ">🏠 首页</a>
-                <a href="pipeline.html" class="nav-tab active">⚡ 流水线</a>
-                <a href="hexagrams.html" class="nav-tab ">☰ 64卦拓扑</a>
-                <a href="laws.html" class="nav-tab ">✨ 5大定律</a>
-                <a href="wuxing.html" class="nav-tab ">☯ 五行三元</a>
-                <a href="jiugong_qi.html" class="nav-tab ">📜 九宫七输入</a>
-                <a href="zhoutian360.html" class="nav-tab ">🌀 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab ">🔢 939697七数</a>
-                <a href="coordinates12.html" class="nav-tab ">🌌 12方位3坐标</a>
-                <a href="ju81.html" class="nav-tab ">📐 用矩81</a>
-                <a href="jiugong_tables.html" class="nav-tab ">📊 九宫纪气大表</a>
+                <a href="index.html" class="nav-tab "> 首页</a>
+                <a href="pipeline.html" class="nav-tab active"> 流水线</a>
+                <a href="hexagrams.html" class="nav-tab "> 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab "> 5大定律</a>
+                <a href="wuxing.html" class="nav-tab "> 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab "> 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab "> 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab "> 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab "> 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab "> 用矩81</a>
+                <a href="jiugong_tables.html" class="nav-tab "> 九宫纪气大表</a>
             </nav>
         </header>
 
@@ -49,7 +49,7 @@
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪
+                        3D 浑天天象坐标仪
                     </div>
                     <div class="orbit-legend">
                         <span class="legend-item equator">● 赤道(天)</span>
@@ -71,13 +71,13 @@
                             <span class="dot blue"></span> 白道
                         </button>
                         <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
-                            ⚡ 速度: <span id="speed-val">1x</span>
+                            速度: <span id="speed-val">1x</span>
                         </button>
                         <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
-                            🎯 复位视角
+                            复位视角
                         </button>
                         <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
-                            🔄 旋转
+                            旋转
                         </button>
                     </div>
 
@@ -96,10 +96,25 @@
             <section class="col-middle-taiyi">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                        太乙九宫八十一宫阵图 (原书精确排布)
                     </div>
                     <div class="law-desc-text">
                         宏观按洛书 9 宫分块，微观 9 数按原书《太乙九宫图》精确定准。点击单元格可联动态象。
+                    </div>
+
+                    <!-- 多重矩数时空跃迁切换栏 (动态维度层) -->
+                    <div class="ju-tier-controller">
+                        <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: #cbd5e1;">
+                            <span style="color: #ffd700; font-weight: 700;">矩度时空:</span>
+                            <span id="current-ju-badge" style="background: rgba(255, 215, 0, 0.18); border: 1px solid rgba(255, 215, 0, 0.4); color: #ffe066; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 800; display: inline-block;">第 1 矩 (1~81)</span>
+                        </div>
+                        <div id="ju-btn-group" class="ju-btn-group" style="display: flex; gap: 5px; align-items: center;">
+                            <button type="button" class="ju-tier-btn active" data-ju="0">1矩基数</button>
+                            <button type="button" class="ju-tier-btn" data-ju="1">2矩(+81)</button>
+                            <button type="button" class="ju-tier-btn" data-ju="2">3矩(+162)</button>
+                            <button type="button" class="ju-tier-btn" data-ju="3">4矩(+243)</button>
+                            <button type="button" id="btn-ju-current-n" class="ju-tier-btn" data-ju="auto">N所在矩</button>
+                        </div>
                     </div>
                 </div>
 
@@ -110,7 +125,7 @@
             <section class="col-right-controls" style="display: flex; flex-direction: column; height: 100%; overflow-y: auto;">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>⚡</span> 任意数值推演控制台
+                        任意数值推演控制台
                     </div>
                     
                     <div class="input-group" style="margin-top: 8px;">
@@ -118,7 +133,7 @@
                         <div class="input-wrapper" style="display: flex; gap: 8px;">
                             <input type="number" id="num-input" value="70000" min="1" max="999999" class="custom-input" style="flex: 1;">
                             <button id="btn-calculate" class="action-btn-gold" style="width: 140px;">
-                                🚀 推演数理 (再点取消)
+                                推演数理 (再点取消)
                             </button>
                         </div>
                     </div>
@@ -127,7 +142,7 @@
                 <!-- 5 步拆解推演流水线 -->
                 <div id="pipeline-steps-card" class="glass-panel" style="margin-top: 6px;">
                     <div class="card-title">
-                        <span>🔍</span> 数据降维 5 步推演流水线
+                        数据降维 5 步推演流水线
                     </div>
                     
                     <div class="pipeline-steps" style="display: flex; flex-direction: column; gap: 4px;">
@@ -151,7 +166,7 @@
                             <div class="step-num">3</div>
                             <div class="step-content">
                                 <div class="step-name">地支 12 位归属 (N % 12)</div>
-                                <div class="step-val" id="val-step-3">余 4 ➔ 卯位</div>
+                                <div class="step-val" id="val-step-3">余 4 -> 卯位</div>
                             </div>
                         </div>
 
@@ -176,7 +191,7 @@
                 <!-- 12 步跳跃映射表 (向下拓展拉长，充分享用底部空间) -->
                 <div class="glass-panel" style="margin-top: 6px; flex: 1; display: flex; flex-direction: column; min-height: 380px;">
                     <div class="card-title">
-                        <span>📋</span> N × k (1~12) 周天跳跃映射明细
+                        N × k (1~12) 周天跳跃映射明细
                     </div>
                     
                     <div class="sequence-table-container" style="flex: 1; max-height: calc(100vh - 300px); min-height: 340px; margin-top: 6px;">
@@ -202,6 +217,6 @@
     </div>
 
     <!-- 流水线引擎 (带版本防缓存) -->
-    <script src="pipeline.js?v=20260804_v37"></script>
+    <script src="pipeline.js?v=20260911_v45"></script>
 </body>
 </html>

@@ -21,7 +21,7 @@
         <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
-                <div class="logo-icon">☯</div>
+                <div class="logo-icon"></div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
                     <span class="subtitle">根据梁致堂原著解构 · 天象五大定律演示馆</span>
@@ -29,17 +29,17 @@
             </div>
             
                                     <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab ">🏠 首页</a>
-                <a href="pipeline.html" class="nav-tab ">⚡ 流水线</a>
-                <a href="hexagrams.html" class="nav-tab ">☰ 64卦拓扑</a>
-                <a href="laws.html" class="nav-tab active">✨ 5大定律</a>
-                <a href="wuxing.html" class="nav-tab ">☯ 五行三元</a>
-                <a href="jiugong_qi.html" class="nav-tab ">📜 九宫七输入</a>
-                <a href="zhoutian360.html" class="nav-tab ">🌀 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab ">🔢 939697七数</a>
-                <a href="coordinates12.html" class="nav-tab ">🌌 12方位3坐标</a>
-                <a href="ju81.html" class="nav-tab ">📐 用矩81</a>
-                <a href="jiugong_tables.html" class="nav-tab ">📊 九宫纪气大表</a>
+                <a href="index.html" class="nav-tab "> 首页</a>
+                <a href="pipeline.html" class="nav-tab "> 流水线</a>
+                <a href="hexagrams.html" class="nav-tab "> 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab active"> 5大定律</a>
+                <a href="wuxing.html" class="nav-tab "> 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab "> 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab "> 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab "> 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab "> 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab "> 用矩81</a>
+                <a href="jiugong_tables.html" class="nav-tab "> 九宫纪气大表</a>
             </nav>
         </header>
 
@@ -49,7 +49,7 @@
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
+                        <span></span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
                         <span class="legend-item equator">● 赤道(0°)</span>
@@ -71,13 +71,13 @@
                             <span class="dot blue"></span> 白道
                         </button>
                         <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
-                            ⚡ 速度: <span id="speed-val">1x</span>
+                             速度: <span id="speed-val">1x</span>
                         </button>
                         <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
-                            🎯 复位视角
+                             复位视角
                         </button>
                         <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
-                            🔄 旋转
+                             旋转
                         </button>
                     </div>
 
@@ -94,12 +94,28 @@
 
             <!-- 栏二：太乙九宫八十一宫阵图 (全页 100% 绝对统一) (33%) -->
             <section class="col-middle-taiyi">
-                <div class="glass-panel">
+                <div class="glass-panel" style="margin-bottom: 6px;">
                     <div class="card-title">
-                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                        <i class="fa-solid fa-table-cells"></i>
+                        <span>太乙九宫八十一宫阵图 (定律时空投影)</span>
                     </div>
                     <div class="law-desc-text">
-                        点击右侧定律按钮、拖动滑块或选择单元格，太乙 81 宫阵图同步闪耀高亮！
+                        根据右侧定律计算值动态呈现太乙气数落点；支持点击单格反向高亮 3D 天球与定律控制台。
+                    </div>
+                </div>
+
+                <!-- 矩度时空控制器 (切换矩度或跳转当前值所在矩) -->
+                <div class="ju-tier-controller" style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 215, 0, 0.25); border-radius: 6px; padding: 5px 8px; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: #cbd5e1;">
+                        <span style="color: #ffd700; font-weight: 700;">矩度时空:</span>
+                        <span id="current-ju-badge" style="background: rgba(255, 215, 0, 0.18); border: 1px solid rgba(255, 215, 0, 0.4); color: #ffe066; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 800; display: inline-block;">第 1 矩 (1~81)</span>
+                    </div>
+                    <div id="ju-btn-group" class="ju-btn-group" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                        <button type="button" class="ju-tier-btn active" data-ju="0">1矩基数</button>
+                        <button type="button" class="ju-tier-btn" data-ju="1">2矩(162)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="2">3矩(243)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="3">4矩(324)</button>
+                        <button type="button" id="btn-ju-current-val" class="ju-tier-btn" data-ju="auto">当前值所在矩</button>
                     </div>
                 </div>
 
@@ -111,7 +127,7 @@
                 <!-- 定律 1：10^n 太阳赤道守恒律 (滑块 + 10 个快捷按键) -->
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>☀️</span> 定律1 · 10^n 太阳赤道守恒律 (双重交互控件)
+                        <span></span> 定律1 · 10^n 太阳赤道守恒律 (双重交互控件)
                     </div>
                     <div class="slider-container" style="margin-top: 4px;">
                         <div style="font-size:12px; color:#cbd5e1; margin-bottom:2px;">
@@ -140,12 +156,12 @@
 
                 <!-- 定律 2：数 7 北斗七星芒星律 (白道七星芒行律) -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title"><span>✨</span> 定律2 · 数 7 · 白道七星芒行律 (12 芒星跳跃)</div>
+                    <div class="card-title"><span></span> 定律2 · 数 7 · 白道七星芒行律 (12 芒星跳跃)</div>
                     <div class="law-desc-text" style="margin-top: 2px;">
                         原书 P334 论述：“数 7 乃白道七星芒行之枢纽，7×k 依次穿梭于赤/黄/白三元，无一重复构造 12 角芒星神圣闭环”。
                     </div>
                     <button id="btn-demo-star7" class="action-btn-gold" style="margin-top: 6px; width: 100%;">
-                        ✨ 渲染 12 芒星数据流光脉冲 (再点取消)
+                         渲染 12 芒星数据流光脉冲 (再点取消)
                     </button>
 
                     <!-- 数理解析及递算明细盒 -->
@@ -176,7 +192,7 @@
 
                 <!-- 定律 3：周天 360° 切割归九律 (滑块 + 角度按键) -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title"><span>🌀</span> 定律3 · 周天 360° 切割归九律</div>
+                    <div class="card-title"><span></span> 定律3 · 周天 360° 切割归九律</div>
                     <div class="slider-container" style="margin-top: 4px;">
                         <div style="font-size:12px; color:#cbd5e1; margin-bottom:2px;">
                             对半切割份数: <span id="split-val-label" style="color:#ffe066; font-weight:800;">1 份 (360°)</span>
@@ -202,7 +218,7 @@
 
                 <!-- 定律 4：地支三合局 -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title"><span>🔺</span> 定律4 · 地支三合局 3D 拓扑</div>
+                    <div class="card-title"><span></span> 定律4 · 地支三合局 3D 拓扑</div>
                     <div class="sanhe-btn-grid" style="margin-top: 4px;">
                         <button class="sanhe-btn active" data-sanhe="water">申子辰 (水局)</button>
                         <button class="sanhe-btn" data-sanhe="metal">巳酉丑 (金局)</button>
@@ -213,9 +229,9 @@
 
                 <!-- 定律 5：永静数 6 天地门轴线 -->
                 <div class="glass-panel" style="margin-top: 6px; margin-bottom: 20px;">
-                    <div class="card-title"><span>🚪</span> 定律5 · 永静数 6 天地门轴线</div>
+                    <div class="card-title"><span></span> 定律5 · 永静数 6 天地门轴线</div>
                     <button id="btn-demo-yongjing" class="action-btn" style="margin-top: 4px; width: 100%;">
-                        🚪 渲染巳亥天地门轴线数据脉冲
+                         渲染巳亥天地门轴线数据脉冲
                     </button>
                 </div>
             </section>
@@ -223,6 +239,6 @@
     </div>
 
     <!-- 天象五大定律引擎 (带版本防缓存) -->
-    <script src="laws.js?v=20260804_v37"></script>
+    <script src="laws.js?v=20260911_v48"></script>
 </body>
 </html>

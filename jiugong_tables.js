@@ -187,14 +187,21 @@ class JiugongTablesPureMath3DEngine {
         poleLine.computeLineDistances();
         this.celestialGridGroup.add(poleLine);
 
-        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
-        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        // 北极星微星核与星宿光环 (告别巨大白塑料球，无 emoji)
+        const northStarGeom = new THREE.SphereGeometry(0.14, 16, 16);
+        const northStarMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const northStar = new THREE.Mesh(northStarGeom, northStarMat);
         northStar.position.set(0, 0, 8.5);
         this.celestialGridGroup.add(northStar);
 
-        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
-        northSprite.position.set(0, 0, 9.8);
+        const northHaloGeom = new THREE.TorusGeometry(0.32, 0.02, 12, 36);
+        const northHaloMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.6 });
+        const northHalo = new THREE.Mesh(northHaloGeom, northHaloMat);
+        northHalo.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northHalo);
+
+        const northSprite = this.createTextSprite("北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.6);
         this.celestialGridGroup.add(northSprite);
     }
 
@@ -216,24 +223,20 @@ class JiugongTablesPureMath3DEngine {
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
 
+        // 十二地支星宿位点：彻底移除死板塑料大球与斜金环，升华为【微光星宿晶核 + 浑天星曜玉璧】
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
-            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
-            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
-            orbMesh.position.copy(pos);
-            this.orbsGroup.add(orbMesh);
+            // 环上微型星宿光核 (半径仅 0.07，精致纯粹如恒星微芒，不遮挡轨道流线)
+            const starGeom = new THREE.SphereGeometry(0.07, 12, 12);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const starMesh = new THREE.Mesh(starGeom, starMat);
+            starMesh.position.copy(pos);
+            this.orbsGroup.add(starMesh);
 
-            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
-            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
-            ringMesh.position.copy(pos);
-            ringMesh.rotation.x = Math.PI / 2;
-            this.orbsGroup.add(ringMesh);
-
+            // 浑天星曜玉璧徽标 (贴合环轨外缘，比例优雅和谐)
             const sprite = this.createTextSprite(b.name, b.color);
-            sprite.position.copy(pos.clone().multiplyScalar(1.18));
+            sprite.position.copy(pos.clone().multiplyScalar(1.08));
             this.orbsGroup.add(sprite);
         });
     }
@@ -252,36 +255,59 @@ class JiugongTablesPureMath3DEngine {
         motionLine.computeLineDistances();
         this.jgt3DGroup.add(motionLine);
 
-        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
+        const pulseGeom = new THREE.SphereGeometry(0.22, 20, 20);
         const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5 });
         this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
         this.jgt3DGroup.add(this.dataPulseMesh);
     }
 
+    // 绘制高质感“浑天星曜玉璧”地支徽标
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
+        // 1. 柔和外围星辉光晕
+        const radGlow = ctx.createRadialGradient(64, 64, 28, 64, 64, 58);
+        radGlow.addColorStop(0, "rgba(0, 0, 0, 0)");
+        radGlow.addColorStop(0.65, colorHex + "33");
+        radGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = radGlow;
         ctx.beginPath();
-        ctx.arc(64, 64, 52, 0, Math.PI * 2);
+        ctx.arc(64, 64, 58, 0, Math.PI * 2);
         ctx.fill();
+
+        // 2. 浑天黑曜石半透明微透星盘底
+        ctx.fillStyle = "rgba(10, 16, 28, 0.88)";
+        ctx.beginPath();
+        ctx.arc(64, 64, 46, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. 双重同心浑天仪规金线
         ctx.strokeStyle = colorHex;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', serif";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(64, 64, 40, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 4. 正中温润书法地支大字 (带内辉)
+        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', 'SimSun', serif";
         ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = colorHex;
+        ctx.shadowBlur = 8;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(text, 64, 64);
+        ctx.fillText(text, 64, 65);
 
         const texture = new THREE.CanvasTexture(canvas);
         const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(spriteMat);
-        sprite.scale.set(1.35, 1.35, 1.35);
+        sprite.scale.set(1.4, 1.4, 1.4);
         return sprite;
     }
 
@@ -323,8 +349,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const badgeTitle = document.getElementById("jgt-badge-title");
     const badgeDesc = document.getElementById("jgt-badge-desc");
 
-    // 渲染太乙 81 宫阵图 (带有数字 + 角标位号，与原书图片 100% 一致)
-    function initLuoshuTaiyi9x9Matrix() {
+    const currentJuBadge = document.getElementById("current-ju-badge");
+    const btnJuCurrentVal = document.getElementById("btn-ju-current-val");
+
+    let currentJu = 0;
+    let currentActivePositions = [];
+    let currentFocusedCell = null;
+    let currentActiveVal = 1;
+    let activeOverrideMap = {};
+
+    // 渲染太乙 81 宫阵图 (支持 1~9 矩乃至更高时空跃迁，真实大数呈现)
+    function renderLuoshuTaiyi9x9Matrix(juIndex = 0, activePositions = [], focusedPos = null, overrideMap = {}) {
         if (!matrixContainer) return;
         matrixContainer.className = "luoshu-taiyi-9x9-container";
         matrixContainer.innerHTML = "";
@@ -341,25 +376,42 @@ document.addEventListener("DOMContentLoaded", () => {
             const grid3x3 = document.createElement("div");
             grid3x3.className = "palace-grid-3x3";
 
-            palace.numbers.forEach(num => {
+            palace.numbers.forEach(baseNum => {
+                const currentVal = overrideMap[baseNum] !== undefined ? overrideMap[baseNum] : (baseNum + juIndex * 81);
+                const r12 = currentVal % 12 === 0 ? 12 : currentVal % 12;
+                const branch = EARTHLY_BRANCHES[r12 - 1];
+                const subTag = TAIYI_81_SUB_LABELS[baseNum] || "";
+                const palacePosText = subTag.replace(/[()]/g, "");
+
                 const cell = document.createElement("div");
                 cell.className = "taiyi-81-cell";
-                cell.dataset.pos = num;
-                
-                const subTag = TAIYI_81_SUB_LABELS[num] || "";
-                cell.title = `数值 ${num} (${palace.name} ${subTag})`;
-                cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-sub">${subTag}</div>`;
+                cell.dataset.pos = baseNum;
+                cell.dataset.val = currentVal;
+                cell.title = `数值: ${currentVal} (第${juIndex + 1}矩)\n落宫位次: ${palace.name} ${palacePosText}\n地支: ${branch.name}位 (${branch.system})`;
+
+                cell.innerHTML = `
+                    <div class="cell-num" style="font-size: ${currentVal >= 10000 ? '12px' : (currentVal >= 1000 ? '14px' : (currentVal >= 100 ? '16px' : '18px'))};">${currentVal}</div>
+                    <div class="cell-sub" style="font-size: 10.5px; display: flex; gap: 2px; align-items: center; justify-content: center; line-height: 1.1;">
+                        <span style="opacity: 0.85;">${palacePosText}</span>
+                        <span style="color: ${branch.color}; font-weight: 900;">${branch.name}</span>
+                    </div>
+                `;
+
+                if (activePositions.includes(baseNum)) {
+                    cell.classList.add("active-pos");
+                }
+
+                if (focusedPos === baseNum) {
+                    cell.style.boxShadow = "0 0 16px rgba(255, 215, 0, 0.95), inset 0 0 10px rgba(255, 215, 0, 0.4)";
+                    cell.style.borderColor = "#ffd700";
+                    cell.classList.add("row-click-flash");
+                    setTimeout(() => cell.classList.remove("row-click-flash"), 450);
+                }
 
                 cell.addEventListener("click", () => {
-                    const isAlreadyActive = cell.classList.contains("active-pos");
-                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
-
-                    if (!isAlreadyActive) {
-                        cell.classList.add("active-pos");
-                        const rem12 = num % 12 === 0 ? 12 : num % 12;
-                        engine.highlightBranchPos(rem12 - 1);
-                    }
+                    handleTaiyiCellClick(baseNum, currentVal, palace, palacePosText, branch);
                 });
+
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -367,14 +419,97 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    initLuoshuTaiyi9x9Matrix();
+    function switchJuTier(ju, targetActivePositions = null, focusedPos = null, overrideMap = {}) {
+        currentJu = Math.max(0, parseInt(ju, 10) || 0);
+        activeOverrideMap = overrideMap;
+
+        document.querySelectorAll(".ju-tier-btn").forEach(btn => {
+            const bJu = btn.dataset.ju;
+            if (bJu === "auto") {
+                btn.classList.toggle("active", currentJu > 3);
+            } else {
+                btn.classList.toggle("active", parseInt(bJu, 10) === currentJu);
+            }
+        });
+
+        if (currentJuBadge) {
+            const startVal = currentJu * 81 + 1;
+            const endVal = (currentJu + 1) * 81;
+            currentJuBadge.innerText = `第 ${currentJu + 1} 矩 (${startVal}~${endVal})`;
+        }
+
+        if (btnJuCurrentVal) {
+            const nJu = Math.floor((currentActiveVal - 1) / 81);
+            btnJuCurrentVal.innerText = `当前值所在矩(第${nJu + 1}矩)`;
+            btnJuCurrentVal.title = `切回 数值 ${currentActiveVal} 所在矩 (第 ${nJu + 1} 矩)`;
+        }
+
+        if (matrixContainer) {
+            matrixContainer.classList.remove("matrix-shift-anim");
+            void matrixContainer.offsetWidth;
+            matrixContainer.classList.add("matrix-shift-anim");
+        }
+
+        const positions = targetActivePositions !== null ? targetActivePositions : currentActivePositions;
+        const focus = focusedPos !== null ? focusedPos : currentFocusedCell;
+        renderLuoshuTaiyi9x9Matrix(currentJu, positions, focus, activeOverrideMap);
+    }
+
+    function setupJuTierControls() {
+        document.querySelectorAll(".ju-tier-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.classList.add("row-click-flash");
+                setTimeout(() => this.classList.remove("row-click-flash"), 450);
+
+                const bJu = this.dataset.ju;
+                if (bJu === "auto") {
+                    const nJu = Math.floor((currentActiveVal - 1) / 81);
+                    switchJuTier(nJu, [currentFocusedCell], currentFocusedCell, { [currentFocusedCell]: currentActiveVal });
+                } else {
+                    const parsedJu = parseInt(bJu, 10);
+                    switchJuTier(parsedJu, [currentFocusedCell], currentFocusedCell);
+                }
+            });
+        });
+    }
+
+    function handleTaiyiCellClick(baseNum, currentVal, palace, palacePosText, branch) {
+        currentFocusedCell = baseNum;
+        currentActivePositions = [baseNum];
+        currentActiveVal = currentVal;
+
+        const rem12 = currentVal % 12 === 0 ? 12 : currentVal % 12;
+        engine.highlightBranchPos(rem12 - 1);
+
+        switchJuTier(currentJu, [baseNum], baseNum);
+
+        // 尝试在右侧大表中高亮匹配该数值 currentVal 的单元格
+        let foundCell = false;
+        document.querySelectorAll("#jgt-table-body td.interactive-cell").forEach(td => {
+            const tdVal = parseInt(td.dataset.val, 10);
+            if (tdVal === currentVal) {
+                td.classList.add("active-cell");
+                td.classList.add("row-click-flash");
+                setTimeout(() => td.classList.remove("row-click-flash"), 500);
+                foundCell = true;
+            } else {
+                td.classList.remove("active-cell");
+            }
+        });
+
+        if (badgeTitle) badgeTitle.innerText = `阵图选中: 第 ${baseNum} 宫 ${palacePosText} (数值 ${currentVal})`;
+        if (badgeDesc) badgeDesc.innerText = `处于第 ${currentJu + 1} 矩 (${currentJu * 81 + 1}~${(currentJu + 1) * 81})，落于【${branch.name}位】`;
+    }
+
+    setupJuTierControls();
+    switchJuTier(0, [], null);
 
     function updatePalaceBanner(palaceKey) {
         if (!palaceBanner) return;
         if (palaceKey === "all") {
             palaceBanner.innerHTML = `
                 <div style="font-size:13px; font-weight:800; color:#ffe066;">
-                    📜 原著《九宫纪气数一览表》9大表合集全景
+                    【文献】 原著《九宫纪气数一览表》9大表合集全景
                 </div>
                 <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px;">
                     梁致堂原著 P342-350（对应 PPT 第34~37页）共 9 张 9x9 纪气数倍积大表，完美呈现每一宫从 1 级至 9 级倍积与进位数。点击每个单格可精准定位单格算式与 81 宫位号！
@@ -384,7 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const pInfo = ORIGINAL_9_TABLES_INFO[parseInt(palaceKey, 10)] || ORIGINAL_9_TABLES_INFO[1];
             palaceBanner.innerHTML = `
                 <div style="font-size:13px; font-weight:800; color:#ffe066;">
-                    📜 原著【${pInfo.name}】原表解构 (${pInfo.page})
+                    【文献】 原著【${pInfo.name}】原表解构 (${pInfo.page})
                 </div>
                 <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px; line-height:1.4;">
                     ${pInfo.desc} (支持点击单格 ×1~×9 精准计算及点击行首全行高亮)
@@ -405,7 +540,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const pInfo = ORIGINAL_9_TABLES_INFO[pNum] || ORIGINAL_9_TABLES_INFO[1];
 
         if (tableTitle) {
-            tableTitle.innerText = `📜 原书【${pInfo.name}】9x9 纪气数倍积大表 (${pInfo.page})`;
+            tableTitle.innerText = `【文献】 原书【${pInfo.name}】9x9 纪气数倍积大表 (${pInfo.page})`;
         }
 
         const seq = pInfo.baseSeq;
@@ -478,7 +613,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
 
                 if (isAlreadyActive) {
-                    document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+                    currentActivePositions = [];
+                    currentFocusedCell = null;
+                    switchJuTier(0, [], null);
                     return;
                 }
 
@@ -486,7 +623,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 tr.classList.add("row-click-flash");
                 setTimeout(() => tr.classList.remove("row-click-flash"), 450);
 
-                highlightCellAnd3D(rowVal * seq[0], rowVal, seq[0], pInfo);
+                // 计算该行所有 9 个乘积以及它们落于太乙 81 的位置
+                const rowActivePositions = [];
+                const rowOverrideMap = {};
+                seq.forEach(colVal => {
+                    const prod = rowVal * colVal;
+                    const r81 = prod % 81 === 0 ? 81 : prod % 81;
+                    rowActivePositions.push(r81);
+                    rowOverrideMap[r81] = prod;
+                });
+                const firstVal = rowVal * seq[0];
+                const firstRem81 = firstVal % 81 === 0 ? 81 : firstVal % 81;
+                const nJu = Math.floor((firstVal - 1) / 81);
+
+                currentActiveVal = firstVal;
+                currentFocusedCell = firstRem81;
+                currentActivePositions = rowActivePositions;
+                switchJuTier(nJu, rowActivePositions, firstRem81, rowOverrideMap);
+
+                highlightCellAnd3D(firstVal, rowVal, seq[0], pInfo);
             });
 
             // 给每一个单格绑定精准点击事件 (Exact Cell Clicking)
@@ -499,11 +654,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
 
                     if (isCellActive) {
-                        document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.remove("active-pos"));
+                        currentActivePositions = [];
+                        currentFocusedCell = null;
+                        switchJuTier(0, [], null);
                         if (detailCard) {
                             detailCard.innerHTML = `
                                 <div style="font-size: 13px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
-                                    📜 原书【${pInfo ? pInfo.name : '九宫'}】9x9 纪气数倍积大表全景 (P342-350)
+                                    【文献】 原书【${pInfo ? pInfo.name : '九宫'}】9x9 纪气数倍积大表全景 (P342-350)
                                 </div>
                                 <div style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
                                     点击大表中任意单元格查看该格单项算式、太乙 81 位号与天体坐标；再次点击可【取消选中】。
@@ -556,8 +713,17 @@ document.addEventListener("DOMContentLoaded", () => {
         trBottomCarry.querySelectorAll(".interactive-cell").forEach(cellTd => {
             cellTd.addEventListener("click", (e) => {
                 e.stopPropagation();
+                const isCellActive = cellTd.classList.contains("active-cell");
                 document.querySelectorAll(".interactive-cell").forEach(c => c.classList.remove("active-cell"));
                 document.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
+
+                if (isCellActive) {
+                    currentActivePositions = [];
+                    currentFocusedCell = null;
+                    switchJuTier(0, [], null);
+                    return;
+                }
+
                 cellTd.classList.add("active-cell");
 
                 const val = parseInt(cellTd.dataset.val, 10);
@@ -582,10 +748,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const deg = (val * 4.4444).toFixed(1) + "°";
         const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
 
-        // 高亮太乙 81 宫 (双行角标位号匹配原图)
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === rem81);
-        });
+        currentActiveVal = val;
+        currentFocusedCell = rem81;
+        currentActivePositions = [rem81];
+        const nJu = Math.floor((val - 1) / 81);
+        switchJuTier(nJu, [rem81], rem81, { [rem81]: val });
 
         // 驱动 3D 节点
         engine.highlightBranchPos(rem12 - 1);
@@ -595,7 +762,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (detailCard) {
             detailCard.innerHTML = `
                 <div style="font-size: 14px; font-weight: 800; color: #ffe066; margin-bottom: 4px;">
-                    🎯 【${pInfo ? pInfo.name : '九宫'}】原书单格精准算式: <span style="color:#ffffff;">${formulaText}</span>
+                    【定位】 【${pInfo ? pInfo.name : '九宫'}】原书单格精准算式: <span style="color:#ffffff;">${formulaText}</span>
                 </div>
                 <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
                     • 单格计算值: <strong>${val}</strong> | 归太乙 81 阵图: <strong style="color:#ffe066;">第 ${rem81} 宫 ${subTag}</strong> | 对应易卦: <strong>${hexName}</strong><br>
@@ -607,7 +774,7 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         }
 
-        if (badgeTitle) badgeTitle.innerText = `单格 ${formulaText} ➔ 第 ${rem81} 宫 ${subTag} (${branch.name}位)`;
+        if (badgeTitle) badgeTitle.innerText = `单格 ${formulaText} -> 第 ${rem81} 宫 ${subTag} (${branch.name}位)`;
         if (badgeDesc) badgeDesc.innerText = `对应 ${hexName} · ${deg}，太乙 81 阵图 ${subTag} 位与 3D 坐标系同步高亮`;
     }
 

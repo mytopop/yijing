@@ -188,14 +188,21 @@ class LawsPureMath3DEngine {
         poleLine.computeLineDistances();
         this.celestialGridGroup.add(poleLine);
 
-        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
-        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        // 北极星微星核与星宿光环 (告别巨大白塑料球，无 emoji)
+        const northStarGeom = new THREE.SphereGeometry(0.14, 16, 16);
+        const northStarMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const northStar = new THREE.Mesh(northStarGeom, northStarMat);
         northStar.position.set(0, 0, 8.5);
         this.celestialGridGroup.add(northStar);
 
-        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
-        northSprite.position.set(0, 0, 9.8);
+        const northHaloGeom = new THREE.TorusGeometry(0.32, 0.02, 12, 36);
+        const northHaloMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.6 });
+        const northHalo = new THREE.Mesh(northHaloGeom, northHaloMat);
+        northHalo.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northHalo);
+
+        const northSprite = this.createTextSprite("北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.6);
         this.celestialGridGroup.add(northSprite);
     }
 
@@ -217,52 +224,71 @@ class LawsPureMath3DEngine {
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
 
+        // 十二地支星宿位点：彻底移除死板塑料大球与斜金环，升华为【微光星宿晶核 + 浑天星曜玉璧】
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
-            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
-            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
-            orbMesh.position.copy(pos);
-            this.orbsGroup.add(orbMesh);
+            // 环上微型星宿光核 (半径仅 0.07，精致纯粹如恒星微芒，不遮挡轨道流线)
+            const starGeom = new THREE.SphereGeometry(0.07, 12, 12);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const starMesh = new THREE.Mesh(starGeom, starMat);
+            starMesh.position.copy(pos);
+            this.orbsGroup.add(starMesh);
 
-            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
-            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
-            ringMesh.position.copy(pos);
-            ringMesh.rotation.x = Math.PI / 2;
-            this.orbsGroup.add(ringMesh);
-
+            // 浑天星曜玉璧徽标 (贴合环轨外缘，比例优雅和谐)
             const sprite = this.createTextSprite(b.name, b.color);
-            sprite.position.copy(pos.clone().multiplyScalar(1.18));
+            sprite.position.copy(pos.clone().multiplyScalar(1.08));
             this.orbsGroup.add(sprite);
         });
     }
 
+    // 绘制高质感“浑天星曜玉璧”地支徽标
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
+        // 1. 柔和外围星辉光晕
+        const radGlow = ctx.createRadialGradient(64, 64, 28, 64, 64, 58);
+        radGlow.addColorStop(0, "rgba(0, 0, 0, 0)");
+        radGlow.addColorStop(0.65, colorHex + "33");
+        radGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = radGlow;
         ctx.beginPath();
-        ctx.arc(64, 64, 52, 0, Math.PI * 2);
+        ctx.arc(64, 64, 58, 0, Math.PI * 2);
         ctx.fill();
+
+        // 2. 浑天黑曜石半透明微透星盘底
+        ctx.fillStyle = "rgba(10, 16, 28, 0.88)";
+        ctx.beginPath();
+        ctx.arc(64, 64, 46, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. 双重同心浑天仪规金线
         ctx.strokeStyle = colorHex;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', serif";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(64, 64, 40, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 4. 正中温润书法地支大字 (带内辉)
+        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', 'SimSun', serif";
         ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = colorHex;
+        ctx.shadowBlur = 8;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(text, 64, 64);
+        ctx.fillText(text, 64, 65);
 
         const texture = new THREE.CanvasTexture(canvas);
         const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(spriteMat);
-        sprite.scale.set(1.35, 1.35, 1.35);
+        sprite.scale.set(1.4, 1.4, 1.4);
         return sprite;
     }
 
@@ -408,7 +434,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
-    function initLuoshuTaiyi9x9Matrix() {
+    let currentJu = 0;
+    let currentActivePositions = [];
+    let currentFocusedCell = null;
+    let currentActiveVal = 81;
+    let activeOverrideMap = {};
+
+    function renderLuoshuTaiyi9x9Matrix(juIndex = 0, activePositions = [], focusedPos = null, overrideMap = {}) {
         if (!matrixContainer) return;
         matrixContainer.className = "luoshu-taiyi-9x9-container";
         matrixContainer.innerHTML = "";
@@ -416,7 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
         LUOSHU_PALACES_EXACT.forEach(palace => {
             const block = document.createElement("div");
             block.className = `palace-block ${palace.class}`;
-            
+
             const title = document.createElement("div");
             title.className = "palace-block-title";
             title.innerText = palace.name;
@@ -425,21 +457,45 @@ document.addEventListener("DOMContentLoaded", () => {
             const grid3x3 = document.createElement("div");
             grid3x3.className = "palace-grid-3x3";
 
-            palace.numbers.forEach(num => {
+            palace.numbers.forEach((num, idx) => {
                 const cell = document.createElement("div");
                 cell.className = "taiyi-81-cell";
                 cell.dataset.pos = num;
-                cell.title = `数值 ${num} (${palace.name})`;
-                const subTag = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[num]) ? TAIYI_81_SUB_LABELS[num] : "";
-                cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-sub">${subTag}</div>`;
-                cell.addEventListener("click", () => {
-                    // 三向联动：点击阵图单元格，高亮左侧与右侧
-                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
-                    cell.classList.add("active-pos");
 
-                    const rem12 = num % 12 === 0 ? 12 : num % 12;
-                    engine.highlightBranchPos(rem12 - 1, 0xff5252);
+                const baseNum = num;
+                const currentVal = (overrideMap && overrideMap[baseNum] !== undefined)
+                    ? overrideMap[baseNum]
+                    : (baseNum + juIndex * 81);
+
+                const palacePosText = `${palace.name}第${idx + 1}位`;
+                const rem12 = currentVal % 12 === 0 ? 12 : currentVal % 12;
+                const branch = EARTHLY_BRANCHES[rem12 - 1];
+                const subTag = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[baseNum]) ? TAIYI_81_SUB_LABELS[baseNum] : "";
+
+                cell.dataset.currentVal = currentVal;
+                cell.title = `宫位: 第 ${baseNum} 宫 (${palacePosText})\n当前数值: ${currentVal} (第 ${juIndex + 1} 矩)\n地支: ${branch.name}位 (${branch.system})\n太乙标志: ${subTag}`;
+
+                const palaceTagText = subTag.replace(/[()]/g, "");
+                const fontSize = currentVal >= 10000 ? '11px' : (currentVal >= 1000 ? '12.5px' : (currentVal >= 100 ? '14px' : '16px'));
+                cell.innerHTML = `
+                    <div class="cell-num" style="font-size: ${fontSize}; white-space: nowrap; overflow: hidden; text-overflow: clip;">${currentVal}</div>
+                    <div class="cell-sub" style="font-size: 10px; white-space: nowrap; display: flex; gap: 2px; align-items: center; justify-content: center; line-height: 1.1;">
+                        <span style="opacity: 0.85;">${palaceTagText}</span>
+                        <span class="cell-branch-name" style="color: ${branch.color}; font-weight: 900;">${branch.name}</span>
+                    </div>
+                `;
+
+                if (activePositions.includes(baseNum)) {
+                    cell.classList.add("active-pos");
+                }
+                if (focusedPos !== null && baseNum === focusedPos) {
+                    cell.classList.add("focused-cell");
+                }
+
+                cell.addEventListener("click", () => {
+                    handleTaiyiCellClick(baseNum, currentVal, palace, palacePosText, branch);
                 });
+
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -447,7 +503,71 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    initLuoshuTaiyi9x9Matrix();
+    function switchJuTier(juIndex, targetActivePositions = null, focusedPos = null, overrideMap = {}) {
+        currentJu = Math.max(0, juIndex);
+        activeOverrideMap = overrideMap || {};
+
+        const juBadge = document.getElementById("current-ju-badge");
+        if (juBadge) {
+            const start = currentJu * 81 + 1;
+            const end = (currentJu + 1) * 81;
+            juBadge.innerText = `第 ${currentJu + 1} 矩 (${start}~${end})`;
+        }
+
+        document.querySelectorAll(".ju-tier-btn").forEach(btn => {
+            const bJu = btn.dataset.ju;
+            if (bJu === "auto") {
+                btn.classList.remove("active");
+            } else {
+                btn.classList.toggle("active", parseInt(bJu, 10) === currentJu);
+            }
+        });
+
+        if (matrixContainer) {
+            matrixContainer.classList.remove("matrix-shift-anim");
+            void matrixContainer.offsetWidth;
+            matrixContainer.classList.add("matrix-shift-anim");
+        }
+
+        const positions = targetActivePositions !== null ? targetActivePositions : currentActivePositions;
+        const focus = focusedPos !== null ? focusedPos : currentFocusedCell;
+        renderLuoshuTaiyi9x9Matrix(currentJu, positions, focus, activeOverrideMap);
+    }
+
+    function setupJuTierControls() {
+        document.querySelectorAll(".ju-tier-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.classList.add("row-click-flash");
+                setTimeout(() => this.classList.remove("row-click-flash"), 450);
+
+                const bJu = this.dataset.ju;
+                if (bJu === "auto") {
+                    const nJu = Math.max(0, Math.floor((currentActiveVal - 1) / 81));
+                    switchJuTier(nJu, [currentFocusedCell], currentFocusedCell, { [currentFocusedCell]: currentActiveVal });
+                } else {
+                    const parsedJu = parseInt(bJu, 10);
+                    switchJuTier(parsedJu, [currentFocusedCell], currentFocusedCell);
+                }
+            });
+        });
+    }
+
+    function handleTaiyiCellClick(baseNum, currentVal, palace, palacePosText, branch) {
+        currentFocusedCell = baseNum;
+        currentActivePositions = [baseNum];
+        currentActiveVal = currentVal;
+
+        const rem12 = currentVal % 12 === 0 ? 12 : currentVal % 12;
+        engine.highlightBranchPos(rem12 - 1, 0xff5252);
+
+        switchJuTier(currentJu, [baseNum], baseNum);
+
+        if (lawBadgeTitle) lawBadgeTitle.innerText = `阵图选中: 第 ${baseNum} 宫 ${palacePosText} (数值 ${currentVal})`;
+        if (lawBadgeDesc) lawBadgeDesc.innerText = `处于第 ${currentJu + 1} 矩 (${currentJu * 81 + 1}~${(currentJu + 1) * 81})，落于【${branch.name}位】 (${branch.system})`;
+    }
+
+    setupJuTierControls();
+    switchJuTier(0, [], null);
 
     const lawBadgeTitle = document.getElementById("law-badge-title");
     const lawBadgeDesc = document.getElementById("law-badge-desc");
@@ -474,7 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (law1ResultBox) {
             law1ResultBox.innerHTML = `
                 <div style="font-size: 13px; font-weight: 700; color: #ff5252; margin-bottom: 4px;">
-                    ☀️ 10^${n} 算式降维结果：
+                     10^${n} 算式降维结果：
                 </div>
                 <div style="font-size: 12px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
                     • 原始数据: <strong>10^${n}</strong><br>
@@ -488,17 +608,19 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         }
 
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            const p = parseInt(cell.dataset.pos, 10);
-            if (p === rem81) {
-                cell.classList.add("active-pos");
-            } else {
-                cell.classList.remove("active-pos");
-            }
-        });
+        const realVal = Math.pow(10, n);
+        const nJu = Math.max(0, Math.floor((realVal - 1) / 81));
+        currentActiveVal = realVal;
+        currentFocusedCell = rem81;
+        currentActivePositions = [rem81];
+        if (n <= 2) {
+            switchJuTier(nJu, [rem81], rem81, { [rem81]: realVal });
+        } else {
+            switchJuTier(0, [rem81], rem81);
+        }
 
         engine.highlightBranchPos(branch.idx, 0xff5252);
-        if (lawBadgeTitle) lawBadgeTitle.innerText = `☀️ 10^${n} 太阳赤道守恒律数据脉冲`;
+        if (lawBadgeTitle) lawBadgeTitle.innerText = ` 10^${n} 太阳赤道守恒律数据脉冲`;
         if (lawBadgeDesc) lawBadgeDesc.innerText = `余数 ${rem12} 对应【${branch.name}】位，数据在赤道正位闪耀运动`;
     }
 
@@ -521,15 +643,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (law2ResultBox) {
             law2ResultBox.innerHTML = `
                 <div style="font-size: 13.5px; font-weight: 700; color: #ffe066; margin-bottom: 4px;">
-                    ✨ 7×k 芒星跳跃三元周流法则：
+                     7×k 芒星跳跃三元周流法则：
                 </div>
                 <div style="font-size: 12.5px; color: #cbd5e1; line-height: 1.5; font-family: var(--font-times);">
                     • 芒星跳跃算式: <strong>7 × k (k=1~12 步)</strong><br>
-                    • 地支跳跃序列: 午 ➔ 丑 ➔ 申 ➔ 卯 ➔ 戌 ➔ 巳 ➔ 子 ➔ 未 ➔ 寅 ➔ 酉 ➔ 辰 ➔ 亥<br>
-                    • 轨道循环法则: <span style="color:#ff5252;">赤(午)</span> ➔ <span style="color:#40c057;">黄(丑)</span> ➔ <span style="color:#4dabf7;">白(申)</span> ➔ <span style="color:#ff5252;">赤(卯)</span> ➔ ... 依次无缝贯通天、地、万物三元！
+                    • 地支跳跃序列: 午 -> 丑 -> 申 -> 卯 -> 戌 -> 巳 -> 子 -> 未 -> 寅 -> 酉 -> 辰 -> 亥<br>
+                    • 轨道循环法则: <span style="color:#ff5252;">赤(午)</span> -> <span style="color:#40c057;">黄(丑)</span> -> <span style="color:#4dabf7;">白(申)</span> -> <span style="color:#ff5252;">赤(卯)</span> -> ... 依次无缝贯通天、地、万物三元！
                 </div>
                 <div style="margin-top: 6px; font-size: 11.5px; color: #ffffff; background: rgba(255,224,102,0.18); padding: 5px 8px; border-radius: 4px;">
-                    🌟 核心结论：数 7 遍历 12 地支无一重复，交织为 12 角神圣芒星，证明白道天体周流秩序！
+                    【要点】 核心结论：数 7 遍历 12 地支无一重复，交织为 12 角神圣芒星，证明白道天体周流秩序！
                 </div>
             `;
         }
@@ -586,7 +708,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     engine.highlightBranchPos(bIdx, 0xffe066);
 
-                    if (lawBadgeTitle) lawBadgeTitle.innerText = `芒星第 ${k} 步: 7×${k} = ${val} ➔ ${branch.name}位`;
+                    if (lawBadgeTitle) lawBadgeTitle.innerText = `芒星第 ${k} 步: 7×${k} = ${val} -> ${branch.name}位`;
                     if (lawBadgeDesc) lawBadgeDesc.innerText = `气数 ${val} 降维落于 ${palaceDesc}，3D 定位至【${branch.name}】(${branch.system})`;
                 });
             });
@@ -600,16 +722,16 @@ document.addEventListener("DOMContentLoaded", () => {
         btnDemoStar7.addEventListener("click", () => {
             isStar7Active = !isStar7Active;
             if (isStar7Active) {
-                btnDemoStar7.innerText = "🛑 停止芒星脉冲 (再点取消)";
+                btnDemoStar7.innerText = "[停止] 停止芒星脉冲 (再点取消)";
                 btnDemoStar7.style.background = "linear-gradient(135deg, #ff5252 0%, #c92a2a 100%)";
                 btnDemoStar7.style.color = "#ffffff";
                 engine.renderStar7Line();
 
                 document.querySelectorAll(".taiyi-81-cell").forEach(cell => cell.classList.add("active-pos"));
-                if (lawBadgeTitle) lawBadgeTitle.innerText = "✨ 数 7 · 12 芒星数据流光脉冲";
+                if (lawBadgeTitle) lawBadgeTitle.innerText = " 数 7 · 12 芒星数据流光脉冲";
                 if (lawBadgeDesc) lawBadgeDesc.innerText = "按 7 × k 顺次环绕 12 地支，数据粒子在芒星阵上光速穿梭";
             } else {
-                btnDemoStar7.innerText = "✨ 渲染 12 芒星数据流光脉冲 (再点取消)";
+                btnDemoStar7.innerText = " 渲染 12 芒星数据流光脉冲 (再点取消)";
                 btnDemoStar7.style.background = "linear-gradient(135deg, #d4af37 0%, #aa7c11 100%)";
                 btnDemoStar7.style.color = "#0a0e17";
                 engine.clearLaws3DGroup();
@@ -633,7 +755,7 @@ document.addEventListener("DOMContentLoaded", () => {
         { parts: 8, deg: "45°",  expr: "4 + 5",     sum: "9" },
         { parts: 16, deg: "22.5°", expr: "2 + 2 + 5", sum: "9" },
         { parts: 32, deg: "11.25°", expr: "1 + 1 + 2 + 5", sum: "9" },
-        { parts: 64, deg: "5.625°", expr: "5 + 6 + 2 + 5 = 18 ➔ 1 + 8", sum: "9" }
+        { parts: 64, deg: "5.625°", expr: "5 + 6 + 2 + 5 = 18 -> 1 + 8", sum: "9" }
     ];
 
     function updateLaw3(idx) {
@@ -648,7 +770,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (law3ResultBox) {
             law3ResultBox.innerHTML = `
                 <div style="font-size: 13px; font-weight: 700; color: #ffe066; margin-bottom: 4px;">
-                    🌀 ${item.deg} 众和归九演算：
+                     ${item.deg} 众和归九演算：
                 </div>
                 <div style="font-size: 12px; color: #cbd5e1; font-family: var(--font-times);">
                     • 数值算式: ${item.expr}<br>
@@ -667,7 +789,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        if (lawBadgeTitle) lawBadgeTitle.innerText = `🌀 周天 ${item.deg} 归九运动`;
+        if (lawBadgeTitle) lawBadgeTitle.innerText = ` 周天 ${item.deg} 归九运动`;
         if (lawBadgeDesc) lawBadgeDesc.innerText = `数位众和数 ${item.expr} 恒无条件收敛归于 9！`;
     }
 
@@ -718,7 +840,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
-            if (lawBadgeTitle) lawBadgeTitle.innerText = `🔺 地支三合局 · ${data.name} 数据脉冲`;
+            if (lawBadgeTitle) lawBadgeTitle.innerText = ` 地支三合局 · ${data.name} 数据脉冲`;
             if (lawBadgeDesc) lawBadgeDesc.innerText = `在 3D 浑天坐标球上，数据粒子在 ${data.name} 能量三角形上循环运动`;
         });
     });
@@ -743,7 +865,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 });
 
-                if (lawBadgeTitle) lawBadgeTitle.innerText = "🚪 永静数 6 天地门轴线数据脉冲";
+                if (lawBadgeTitle) lawBadgeTitle.innerText = " 永静数 6 天地门轴线数据脉冲";
                 if (lawBadgeDesc) lawBadgeDesc.innerText = "数据粒子在巳位(地户)与亥位(天门)轴线之间穿梭运动";
             } else {
                 btnDemoYongjing.classList.remove("active");

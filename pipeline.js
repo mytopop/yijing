@@ -67,16 +67,26 @@ const TAIYI_81_SUB_LABELS = {
     33: "(六₄)", 78: "(六₉)", 15: "(六₂)", 24: "(六₃)", 42: "(六₅)", 60: "(六₇)", 69: "(六₈)", 6: "(六₁)", 51: "(六₆)"
 };
 
+// 天门-地户轴单位向量 (东南地户巳 -60°, 西北天门亥 120°)
+const AXIS_TIANMEN_DIHU = new THREE.Vector3(
+    Math.cos(THREE.MathUtils.degToRad(-60)), 
+    Math.sin(THREE.MathUtils.degToRad(-60)), 
+    0
+).normalize();
+
 function getBranch3DPos(branchIdx, radius = 6.0) {
     const angle = THREE.MathUtils.degToRad(90 - branchIdx * 30);
     const baseVec = new THREE.Vector3(radius * Math.cos(angle), radius * Math.sin(angle), 0);
     
     const remSystem = (branchIdx + 1) % 3;
     if (remSystem === 2) {
+        // 黄道四支 (丑, 辰, 未, 戌): 绕卯-酉轴 (春分-秋分, X 轴) 旋转 +23.5°
         baseVec.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
     } else if (remSystem === 0) {
-        baseVec.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
+        // 白道四支 (寅, 巳, 申, 亥): 绕天门-地户轴 (巳-亥, AXIS_TIANMEN_DIHU) 轴立体旋转 18°
+        baseVec.applyAxisAngle(AXIS_TIANMEN_DIHU, THREE.MathUtils.degToRad(18));
     }
+    // remSystem === 1 为赤道四支 (子, 卯, 午, 酉): 纯水平赤道面 Z = 0
     return baseVec;
 }
 
@@ -91,6 +101,7 @@ class PipelinePureMath3DEngine {
         this.renderer = null;
         this.controls = null;
 
+        this.frameworkGroup = new THREE.Group();
         this.equatorGroup = new THREE.Group();
         this.eclipticGroup = new THREE.Group();
         this.lunarGroup = new THREE.Group();
@@ -106,6 +117,7 @@ class PipelinePureMath3DEngine {
         this.pulseSpeedMultiplier = 1.0;
 
         this.initScene();
+        this.createArmillaryFramework();
         this.createArmillaryRings();
         this.createCelestialGridAndPoles();
         this.setupLights();
@@ -132,6 +144,7 @@ class PipelinePureMath3DEngine {
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
 
+        this.scene.add(this.frameworkGroup);
         this.scene.add(this.equatorGroup);
         this.scene.add(this.eclipticGroup);
         this.scene.add(this.lunarGroup);
@@ -171,6 +184,67 @@ class PipelinePureMath3DEngine {
         this.scene.add(goldLight);
     }
 
+    // 浑天仪外层固定骨架 (六合仪支架与中黄地核)
+    createArmillaryFramework(radius = 6.0) {
+        const frameRadius = radius * 1.07;
+        const frameMat = new THREE.MeshStandardMaterial({
+            color: 0xd4af37,
+            metalness: 0.85,
+            roughness: 0.25,
+            emissive: 0x332200,
+            transparent: true,
+            opacity: 0.65
+        });
+
+        // 1. 地平基准大环 (Horizon Ring)
+        const horizonGeom = new THREE.TorusGeometry(frameRadius, 0.055, 12, 120);
+        const horizonMesh = new THREE.Mesh(horizonGeom, frameMat);
+        this.frameworkGroup.add(horizonMesh);
+
+        // 2. 子午立双环 (Meridian Dual Rings，在 YZ 垂直面)
+        const meridianGeom1 = new THREE.TorusGeometry(frameRadius, 0.05, 12, 120);
+        const meridianMesh1 = new THREE.Mesh(meridianGeom1, frameMat);
+        meridianMesh1.rotation.y = Math.PI / 2;
+        this.frameworkGroup.add(meridianMesh1);
+
+        const meridianGeom2 = new THREE.TorusGeometry(frameRadius * 0.98, 0.035, 12, 120);
+        const meridianMesh2 = new THREE.Mesh(meridianGeom2, frameMat);
+        meridianMesh2.rotation.y = Math.PI / 2;
+        this.frameworkGroup.add(meridianMesh2);
+
+        // 3. 四方地平天标
+        const cardinals = [
+            { name: "正北", vec: new THREE.Vector3(0, frameRadius * 1.06, 0), color: "#ffe066" },
+            { name: "正东", vec: new THREE.Vector3(frameRadius * 1.06, 0, 0), color: "#ffe066" },
+            { name: "正南", vec: new THREE.Vector3(0, -frameRadius * 1.06, 0), color: "#ffe066" },
+            { name: "正西", vec: new THREE.Vector3(-frameRadius * 1.06, 0, 0), color: "#ffe066" }
+        ];
+        cardinals.forEach(c => {
+            const sp = this.createTextSprite(c.name, c.color);
+            sp.position.copy(c.vec);
+            sp.scale.set(1.1, 1.1, 1.1);
+            this.frameworkGroup.add(sp);
+        });
+
+        // 4. 中黄地核球 (Terra Core，中黄居中)
+        const coreGeom = new THREE.SphereGeometry(0.85, 24, 24);
+        const coreMat = new THREE.MeshStandardMaterial({
+            color: 0x183050,
+            emissive: 0x0a1a30,
+            metalness: 0.6,
+            roughness: 0.3,
+            transparent: true,
+            opacity: 0.7
+        });
+        const coreMesh = new THREE.Mesh(coreGeom, coreMat);
+        this.frameworkGroup.add(coreMesh);
+
+        const coreWireGeom = new THREE.SphereGeometry(0.86, 12, 8);
+        const coreWireMat = new THREE.MeshBasicMaterial({ color: 0xffe066, wireframe: true, transparent: true, opacity: 0.25 });
+        const coreWireMesh = new THREE.Mesh(coreWireGeom, coreWireMat);
+        this.frameworkGroup.add(coreWireMesh);
+    }
+
     createCelestialGridAndPoles() {
         const radius = 6.0;
 
@@ -186,81 +260,110 @@ class PipelinePureMath3DEngine {
         poleLine.computeLineDistances();
         this.celestialGridGroup.add(poleLine);
 
-        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
-        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        // 北极星微星核与星宿光环 (告别巨大白塑料球)
+        const northStarGeom = new THREE.SphereGeometry(0.14, 16, 16);
+        const northStarMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const northStar = new THREE.Mesh(northStarGeom, northStarMat);
         northStar.position.set(0, 0, 8.5);
         this.celestialGridGroup.add(northStar);
 
-        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
-        northSprite.position.set(0, 0, 9.8);
+        const northHaloGeom = new THREE.TorusGeometry(0.32, 0.02, 12, 36);
+        const northHaloMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.6 });
+        const northHalo = new THREE.Mesh(northHaloGeom, northHaloMat);
+        northHalo.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northHalo);
+
+        const northSprite = this.createTextSprite("北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.6);
         this.celestialGridGroup.add(northSprite);
     }
 
     createArmillaryRings() {
         const radius = 6.0;
 
+        // 1. 赤道环 (水平 0° 面，金属赤红)
         const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
         const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
+        // 2. 黄道环 (绕春分-秋分 X 轴旋转 +23.5°，金属翠绿)
         const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
+        // 3. 白道环 (解绑卯酉单轴！绕天门-地户轴立体旋转 18°，金属青蓝)
         const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
-        lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
+        lunarMesh.quaternion.setFromAxisAngle(AXIS_TIANMEN_DIHU, THREE.MathUtils.degToRad(18));
         this.lunarGroup.add(lunarMesh);
 
+        // 4. 十二地支星宿位点：彻底移除死板塑料大球与斜金环，升华为【微光星宿晶核 + 浑天星曜玉璧】
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
-            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
-            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
-            orbMesh.position.copy(pos);
-            this.orbsGroup.add(orbMesh);
+            // 环上微型星宿光核 (半径仅 0.07，精致纯粹如恒星微芒，不遮挡轨道流线)
+            const starGeom = new THREE.SphereGeometry(0.07, 12, 12);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const starMesh = new THREE.Mesh(starGeom, starMat);
+            starMesh.position.copy(pos);
+            this.orbsGroup.add(starMesh);
 
-            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
-            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
-            ringMesh.position.copy(pos);
-            ringMesh.rotation.x = Math.PI / 2;
-            this.orbsGroup.add(ringMesh);
-
+            // 浑天星曜玉璧徽标 (贴合环轨外缘，比例优雅和谐)
             const sprite = this.createTextSprite(b.name, b.color);
-            sprite.position.copy(pos.clone().multiplyScalar(1.18));
+            sprite.position.copy(pos.clone().multiplyScalar(1.08));
             this.orbsGroup.add(sprite);
         });
     }
 
+    // 绘制高质感“浑天星曜玉璧”地支徽标
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
+        // 1. 柔和外围星辉光晕
+        const radGlow = ctx.createRadialGradient(64, 64, 28, 64, 64, 58);
+        radGlow.addColorStop(0, "rgba(0, 0, 0, 0)");
+        radGlow.addColorStop(0.65, colorHex + "33");
+        radGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = radGlow;
         ctx.beginPath();
-        ctx.arc(64, 64, 52, 0, Math.PI * 2);
+        ctx.arc(64, 64, 58, 0, Math.PI * 2);
         ctx.fill();
+
+        // 2. 浑天黑曜石半透明微透星盘底
+        ctx.fillStyle = "rgba(10, 16, 28, 0.88)";
+        ctx.beginPath();
+        ctx.arc(64, 64, 46, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. 双重同心浑天仪规金线
         ctx.strokeStyle = colorHex;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', serif";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(64, 64, 40, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 4. 正中温润书法地支大字 (带内辉)
+        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', 'SimSun', serif";
         ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = colorHex;
+        ctx.shadowBlur = 8;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(text, 64, 64);
+        ctx.fillText(text, 64, 65);
 
         const texture = new THREE.CanvasTexture(canvas);
         const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(spriteMat);
-        sprite.scale.set(1.35, 1.35, 1.35);
+        sprite.scale.set(1.4, 1.4, 1.4);
         return sprite;
     }
 
@@ -295,27 +398,45 @@ class PipelinePureMath3DEngine {
         this.pipe3DGroup.add(tubeMesh);
 
         points.slice(0, 12).forEach((p) => {
-            const sphereGeom = new THREE.SphereGeometry(0.3, 16, 16);
+            const sphereGeom = new THREE.SphereGeometry(0.18, 16, 16);
             const sphereMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffe066 });
             const sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
             sphereMesh.position.copy(p);
             this.pipe3DGroup.add(sphereMesh);
         });
 
-        const pulseGeom = new THREE.SphereGeometry(0.42, 16, 16);
+        const pulseGeom = new THREE.SphereGeometry(0.32, 16, 16);
         const pulseMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
         this.pipe3DGroup.add(this.dataPulseMesh);
     }
 
+    // 单个地支高亮：升级为“浑天同心耀金灵光环” (告别粗笨大实心白球)
     highlightSingleBranch(bIdx) {
         this.clearPipe3DGroup();
         const pos = getBranch3DPos(bIdx);
-        const pulseGeom = new THREE.SphereGeometry(0.5, 32, 32);
-        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.8 });
-        const pulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
-        pulseMesh.position.copy(pos);
-        this.pipe3DGroup.add(pulseMesh);
+
+        // 1. 核心星光发光点
+        const starGeom = new THREE.SphereGeometry(0.14, 16, 16);
+        const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const starMesh = new THREE.Mesh(starGeom, starMat);
+        starMesh.position.copy(pos);
+        this.pipe3DGroup.add(starMesh);
+
+        // 2. 悬浮面向相机的双重同心光晕环 (准星聚焦仪轨)
+        const ringGeom = new THREE.TorusGeometry(0.46, 0.03, 12, 48);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.85 });
+        const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+        ringMesh.position.copy(pos);
+        if (this.camera) ringMesh.quaternion.copy(this.camera.quaternion);
+        this.pipe3DGroup.add(ringMesh);
+
+        const outerRingGeom = new THREE.TorusGeometry(0.68, 0.02, 12, 48);
+        const outerRingMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.4 });
+        const outerRingMesh = new THREE.Mesh(outerRingGeom, outerRingMat);
+        outerRingMesh.position.copy(pos);
+        if (this.camera) outerRingMesh.quaternion.copy(this.camera.quaternion);
+        this.pipe3DGroup.add(outerRingMesh);
     }
 
     animate() {
@@ -350,7 +471,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let isDeductionRunning = false;
     let stepAnimationTimer = null;
 
-    function initLuoshuTaiyi9x9Matrix() {
+    let currentJu = 0; // 当前所处矩数 (0=第1矩 1~81, 1=第2矩 82~162, 864=第865矩...)
+    let activeDeductionN = 70000; // 当前输入的推演数值
+
+    const currentJuBadge = document.getElementById("current-ju-badge");
+    const btnJuCurrentN = document.getElementById("btn-ju-current-n");
+
+    function renderLuoshuTaiyi9x9Matrix(juIndex, activeRem81 = null) {
         if (!matrixContainer) return;
         matrixContainer.className = "luoshu-taiyi-9x9-container";
         matrixContainer.innerHTML = "";
@@ -367,17 +494,36 @@ document.addEventListener("DOMContentLoaded", () => {
             const grid3x3 = document.createElement("div");
             grid3x3.className = "palace-grid-3x3";
 
-            palace.numbers.forEach(num => {
+            palace.numbers.forEach(baseNum => {
+                const currentVal = baseNum + juIndex * 81;
+                const r12 = currentVal % 12 === 0 ? 12 : currentVal % 12;
+                const branch = EARTHLY_BRANCHES[r12 - 1];
+                const subTag = TAIYI_81_SUB_LABELS[baseNum] || "";
+                const palacePosText = subTag.replace(/[()]/g, "");
+
                 const cell = document.createElement("div");
                 cell.className = "taiyi-81-cell";
-                cell.dataset.pos = num;
-                cell.title = `数值 ${num} (${palace.name})`;
-                const subTag = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[num]) ? TAIYI_81_SUB_LABELS[num] : "";
-                cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-sub">${subTag}</div>`;
+                cell.dataset.pos = baseNum;
+                cell.dataset.val = currentVal;
+                cell.title = `数值: ${currentVal} (第${juIndex + 1}矩)\n落宫位次: ${palace.name} ${palacePosText}\n地支: ${branch.name}位 (${branch.system})`;
+
+                cell.innerHTML = `
+                    <div class="cell-num" style="font-size: ${currentVal >= 10000 ? '13px' : (currentVal >= 1000 ? '15.5px' : '18px')};">${currentVal}</div>
+                    <div class="cell-sub" style="font-size: 10.5px; display: flex; gap: 2px; align-items: center; justify-content: center; line-height: 1.1;">
+                        <span style="opacity: 0.85;">${palacePosText}</span>
+                        <span style="color: ${branch.color}; font-weight: 900;">${branch.name}</span>
+                    </div>
+                `;
+
+                if (activeRem81 && baseNum === activeRem81) {
+                    cell.classList.add("active-pos");
+                }
+
                 cell.addEventListener("click", () => {
-                    numInput.value = num;
-                    calculatePipeline(num);
+                    numInput.value = currentVal;
+                    calculatePipeline(currentVal);
                 });
+
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -385,7 +531,63 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    initLuoshuTaiyi9x9Matrix();
+    function switchJuTier(ju, activeRem = null) {
+        currentJu = Math.max(0, parseInt(ju, 10) || 0);
+
+        // 更新按钮激活状态
+        document.querySelectorAll(".ju-tier-btn").forEach(btn => {
+            const bJu = btn.dataset.ju;
+            if (bJu === "auto") {
+                btn.classList.toggle("active", currentJu > 3);
+            } else {
+                btn.classList.toggle("active", parseInt(bJu, 10) === currentJu);
+            }
+        });
+
+        // 更新徽章文本 (无跳跃动画，保持静态稳定)
+        if (currentJuBadge) {
+            const startVal = currentJu * 81 + 1;
+            const endVal = (currentJu + 1) * 81;
+            currentJuBadge.innerText = `第 ${currentJu + 1} 矩 (${startVal}~${endVal})`;
+        }
+
+        // 更新“N所在矩”按钮文字
+        if (btnJuCurrentN) {
+            const nJu = Math.floor((activeDeductionN - 1) / 81);
+            btnJuCurrentN.innerText = `N所在矩(第${nJu + 1}矩)`;
+            btnJuCurrentN.title = `切回 N = ${activeDeductionN} 所在矩 (第 ${nJu + 1} 矩)`;
+        }
+
+        // 阵图时空跃迁波动动效
+        if (matrixContainer) {
+            matrixContainer.classList.remove("matrix-shift-anim");
+            void matrixContainer.offsetWidth;
+            matrixContainer.classList.add("matrix-shift-anim");
+        }
+
+        const targetRem = activeRem !== null ? activeRem : (activeDeductionN % 81 === 0 ? 81 : activeDeductionN % 81);
+        renderLuoshuTaiyi9x9Matrix(currentJu, targetRem);
+    }
+
+    function setupJuTierControls() {
+        document.querySelectorAll(".ju-tier-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.classList.add("row-click-flash");
+                setTimeout(() => this.classList.remove("row-click-flash"), 450);
+
+                const bJu = this.dataset.ju;
+                if (bJu === "auto") {
+                    const nJu = Math.floor((activeDeductionN - 1) / 81);
+                    switchJuTier(nJu);
+                } else {
+                    switchJuTier(parseInt(bJu, 10));
+                }
+            });
+        });
+    }
+
+    setupJuTierControls();
+    switchJuTier(0);
 
     function getDigitalRoot(n) {
         let val = Math.abs(n);
@@ -399,15 +601,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const inputVal = parseInt(n, 10);
         if (isNaN(inputVal) || inputVal <= 0) return;
 
+        activeDeductionN = inputVal;
         const rem81 = inputVal % 81 === 0 ? 81 : inputVal % 81;
         const rem12 = inputVal % 12 === 0 ? 12 : inputVal % 12;
         const branch = EARTHLY_BRANCHES[rem12 - 1];
         const digRoot = getDigitalRoot(inputVal);
         const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
 
+        // 根据输入的 N 自动动态切换至该数字所在的矩数
+        const nJu = Math.floor((inputVal - 1) / 81);
+        switchJuTier(nJu, rem81);
+
         document.getElementById("val-step-1").innerText = `N = ${inputVal}`;
-        document.getElementById("val-step-2").innerText = `${inputVal} % 81 = ${rem81} ➔ ${getPalacePosDesc(rem81)}`;
-        document.getElementById("val-step-3").innerText = `余 ${rem12} ➔ ${branch.name}位`;
+        document.getElementById("val-step-2").innerText = `${inputVal} % 81 = ${rem81} -> ${getPalacePosDesc(rem81)}`;
+        document.getElementById("val-step-3").innerText = `余 ${rem12} -> ${branch.name}位`;
         
         const step4El = document.getElementById("val-step-4");
         step4El.innerText = `${branch.system}`;
@@ -433,11 +640,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         seqTableBody.innerHTML = tableHtml;
 
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            const p = parseInt(cell.dataset.pos, 10);
-            cell.classList.toggle("active-pos", p === rem81);
-        });
-
         engine.renderNumber12StepTrajectory(inputVal);
 
         bindTableEvents(inputVal);
@@ -456,7 +658,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 seqTableBody.querySelectorAll(".interactive-row").forEach(r => r.classList.remove("active-row"));
 
                 if (isAlreadyActive) {
-                    calculatePipeline(inputVal); // 取消选中，恢复全量 12 步轨迹
+                    // 取消选中：恢复 N 本身所在的矩数，并重新绘制全量 12 步 3D 轨迹
+                    const nJu = Math.floor((inputVal - 1) / 81);
+                    const nRem81 = inputVal % 81 === 0 ? 81 : inputVal % 81;
+                    const nRem12 = inputVal % 12 === 0 ? 12 : inputVal % 12;
+                    const branch = EARTHLY_BRANCHES[nRem12 - 1];
+                    const subTag = TAIYI_81_SUB_LABELS[nRem81] || "";
+                    switchJuTier(nJu, nRem81);
+                    engine.renderNumber12StepTrajectory(inputVal);
+                    if (pipeBadgeTitle) pipeBadgeTitle.innerText = `数值 ${inputVal} 3D 周天空间轨迹`;
+                    if (pipeBadgeDesc) pipeBadgeDesc.innerText = `模 81 降维落于第 ${nRem81} 宫 ${subTag}。地支属【${branch.name}】(${branch.system})`;
                     return;
                 }
 
@@ -471,14 +682,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 const branch = EARTHLY_BRANCHES[bIdx];
                 const subTag = TAIYI_81_SUB_LABELS[rem81] || "";
 
-                document.querySelectorAll(".taiyi-81-cell").forEach(c => {
-                    c.classList.toggle("active-pos", parseInt(c.dataset.pos, 10) === rem81);
-                });
+                // 核心修复：自动时空跃迁切换至该乘积所在真实矩数，并高亮该位置！
+                const valJu = Math.floor((val - 1) / 81);
+                switchJuTier(valJu, rem81);
 
                 engine.highlightSingleBranch(bIdx);
 
-                if (pipeBadgeTitle) pipeBadgeTitle.innerText = `第 ${k} 步: ${inputVal}×${k} = ${val} ➔ ${branch.name}位`;
-                if (pipeBadgeDesc) pipeBadgeDesc.innerText = `乘积 ${val} 降维落于第 ${rem81} 宫 ${subTag}，定位至 【${branch.name}位】 (${branch.system})`;
+                if (pipeBadgeTitle) pipeBadgeTitle.innerText = `第 ${k} 步: ${inputVal}×${k} = ${val} -> ${branch.name}位`;
+                if (pipeBadgeDesc) pipeBadgeDesc.innerText = `乘积 ${val} 跃迁至第 ${valJu + 1} 矩 (${valJu * 81 + 1}~${(valJu + 1) * 81})，落于第 ${rem81} 宫 ${subTag}，归【${branch.name}位】(${branch.system})`;
             });
         });
     }
@@ -513,6 +724,52 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 450);
     }
 
+    // 绑定 5 步推演流水线卡片独立点击联动 (支持反向点击联动太乙九宫与取消)
+    [1, 2, 3, 4, 5].forEach(s => {
+        const el = document.getElementById(`step-box-${s}`);
+        if (!el) return;
+        el.style.cursor = "pointer";
+        el.addEventListener("click", () => {
+            const isAlreadyActive = el.classList.contains("active");
+            [1, 2, 3, 4, 5].forEach(i => {
+                const box = document.getElementById(`step-box-${i}`);
+                if (box) box.classList.remove("active", "row-click-flash");
+            });
+
+            if (isAlreadyActive) {
+                // 取消选中，恢复全量轨迹与默认阵图
+                calculatePipeline(activeDeductionN);
+                return;
+            }
+
+            el.classList.add("active", "row-click-flash");
+            setTimeout(() => el.classList.remove("row-click-flash"), 450);
+
+            const n = activeDeductionN;
+            const rem81 = n % 81 === 0 ? 81 : n % 81;
+            const rem12 = n % 12 === 0 ? 12 : n % 12;
+            const branch = EARTHLY_BRANCHES[rem12 - 1];
+            const nJu = Math.floor((n - 1) / 81);
+
+            // 切换到 N 所在矩
+            switchJuTier(nJu, rem81);
+
+            if (s === 1 || s === 2) {
+                engine.highlightSingleBranch(rem12 - 1);
+                if (pipeBadgeTitle) pipeBadgeTitle.innerText = `第 ${s} 步 · 数值 ${n} -> 归入太乙第 ${rem81} 宫`;
+                if (pipeBadgeDesc) pipeBadgeDesc.innerText = `该数落于第 ${nJu + 1} 矩 (${nJu * 81 + 1}~${(nJu + 1) * 81})，${getPalacePosDesc(rem81)}。`;
+            } else if (s === 3 || s === 4) {
+                engine.highlightSingleBranch(rem12 - 1);
+                if (pipeBadgeTitle) pipeBadgeTitle.innerText = `第 ${s} 步 · 12地支定位 -> 【${branch.name}位】(${branch.system})`;
+                if (pipeBadgeDesc) pipeBadgeDesc.innerText = `模 12 余 ${rem12} 严格定域在 ${branch.system}，天体坐标系精确收敛。`;
+            } else if (s === 5) {
+                const root = getDigitalRoot(n);
+                if (pipeBadgeTitle) pipeBadgeTitle.innerText = `第 5 步 · 众和极数 -> 【${root}】`;
+                if (pipeBadgeDesc) pipeBadgeDesc.innerText = `原著数理法则：大数连续累加为单数字，数字根为 ${root}。`;
+            }
+        });
+    });
+
     // 实时监听输入更改 (手动输入数字时自动实时更新推演与 3D 轨迹)
     if (numInput) {
         numInput.addEventListener("input", function() {
@@ -535,7 +792,7 @@ document.addEventListener("DOMContentLoaded", () => {
             isDeductionRunning = !isDeductionRunning;
 
             if (isDeductionRunning) {
-                btnCalculate.innerText = "🛑 结束推演 (再点取消)";
+                btnCalculate.innerText = "结束推演 (再点取消)";
                 btnCalculate.style.background = "linear-gradient(135deg, #ff5252 0%, #c92a2a 100%)";
                 btnCalculate.style.color = "#ffffff";
 
@@ -546,7 +803,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     clearInterval(stepAnimationTimer);
                     stepAnimationTimer = null;
                 }
-                btnCalculate.innerText = "🚀 推演数理 (点击启动)";
+                btnCalculate.innerText = "推演数理 (点击启动)";
                 btnCalculate.style.background = "linear-gradient(135deg, #d4af37 0%, #aa7c11 100%)";
                 btnCalculate.style.color = "#0a0e17";
 

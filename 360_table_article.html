@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>易经数理的几何与代数架构：周天 360 度与太乙八十一阵的推演原理</title>
+<!-- KaTeX 数学公式渲染 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+<style>
+/* 经典白底学术与公众号通用雅致排版 */
+:root {
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #27272a;
+  --text-body: #3f3f46;
+  --text-muted: #71717a;
+  --border-color: #e4e4e7;
+  --border-subtle: #f4f4f5;
+  --accent-primary: #1e3a8a;  /* 经典普鲁士黛蓝 */
+  --accent-secondary: #0d9488;/* 雅致青绿 */
+  --accent-gold: #b45309;     /* 古铜微金 */
+  --code-bg: #f1f5f9;
+  --table-header-bg: #f8fafc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-page);
+  color: var(--text-body);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+  line-height: 1.8;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.article-wrapper {
+  max-width: 860px;
+  margin: 40px auto;
+  padding: 50px 60px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+h1 {
+  font-size: 26px;
+  line-height: 1.4;
+  color: var(--text-main);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--accent-primary);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+h2 {
+  font-size: 20px;
+  color: var(--accent-primary);
+  margin-top: 42px;
+  margin-bottom: 18px;
+  padding-left: 12px;
+  border-left: 4px solid var(--accent-primary);
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 17px;
+  color: #18181b;
+  margin-top: 26px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+p {
+  margin: 16px 0;
+  color: var(--text-body);
+  text-align: justify;
+  font-size: 15.5px;
+}
+
+strong {
+  color: #09090b;
+  font-weight: 600;
+}
+
+/* 表格规范设计（三线表风格） */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 14.5px;
+  background-color: #ffffff;
+  border-top: 2px solid #27272a;
+  border-bottom: 2px solid #27272a;
+}
+
+th, td {
+  padding: 10px 14px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+th {
+  background-color: var(--table-header-bg);
+  color: #18181b;
+  font-weight: 600;
+  border-bottom: 1.5px solid #71717a;
+}
+
+tr:hover {
+  background-color: #f8fafc;
+}
+
+/* 图片容器 */
+.img-box {
+  margin: 32px 0;
+  text-align: center;
+  background-color: #fafafa;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.img-box img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: block;
+  margin: 0 auto;
+}
+
+figcaption {
+  margin-top: 12px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* 代码与公式块 */
+code {
+  background-color: var(--code-bg);
+  color: #0f172a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+pre {
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 16px 20px;
+  overflow-x: auto;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: #334155;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 40px 0;
+}
+
+@media (max-width: 768px) {
+  .article-wrapper {
+    margin: 12px;
+    padding: 24px 18px;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+  h1 {
+    font-size: 21px;
+  }
+  h2 {
+    font-size: 18px;
+  }
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+</style>
+</head>
+<body>
+<div class="article-wrapper">
+<h1>易经数理的几何与代数架构：周天 360 度与太乙八十一阵的推演原理</h1>
+<h2>一、引言：古典数理体系的研究视阈</h2>
+<p>在中国传统天文学与易学数理脉络中，存在一套以数字和图形来度量天地时空的完备模型。当代学者梁致堂先生在《易经数理秘笈》中，整理并复原了《九宫纪周天 360°气数一览大表》以及《太乙九宫八十一阵图》。</p>
+<p>初读此类文献时，往往容易受限于传统术语而感到晦涩。如果将其剥离掉神秘化的语汇，从现代几何学与代数学的角度加以审视，其本质是一套将<strong>“天球连续运动度数（时间周期量）”</strong>与<strong>“地面九宫离散分布（空间定域量）”</strong>进行经纬正交映射的古典代数系统。</p>
+<p>本文旨在以平铺直叙的方式，系统梳理该模型的基础定义、代数规律，并结合具体的数值计算实例，阐明其内在严密的推演逻辑。</p>
+<hr />
+<h2>二、基础空间架构：圆天与方地的测量学定义</h2>
+<p>《周髀算经》卷上开篇载：“圆出于方，方出于矩，矩出于九九八十一。故折矩以为勾广三，股修四，径隅五。” 这段论述在古典数学中是一套明确的度量准则：</p>
+<pre><code>                    ┌────────────────────────────────────────┐
+                    │               古典量天测地尺              │
+                    └────────────────────────────────────────┘
+                               /                    \
+                              /                      \
+                 【天球时间尺度：圆】                 【地面空间尺度：方】
+                 • 尺度：周天 360 度                 • 尺度：太乙 81 方阵
+                 • 属性：连续旋转周期                • 属性：定域九宫格点
+                 • 测算：黄道/赤道视运动              • 测算：洛书九宫嵌套
+</code></pre>
+<h3>1. 天度为圆（360 度）</h3>
+<p>天象的运行以日、月、五星在天球上的视运动为表征，呈现周而复始的旋转特性。古人以浑天之法将天球划分为 360 等分（周天度数），作为量度天道时间演进的标准刻度。</p>
+<h3>2. 地度为方（81 矩）</h3>
+<p>地表的空间方位以观察者为中心向外延展。古人首先依洛书建立九宫基准（戴九履一、左三右七、二四为肩、六八为足），在此基础上，每个宫位再细分 9 个定域子单元，形成 $9  imes 9 = 81$ 个离散网格，称之为“八十一矩”。</p>
+<hr />
+<h2>三、三维天象与八十一阵流水线总控系统</h2>
+<p>为了直观呈现数值在时空中的流转，整个推演系统可由下图的三栏交互架构完整表达：</p>
+<figure class="img-box">
+  <img src="file:///e:/文档/我的文档/易经数理/assets/pipeline_full_screenshot.png" alt="太乙九宫八十一阵与时空推演流水线总控系统" />
+  <figcaption>图 1：太乙九宫八十一阵图与三维浑天天象坐标推演总览</figcaption>
+</figure>
+
+<p>该架构自左至右分为三大核心模块：<br />
+1. <strong>左栏·三维浑天天象仪</strong>：直观展示赤道（天系）、黄道（地系）、白道（万物系）三套正交且互相倾斜的空间轨道，以及十二地支所对应的空间方位。<br />
+2. <strong>中栏·太乙九宫八十一宫阵图</strong>：宏观依洛书九宫分块，微观依太乙排布 81 个单元格，每个格点均具备唯一的空间编号与角标。<br />
+3. <strong>右栏·任意数值推演控制台</strong>：将任意输入的自然数 $N$，经过 5 步降维算法，分别定位于空间宫位、时间地支与运动轨道。</p>
+<hr />
+<h2>四、经纬交乘原理与 81 之矩的代数证明</h2>
+<p>在九宫周天表中，每一个宫位均构建为一个 $9  imes 9$ 的正交乘法表。横轴代表时间演化（公差为 9），纵轴代表空间延展（公差为 9）。</p>
+<h3>1. 为什么横纵采用相乘法则？</h3>
+<p>在几何学中，一维线与一维线相加仍然是一维线；唯有横轴（经）与纵轴（纬）正交相乘，维度才从一维线跃迁为二维平面。汉字中的“矩”字，左为“巨”（工匠画方之矩尺），右为“矢”（光阴离弦之飞箭），本身即寓意空间与时间的相互交织。</p>
+<h3>2. 逐行公差恒定增加 81 的数学证明</h3>
+<p>以【一宫】为例，其横轴与纵轴的基础数列均为：<br />
+$$1, 10, 19, 28, 37, 46, 55, 64, 73$$</p>
+<p>当纵横两两相乘时，每一行的横向差值如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">行号</th>
+<th style="text-align: center;">纵坐标 ($y$)</th>
+<th style="text-align: left;">横向展开序列</th>
+<th style="text-align: center;">该行横向公差 ($d_r$)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">第 1 行</td>
+<td style="text-align: center;">$1$</td>
+<td style="text-align: left;">$1, 10, 19, 28, 37, 46, 55, 64, 73$</td>
+<td style="text-align: center;"><strong>9</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;">第 2 行</td>
+<td style="text-align: center;">$10$</td>
+<td style="text-align: left;">$10, 100, 190, 280, 370, 460, 550, 640, 730$</td>
+<td style="text-align: center;"><strong>90</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;">第 3 行</td>
+<td style="text-align: center;">$19$</td>
+<td style="text-align: left;">$19, 190, 361, 532, 703, 874, 1045, 1216, 1387$</td>
+<td style="text-align: center;"><strong>171</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;">第 4 行</td>
+<td style="text-align: center;">$28$</td>
+<td style="text-align: left;">$28, 280, 532, 784, 1036, 1288, 1540, 1792, 2044$</td>
+<td style="text-align: center;"><strong>252</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;">第 5 行</td>
+<td style="text-align: center;">$37$</td>
+<td style="text-align: left;">$37, 370, 703, 1036, 1369, 1702, 2035, 2368, 2701$</td>
+<td style="text-align: center;"><strong>333</strong></td>
+</tr>
+</tbody>
+</table>
+<p>观察公差列的连续差值：<br />
+$$\Delta d = 90 - 9 = 171 - 90 = 252 - 171 = 333 - 252 = \mathbf{81}$$</p>
+<p><strong>代数通式推导</strong>：<br />
+设横轴第 $c$ 列的数值为 $x_c = x_0 + (c-1) \cdot 9$；<br />
+第 $r$ 行的纵坐标为 $y_r$，第 $r+1$ 行的纵坐标为 $y_{r+1} = y_r + 9$。<br />
+则第 $r$ 行相邻两列之差为：<br />
+$$d_r = y_r \cdot x_{c+1} - y_r \cdot x_c = y_r \cdot 9$$<br />
+第 $r+1$ 行相邻两列之差为：<br />
+$$d_{r+1} = y_{r+1} \cdot 9 = (y_r + 9) \cdot 9 = y_r \cdot 9 + 81 = d_r + \mathbf{81}$$</p>
+<p>由此可得，<strong>表格纵向每向下延伸一行，其横向步进的公差必然恒定增加 81</strong>。这正是原书所言“下一行之数，皆为本行数加 81 之矩数”的严格代数本质。</p>
+<hr />
+<h2>五、黄金基准行：为何选取平方数的 10 倍（$K^2   imes 10$）？</h2>
+<p>在大表整整 81 个单元格中，各宫选定了一行作为与周天度数相接轨的基准行。其选取规则严格遵照：<br />
+$$  ext{基准行纵坐标} = K \cdot 10$$<br />
+其中 $K$ 为当前宫的序数（一宫为 1，二宫为 2，……，九宫为 9）。例如：<br />
+- 一宫：纵坐标为 $1    imes 10 = 10$（第 2 行）<br />
+- 二宫：纵坐标为 $2    imes 10 = 20$（第 3 行）<br />
+- 三宫：纵坐标为 $3    imes 10 = 30$（第 4 行）<br />
+- 四宫：纵坐标为 $4    imes 10 = 40$（第 5 行）</p>
+<p>选取此行的原因在于：<br />
+1. <strong>末位出“0”以契合天度</strong>：算筹相乘通常生成零散数值，只有包含因子 10 的乘积，末位才显现十进制整倍数“0”，具备量化为天体几何度数的基准形式。<br />
+2. <strong>公差与周天象限完美咬合</strong>：该行横向公差为 $K \cdot 10  imes 9 = K  imes 90^\circ$。</p>
+<p>这一公差随着宫位的上升，构建出一组步步跃升的周天阶梯：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">宫位</th>
+<th style="text-align: center;">宫序 ($K$)</th>
+<th style="text-align: center;">基准行数值</th>
+<th style="text-align: center;">横向公差 ($K  imes 90^\circ$)</th>
+<th style="text-align: left;">对应的天体周天几何意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>坎一宫</strong></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;"><strong>90°</strong></td>
+<td style="text-align: left;">走出第一象限（春分至夏至，一季圆满）</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>坤二宫</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">20</td>
+<td style="text-align: center;"><strong>180°</strong></td>
+<td style="text-align: left;">天球赤道大圆之直径，阴阳分界</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>震三宫</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">30</td>
+<td style="text-align: center;"><strong>270°</strong></td>
+<td style="text-align: left;">跨越三个象限，万物发育齐备</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>巽四宫</strong></td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: center;"><strong>360°</strong></td>
+<td style="text-align: left;"><strong>四时运行一周天，360 度闭环达成</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>中五宫</strong></td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;"><strong>450°</strong></td>
+<td style="text-align: left;">$360^\circ + 90^\circ$，元气重启，生机不绝</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>乾六宫</strong></td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">60</td>
+<td style="text-align: center;"><strong>540°</strong></td>
+<td style="text-align: left;">$360^\circ + 180^\circ$，乾坤气数高阶交媾</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>兑七宫</strong></td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">70</td>
+<td style="text-align: center;"><strong>630°</strong></td>
+<td style="text-align: left;">$360^\circ + 270^\circ$，肃杀收敛，功成身退</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>艮八宫</strong></td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">80</td>
+<td style="text-align: center;"><strong>720°</strong></td>
+<td style="text-align: left;"><strong>双周天合璧（$360^\circ  imes 2$），阴阳各转一圈</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>离九宫</strong></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;"><strong>810°</strong></td>
+<td style="text-align: left;"><strong>九九归一（$81  imes 10^\circ$），方圆终极大圆满</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>六、实战测算：任意数 $N=70000$ 的五步推演流水线</h2>
+<p>为说明该体系的实用运算过程，以图 1 控制台中输入的数值 $N = 70000$ 为例，进行完整的 5 步降维推演。</p>
+<h3>步骤 1：确立原始参数</h3>
+<p>设输入自然数为：<br />
+$$N = 70000$$</p>
+<h3>步骤 2：太乙 81 阵空间归属（模 81 降维）</h3>
+<p>将数值纳入地面太乙 81 方阵中进行模算：<br />
+$$70000 \div 81 = 864 \quad     ext{余} \quad \mathbf{16}$$<br />
+- <strong>定位结果</strong>：余数为 16，即落入太乙第 <strong>16 号单元格</strong>。<br />
+- <strong>宫位查对</strong>：在太乙八十一宫阵图中，16 号单元格位于<strong>兑七宫</strong>（宏观右侧），在其九格微观中位列第二位，其严谨角标为 <strong>(七₂)</strong>。</p>
+<h3>步骤 3：时间方位归属（模 12 确定地支）</h3>
+<p>天道以十二时辰、十二地支记录方位与时序，将数值纳入十二支循环：<br />
+$$70000 \div 12 = 5833 \quad    ext{余} \quad \mathbf{4}$$<br />
+- <strong>定位结果</strong>：余数 4 对应第 4 位地支，即<strong>【卯位】</strong>（东方木位）。</p>
+<h3>步骤 4：空间动力学三元坐标归属</h3>
+<p>传统三元天象模型将十二地支划分为三组互相交织的运行轨道：<br />
+- <strong>赤道天系（四正）</strong>：子、午、卯、酉（余数 1, 7, 4, 10）<br />
+- <strong>黄道地系（四墓）</strong>：丑、未、辰、戌（余数 2, 8, 5, 11）<br />
+- <strong>白道万物系（四隅）</strong>：寅、申、巳、亥（余数 3, 9, 6, 12）</p>
+<p>因 $N=70000$ 之模 12 余数为 4（卯位），故其在三维动力学体系中直接归属于：<br />
+$$\mathbf{赤道（天系）}$$</p>
+<h3>步骤 5：众和极数收敛</h3>
+<p>众和极数是将数值的各位数字依次累加，直至化简为单个数字：<br />
+$$70000 <br />
+ightarrow 7 + 0 + 0 + 0 + 0 = \mathbf{7}$$<br />
+- <strong>数理涵义</strong>：其极数恒等于 7，不仅在代数上完全收敛，而且与步骤 2 中求得的“兑七宫”空间属性形成完美的数学同构闭环。</p>
+<h3>延伸运算：$N     imes k$ 周天跳跃轨迹明细</h3>
+<p>当 $N=70000$ 沿时间轴以步长 $k$（$1 \le k \le 12$）连续跃进时，其在三元轨道上的循环轨迹完全呈现出精准的几何对称：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">序号 ($k$)</th>
+<th style="text-align: center;">乘式</th>
+<th style="text-align: center;">乘积</th>
+<th style="text-align: center;">模 12 余数</th>
+<th style="text-align: center;">对应地支</th>
+<th style="text-align: center;">三元轨道归属</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">$70000    imes 1$</td>
+<td style="text-align: center;">70,000</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">卯</td>
+<td style="text-align: center;">赤道 (天)</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">$70000    imes 2$</td>
+<td style="text-align: center;">140,000</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">未</td>
+<td style="text-align: center;">黄道 (地)</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">$70000    imes 3$</td>
+<td style="text-align: center;">210,000</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">亥</td>
+<td style="text-align: center;">白道 (万物)</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">$70000    imes 4$</td>
+<td style="text-align: center;">280,000</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">卯</td>
+<td style="text-align: center;">赤道 (天)</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">$70000    imes 5$</td>
+<td style="text-align: center;">350,000</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">未</td>
+<td style="text-align: center;">黄道 (地)</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">$70000    imes 6$</td>
+<td style="text-align: center;">420,000</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">亥</td>
+<td style="text-align: center;">白道 (万物)</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">$70000    imes 7$</td>
+<td style="text-align: center;">490,000</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">卯</td>
+<td style="text-align: center;">赤道 (天)</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">$70000    imes 8$</td>
+<td style="text-align: center;">560,000</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">未</td>
+<td style="text-align: center;">黄道 (地)</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">$70000    imes 9$</td>
+<td style="text-align: center;">630,000</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">亥</td>
+<td style="text-align: center;">白道 (万物)</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">$70000   imes 10$</td>
+<td style="text-align: center;">700,000</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">卯</td>
+<td style="text-align: center;">赤道 (天)</td>
+</tr>
+<tr>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">$70000   imes 11$</td>
+<td style="text-align: center;">770,000</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">未</td>
+<td style="text-align: center;">黄道 (地)</td>
+</tr>
+<tr>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">$70000   imes 12$</td>
+<td style="text-align: center;">840,000</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">亥</td>
+<td style="text-align: center;">白道 (万物)</td>
+</tr>
+</tbody>
+</table>
+<p>从表中可见，乘积在轨道上的演变呈现出严谨的 <strong>【卯(赤道) ➔ 未(黄道) ➔ 亥(白道)】</strong> 三元等差循环，此即传统数理所谓“亥卯未三合木局”的代数动力学模型。</p>
+<hr />
+<h2>七、数据跳转定理：九宫自乘与模 9 矩阵分布</h2>
+<p>除了单宫内的公差规律外，各宫相乘在宏观九宫上的落点遵循严格的模 9 群论特征。</p>
+<h3>《九宫交互乘法矩阵》（模 9 映射表）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">宫位</th>
+<th style="text-align: center;">乘一宫</th>
+<th style="text-align: center;">乘二宫</th>
+<th style="text-align: center;">乘三宫</th>
+<th style="text-align: center;">乘四宫</th>
+<th style="text-align: center;">乘五宫</th>
+<th style="text-align: center;">乘六宫</th>
+<th style="text-align: center;">乘七宫</th>
+<th style="text-align: center;">乘八宫</th>
+<th style="text-align: center;">乘九宫</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>一宫 (1)</strong></td>
+<td style="text-align: center;"><strong>1</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>二宫 (2)</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;"><strong>4</strong></td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>三宫 (3)</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;"><strong>9</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>四宫 (4)</strong></td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;"><strong>7</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>五宫 (5)</strong></td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;"><strong>7</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>六宫 (6)</strong></td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;"><strong>9</strong></td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>七宫 (7)</strong></td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;"><strong>4</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>八宫 (8)</strong></td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;"><strong>1</strong></td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>九宫 (9)</strong></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;"><strong>9</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>核心代数特征：</h3>
+<ol>
+<li><strong>离九宫吸收态</strong>：第九列全为 9。在模 9 运算中，9 与 0 同余，任何数与 9 相乘，乘积必能被 9 整除，表现出代数上的零元收敛特征。</li>
+<li><strong>三六九子群封闭性</strong>：三宫与六宫与任意数相乘，其落点集合严格限定在 ${3, 6, 9}$ 之内，构成封闭理想子群。</li>
+<li><strong>主对角线二次剩余守恒</strong>：各宫自乘的落点集合仅包含 ${1, 4, 7, 9}$，这在数论中对应模 9 的全体二次剩余集合。</li>
+</ol>
+<hr />
+<h2>八、总结</h2>
+<p>综上所述，《九宫纪周天 360°气数一览大表》并非凭空拟构的神秘谶纬，而是一部结构高度自洽的古典数理模型：<br />
+- 它以 <strong>360°圆周</strong> 作为量天的时间尺；<br />
+- 以 <strong>81 矩方阵</strong> 作为量地的空间网格；<br />
+- 借助 <strong>横纵相乘</strong> 完成时空维度的跃迁；<br />
+- 利用 <strong>平方数乘 10</strong> 导出与周天象限精准咬合的公差体系；<br />
+- 最终通过 <strong>模 81 与模 12 降维</strong>，将任意气数精准锚定在三维天球与九宫阵列之中。</p>
+<p>通过现代数学语言的还原，我们得以拨开笼罩其上的历史迷雾，见证古代先民在没有现代计算设备的条件下，依靠纯粹的代数对称与几何空间思维，所建立起的那套精微而庞大的古典时空度量体系。</p>
+</div>
+</body>
+</html>

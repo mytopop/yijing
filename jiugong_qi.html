@@ -21,7 +21,7 @@
         <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
-                <div class="logo-icon">☯</div>
+                <div class="logo-icon"></div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
                     <span class="subtitle">根据梁致堂原著解构 · 九宫七输入通用推演解构馆</span>
@@ -29,17 +29,17 @@
             </div>
             
             <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab ">🏠 首页</a>
-                <a href="pipeline.html" class="nav-tab ">⚡ 流水线</a>
-                <a href="hexagrams.html" class="nav-tab ">☰ 64卦拓扑</a>
-                <a href="laws.html" class="nav-tab ">✨ 5大定律</a>
-                <a href="wuxing.html" class="nav-tab ">☯ 五行三元</a>
-                <a href="jiugong_qi.html" class="nav-tab active">📜 九宫七输入</a>
-                <a href="zhoutian360.html" class="nav-tab ">🌀 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab ">🔢 939697七数</a>
-                <a href="coordinates12.html" class="nav-tab ">🌌 12方位3坐标</a>
-                <a href="ju81.html" class="nav-tab ">📐 用矩81</a>
-                <a href="jiugong_tables.html" class="nav-tab ">📊 九宫纪气大表</a>
+                <a href="index.html" class="nav-tab "> 首页</a>
+                <a href="pipeline.html" class="nav-tab "> 流水线</a>
+                <a href="hexagrams.html" class="nav-tab "> 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab "> 5大定律</a>
+                <a href="wuxing.html" class="nav-tab "> 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab active"> 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab "> 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab "> 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab "> 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab "> 用矩81</a>
+                <a href="jiugong_tables.html" class="nav-tab "> 九宫纪气大表</a>
             </nav>
         </header>
 
@@ -49,7 +49,7 @@
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
+                        <span></span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
                         <span class="legend-item equator">● 赤道(0°)</span>
@@ -71,13 +71,13 @@
                             <span class="dot blue"></span> 白道
                         </button>
                         <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
-                            ⚡ 速度: <span id="speed-val">1x</span>
+                             速度: <span id="speed-val">1x</span>
                         </button>
                         <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
-                            🎯 复位视角
+                             复位视角
                         </button>
                         <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
-                            🔄 旋转
+                             旋转
                         </button>
                     </div>
 
@@ -94,12 +94,28 @@
 
             <!-- 栏二：太乙九宫八十一宫阵图 (全页 100% 绝对统一) (33%) -->
             <section class="col-middle-taiyi">
-                <div class="glass-panel">
+                <div class="glass-panel" style="margin-bottom: 6px;">
                     <div class="card-title">
-                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                        <i class="fa-solid fa-table-cells"></i>
+                        <span>太乙九宫八十一宫阵图 (七行时空投影)</span>
                     </div>
                     <div class="law-desc-text">
-                        七行参数经太乙 81 降维后，对应的宫位在太乙 81 宫阵图中同步点亮。
+                        七行参数经太乙 81 降维并映射各矩度；支持点击单格反向高亮 3D 天球与右侧推演节点。
+                    </div>
+                </div>
+
+                <!-- 矩度时空控制器 (切换矩度或跳转当前值所在矩) -->
+                <div class="ju-tier-controller" style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 215, 0, 0.25); border-radius: 6px; padding: 5px 8px; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: #cbd5e1;">
+                        <span style="color: #ffd700; font-weight: 700;">矩度时空:</span>
+                        <span id="current-ju-badge" style="background: rgba(255, 215, 0, 0.18); border: 1px solid rgba(255, 215, 0, 0.4); color: #ffe066; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 800; display: inline-block;">第 1 矩 (1~81)</span>
+                    </div>
+                    <div id="ju-btn-group" class="ju-btn-group" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                        <button type="button" class="ju-tier-btn active" data-ju="0">1矩基数</button>
+                        <button type="button" class="ju-tier-btn" data-ju="1">2矩(+81)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="2">3矩(+162)</button>
+                        <button type="button" class="ju-tier-btn" data-ju="3">4矩(+243)</button>
+                        <button type="button" id="btn-ju-current-val" class="ju-tier-btn" data-ju="auto">当前值所在矩</button>
                     </div>
                 </div>
 
@@ -111,7 +127,7 @@
                 <!-- 输入面板 -->
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>✍️</span> 九宫 7 行通用参数输入面板
+                        <span></span> 九宫 7 行通用参数输入面板
                     </div>
                     <div style="font-size: 11.5px; color: #94a3b8; margin-bottom: 6px;">
                         原书 P334 论述：“凡一切人事天道，皆可归纳为 7 行进退算法”。请输入 7 个正整数：
@@ -129,11 +145,11 @@
 
                     <div style="display: flex; gap: 6px; margin-top: 8px;">
                         <button id="btn-qi7-calculate" class="action-btn" style="flex: 1;">
-                            🚀 执行七行算法 3D 降维推演
+                             执行七行算法 3D 降维推演
                         </button>
                         <!-- 推演树控制按钮 (点击开始/再次点击结束) -->
                         <button id="btn-toggle-tree" class="action-btn-gold" style="flex: 1;">
-                            🌳 启动推演树 (再点结束)
+                             启动推演树 (再点结束)
                         </button>
                     </div>
                 </div>
@@ -141,7 +157,7 @@
                 <!-- 数理推演树 5 步递算动画卡片 -->
                 <div class="glass-panel" style="margin-top: 6px;">
                     <div class="card-title">
-                        <span>🌳</span> 七行数理推演树 5 步动画递算节点
+                        <span></span> 七行数理推演树 5 步动画递算节点
                     </div>
                     <div id="qi7-steps-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 6px;">
                         <div class="pipe-step step-card interactive-row" data-step="1" style="flex-direction:column; padding:6px 2px; text-align:center;">
@@ -169,9 +185,9 @@
 
                 <!-- 七行算式推演结果大表 (支持整行与单格弹性晃动震荡与高亮 + Toggle Off) -->
                 <div class="glass-panel" style="margin-top: 6px;">
-                    <div class="card-title"><span>📊</span> 七行参数太乙 81 降维明细大表</div>
+                    <div class="card-title"><span></span> 七行参数太乙 81 降维明细大表</div>
                     <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 4px;">
-                        👇 点击任意行或单格触发受好评的弹性晃动震荡与 3D/81 宫三向高亮，再次点击可【取消选中】。
+                         点击任意行或单格触发受好评的弹性晃动震荡与 3D/81 宫三向高亮，再次点击可【取消选中】。
                     </div>
                     <div class="sequence-table-container" style="max-height: 260px;">
                         <table class="seq-table">
@@ -196,6 +212,6 @@
     </div>
 
     <!-- 九宫七输入引擎 (带版本防缓存) -->
-    <script src="jiugong_qi.js?v=20260804_v37"></script>
+    <script src="jiugong_qi.js?v=20260911_v48"></script>
 </body>
 </html>

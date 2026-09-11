@@ -137,14 +137,16 @@ class Taiyi3DEngine {
             const lineObj = new THREE.Line(lineGeom, lineMat);
             this.axesGroup.add(lineObj);
 
-            const nodeGeom = new THREE.SphereGeometry(0.3, 16, 16);
-            const nodeMat = new THREE.MeshStandardMaterial({ color: 0xffe066, metalness: 0.9, roughness: 0.1 });
-            const nodeMesh = new THREE.Mesh(nodeGeom, nodeMat);
-            nodeMesh.position.copy(pos);
-            this.nodesGroup.add(nodeMesh);
+            // 环上微型星宿光核 (半径仅 0.07，精致纯粹如恒星微芒，不遮挡轨道流线)
+            const starGeom = new THREE.SphereGeometry(0.07, 12, 12);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const starMesh = new THREE.Mesh(starGeom, starMat);
+            starMesh.position.copy(pos);
+            this.nodesGroup.add(starMesh);
 
+            // 浑天星曜玉璧徽标 (贴合环轨外缘，比例优雅和谐)
             const sprite = this.createTextSprite(b.name, b.color);
-            sprite.position.copy(pos.clone().multiplyScalar(1.17));
+            sprite.position.copy(pos.clone().multiplyScalar(1.08));
             this.nodesGroup.add(sprite);
         });
 
@@ -168,30 +170,53 @@ class Taiyi3DEngine {
         this.scene.add(starfield);
     }
 
+    // 绘制高质感“浑天星曜玉璧”地支徽标
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(24, 34, 56, 0.95)";
+        // 1. 柔和外围星辉光晕
+        const radGlow = ctx.createRadialGradient(64, 64, 28, 64, 64, 58);
+        radGlow.addColorStop(0, "rgba(0, 0, 0, 0)");
+        radGlow.addColorStop(0.65, (colorHex || "#d4af37") + "33");
+        radGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = radGlow;
         ctx.beginPath();
-        ctx.arc(64, 64, 50, 0, Math.PI * 2);
+        ctx.arc(64, 64, 58, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = "#d4af37";
-        ctx.lineWidth = 4;
+
+        // 2. 浑天黑曜石半透明微透星盘底
+        ctx.fillStyle = "rgba(10, 16, 28, 0.88)";
+        ctx.beginPath();
+        ctx.arc(64, 64, 46, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. 双重同心浑天仪规金线
+        ctx.strokeStyle = colorHex || "#d4af37";
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.font = "Bold 40px 'Noto Serif SC', 'KaiTi', serif";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(64, 64, 40, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 4. 正中温润书法地支大字 (带内辉)
+        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', 'SimSun', serif";
         ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = colorHex || "#d4af37";
+        ctx.shadowBlur = 8;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(text, 64, 64);
+        ctx.fillText(text, 64, 65);
 
         const texture = new THREE.CanvasTexture(canvas);
         const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(spriteMat);
-        sprite.scale.set(1.3, 1.3, 1.3);
+        sprite.scale.set(1.4, 1.4, 1.4);
         return sprite;
     }
 
@@ -209,14 +234,30 @@ class Taiyi3DEngine {
         const radius = 6.0;
         const pos = getEquatorialPos(branchIdx, radius);
 
-        const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffe066 });
-        const sphereGeom = new THREE.SphereGeometry(0.55, 20, 20);
-        const sphereMesh = new THREE.Mesh(sphereGeom, sphereMat);
-        sphereMesh.position.copy(pos);
-        this.taiyi3DGroup.add(sphereMesh);
+        // 1. 核心星光发光点
+        const starGeom = new THREE.SphereGeometry(0.14, 16, 16);
+        const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const starMesh = new THREE.Mesh(starGeom, starMat);
+        starMesh.position.copy(pos);
+        this.taiyi3DGroup.add(starMesh);
+
+        // 2. 双重同心光晕环 (准星聚焦仪轨)
+        const ringGeom = new THREE.TorusGeometry(0.46, 0.03, 12, 48);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.85 });
+        const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+        ringMesh.position.copy(pos);
+        if (this.camera) ringMesh.quaternion.copy(this.camera.quaternion);
+        this.taiyi3DGroup.add(ringMesh);
+
+        const outerRingGeom = new THREE.TorusGeometry(0.68, 0.02, 12, 48);
+        const outerRingMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.4 });
+        const outerRingMesh = new THREE.Mesh(outerRingGeom, outerRingMat);
+        outerRingMesh.position.copy(pos);
+        if (this.camera) outerRingMesh.quaternion.copy(this.camera.quaternion);
+        this.taiyi3DGroup.add(outerRingMesh);
 
         const lineGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), pos]);
-        const lineMat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 3 });
+        const lineMat = new THREE.LineBasicMaterial({ color: 0xffe066, linewidth: 2, transparent: true, opacity: 0.7 });
         const lineObj = new THREE.Line(lineGeom, lineMat);
         this.taiyi3DGroup.add(lineObj);
     }
@@ -314,7 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         taiyiResultBox.innerHTML = `
             <div style="font-weight: 700; color: #ffffff;">
-                选中宫位：<strong style="color: #fff066;">${name}</strong> ➔ 地支落位 = <strong style="color: ${branch.color};">${branch.name}位 (${branch.system})</strong>
+                选中宫位：<strong style="color: #fff066;">${name}</strong> -> 地支落位 = <strong style="color: ${branch.color};">${branch.name}位 (${branch.system})</strong>
             </div>
             <div style="margin-top: 6px; font-size: 12px; color: #cbd5e1;">
                 九宫幻方任意横向、纵向、对角线三数相加之和恒为 <strong>15</strong>！<br>

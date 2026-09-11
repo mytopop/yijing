@@ -14,14 +14,14 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- 全局精美 CSS 样式表 (带版本防缓存) -->
-    <link rel="stylesheet" href="index.css?v=20260804_v39">
+    <link rel="stylesheet" href="index.css?v=20260911_v42">
 </head>
 <body>
     <div class="app-container">
         <!-- 统一 100% 结构固定 Header 顶栏 (10 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
-                <div class="logo-icon">☯</div>
+                <div class="logo-icon"></div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
                     <span class="subtitle">根据梁致堂原著解构 · 周天 360° 气数全景解构馆</span>
@@ -29,17 +29,17 @@
             </div>
             
             <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab ">🏠 首页</a>
-                <a href="pipeline.html" class="nav-tab ">⚡ 流水线</a>
-                <a href="hexagrams.html" class="nav-tab ">☰ 64卦拓扑</a>
-                <a href="laws.html" class="nav-tab ">✨ 5大定律</a>
-                <a href="wuxing.html" class="nav-tab ">☯ 五行三元</a>
-                <a href="jiugong_qi.html" class="nav-tab ">📜 九宫七输入</a>
-                <a href="zhoutian360.html" class="nav-tab active">🌀 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab ">🔢 939697七数</a>
-                <a href="coordinates12.html" class="nav-tab ">🌌 12方位3坐标</a>
-                <a href="ju81.html" class="nav-tab ">📐 用矩81</a>
-                <a href="jiugong_tables.html" class="nav-tab ">📊 九宫纪气大表</a>
+                <a href="index.html" class="nav-tab "> 首页</a>
+                <a href="pipeline.html" class="nav-tab "> 流水线</a>
+                <a href="hexagrams.html" class="nav-tab "> 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab "> 5大定律</a>
+                <a href="wuxing.html" class="nav-tab "> 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab "> 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab active"> 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab "> 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab "> 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab "> 用矩81</a>
+                <a href="jiugong_tables.html" class="nav-tab "> 九宫纪气大表</a>
             </nav>
         </header>
 
@@ -49,7 +49,7 @@
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
+                        3D 浑天天象坐标仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
                         <span class="legend-item equator">● 赤道(0°)</span>
@@ -71,13 +71,13 @@
                             <span class="dot blue"></span> 白道
                         </button>
                         <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
-                            ⚡ 速度: <span id="speed-val">1x</span>
+                            速度: <span id="speed-val">1x</span>
                         </button>
                         <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
-                            🎯 复位视角
+                            复位视角
                         </button>
                         <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
-                            🔄 旋转
+                            旋转
                         </button>
                     </div>
 
@@ -96,10 +96,25 @@
             <section class="col-middle-taiyi">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                        太乙九宫八十一宫阵图 (原书精确排布)
                     </div>
                     <div class="law-desc-text">
-                        宏观按洛书 9 宫分块，微观 9 数按原书《太乙九宫图》精确定准。点击单元格可联动态象。
+                        宏观按洛书 9 宫分块，微观 9 数按原书《太乙九宫图》精确定准。右侧任意点击均联动响应。
+                    </div>
+
+                    <!-- 多重矩数时空跃迁切换栏 (动态维度层) -->
+                    <div class="ju-tier-controller">
+                        <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: #cbd5e1;">
+                            <span style="color: #ffd700; font-weight: 700;">矩度时空:</span>
+                            <span id="current-ju-badge" style="background: rgba(255, 215, 0, 0.18); border: 1px solid rgba(255, 215, 0, 0.4); color: #ffe066; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 800; display: inline-block;">第 1 矩 (1~81)</span>
+                        </div>
+                        <div id="ju-btn-group" class="ju-btn-group" style="display: flex; gap: 5px; align-items: center;">
+                            <button type="button" class="ju-tier-btn active" data-ju="0">1矩基数</button>
+                            <button type="button" class="ju-tier-btn" data-ju="1">2矩(+81)</button>
+                            <button type="button" class="ju-tier-btn" data-ju="2">3矩(+162)</button>
+                            <button type="button" class="ju-tier-btn" data-ju="3">4矩(+243)</button>
+                            <button type="button" id="btn-ju-current-n" class="ju-tier-btn" data-ju="auto">N所在矩</button>
+                        </div>
                     </div>
                 </div>
 
@@ -110,10 +125,10 @@
             <section class="col-right-controls" style="overflow-y: auto; max-height: calc(100vh - 120px);">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>🌀</span> 原著《周天 360°》5 大解构表格切选
+                        原著《周天 360°》5 大解构表格切选
                     </div>
                     <div class="sanhe-btn-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 6px; gap: 4px;">
-                        <button class="sanhe-btn zhoutian-tab-btn active" data-target="panel-table-5" style="color:#ffe066;">📜 周天360°大表</button>
+                        <button class="sanhe-btn zhoutian-tab-btn active" data-target="panel-table-5" style="color:#ffe066;">周天360°大表</button>
                         <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-1">1. 4象90°质变表</button>
                         <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-2">2. 6×60°节卦表</button>
                         <button class="sanhe-btn zhoutian-tab-btn" data-target="panel-table-3">3. 81矩归属表</button>
@@ -124,7 +139,7 @@
                 <!-- 选定宫位原书页码与数理概述横幅 -->
                 <div id="zt-banner" class="glass-panel" style="margin-top: 4px; border-left: 5px solid #ffe066;">
                     <div style="font-size:13px; font-weight:800; color:#ffe066;">
-                        📜 原著《九宫纪周天(360°)气数一览大表》(原书 P315-320)
+                        原著《九宫纪周天(360°)气数一览大表》(原书 P315-320)
                     </div>
                     <div style="font-size:11.5px; color:#cbd5e1; margin-top:2px; line-height:1.4;">
                         包含一宫(+90°)、二宫(+180°)、三宫(+270°)、四宫(+360°)、五宫(+450°)...九宫全量周天气数。点击单格可精准高亮与计算！
@@ -135,12 +150,12 @@
                 <div id="panel-table-5" class="zhoutian-content-panel" style="margin-top: 4px;">
                     <div class="glass-panel">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div id="zt-table-title" class="card-title"><span>📊</span> 九宫纪周天 (360°) 9x9 倍积气数大表</div>
+                            <div id="zt-table-title" class="card-title">九宫纪周天 (360°) 9x9 倍积气数大表</div>
                         </div>
                         
                         <!-- 三标体系：赤标 1 4 7，黄标 2 5 8，白标 3 6 9 切选按钮组 -->
                         <div style="font-size:11px; color:#cbd5e1; margin-top:6px; margin-bottom:2px; font-weight:700;">
-                            🌟 赤标 (天道 1·4·7) · 黄标 (地道 2·5·8) · 白标 (人道 3·6·9)
+                            赤标 (天道 1·4·7) · 黄标 (地道 2·5·8) · 白标 (人道 3·6·9)
                         </div>
                         <div class="sanhe-btn-grid" style="grid-template-columns: repeat(3, 1fr); gap: 4px;">
                             <button class="sanhe-btn zt-palace-tab active" data-palace="1" style="color:#ff5252;">赤标一宫 (1行·9)</button>
@@ -273,8 +288,8 @@
                                     <tr class="interactive-row"><td>3 次</td><td>45°</td><td>4 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (搁九宫)</td></tr>
                                     <tr class="interactive-row"><td>4 次</td><td>22.5°</td><td>2 + 2 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
                                     <tr class="interactive-row"><td>5 次</td><td>11.25°</td><td>1 + 1 + 2 + 5 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
-                                    <tr class="interactive-row"><td>6 次</td><td>5.625°</td><td>5+6+2+5 = 18 ➔ 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
-                                    <tr class="interactive-row"><td>7 次</td><td>2.8125°</td><td>2+8+1+2+5 = 18 ➔ 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr class="interactive-row"><td>6 次</td><td>5.625°</td><td>5+6+2+5 = 18 -> 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
+                                    <tr class="interactive-row"><td>7 次</td><td>2.8125°</td><td>2+8+1+2+5 = 18 -> 1+8 = 9</td><td style="color:#ffe066; font-weight:700;">9 (离九宫)</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -285,6 +300,6 @@
     </div>
 
     <!-- 周天 360° 引擎 (带版本防缓存) -->
-    <script src="zhoutian360.js?v=20260804_v38"></script>
+    <script src="zhoutian360.js?v=20260911_v45"></script>
 </body>
 </html>

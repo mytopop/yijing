@@ -59,26 +59,26 @@ const YAO_TITLES_YIN = ["初六", "六二", "六三", "六四", "六五", "上�
 
 // 64 卦权威卦辞与六爻爻辞模板数据集
 const HEXAGRAMS_64_DATA = [
-    { num: 1, name: "乾为天", symbol: "☰☰", upper: "乾 (天)", lower: "乾 (天)", ci: "元亨利贞。", lines: [1,1,1,1,1,1], yaoCi: ["潜龙勿用。", "见龙在田，利见大人。", "君子终日乾乾，夕惕若厉无咎。", "或跃在渊，无咎。", "飞龙在天，利见大人。", "亢龙有悔。"] },
-    { num: 2, name: "坤为地", symbol: "☷☷", upper: "坤 (地)", lower: "坤 (地)", ci: "元亨，利贞马之贞。君子有攸往，先迷后得主。", lines: [0,0,0,0,0,0], yaoCi: ["履霜，坚冰至。", "直方大，不习无不利。", "含章可贞，或从王事，无成有终。", "括囊，无咎无誉。", "黄裳，元吉。", "龙战于野，其血玄黄。"] },
-    { num: 3, name: "水雷屯", symbol: "☵☳", upper: "坎 (水)", lower: "震 (雷)", ci: "元亨利贞，勿用有攸往，利建侯。", lines: [1,0,0,0,1,0], yaoCi: ["磐桓，利居贞，利建侯。", "屯如邅如，乘马班如。匪寇婚媾。", "即鹿无虞，惟入于林中。", "乘马班如，求婚媾，往吉无不利。", "屯其膏，小贞吉，大贞凶。", "乘马班如，泣血涟涟。"] },
-    { num: 4, name: "山水蒙", symbol: "☶☵", upper: "艮 (山)", lower: "坎 (水)", ci: "亨。匪我求童蒙，童蒙求我。初筮告，再三渎，渎则不告。", lines: [0,1,0,0,0,1], yaoCi: ["发蒙，利用刑人，用说桎梏。", "包蒙吉，纳妇吉，子克家。", "勿用取女，见金夫，不有躬，无攸利。", "困蒙，吝。", "童蒙，吉。", "击蒙，不利为寇，利御寇。"] },
-    { num: 5, name: "水天需", symbol: "☵☰", upper: "坎 (水)", lower: "乾 (天)", ci: "有孚，光亨，贞吉。利涉大川。", lines: [1,1,1,0,1,0], yaoCi: ["需于郊，利用恒，无咎。", "需于沙，小有言，终吉。", "需于泥，致寇至。", "需于血，出自穴。", "需于酒食，贞吉。", "入于穴，有不速之客三人来，敬之终吉。"] },
-    { num: 6, name: "天水讼", symbol: "☰☵", upper: "乾 (天)", lower: "坎 (水)", ci: "有孚，窒惕，中吉。终凶。利见大人，不利涉大川。", lines: [0,1,0,1,1,1], yaoCi: ["不永所事，小有言，终吉。", "不克讼，归而逋，其邑人三百户无眚。", "食旧德，贞厉，终吉。", "不克讼，复即命渝，安贞吉。", "讼，元吉。", "或锡之鞶带，终朝三褫之。"] },
-    { num: 7, name: "地水师", symbol: "☷☵", upper: "坤 (地)", lower: "坎 (水)", ci: "贞，丈人，吉无咎。", lines: [0,1,0,0,0,0], yaoCi: ["师出以律，否臧凶。", "在师中，吉无咎，王三锡命。", "师或舆尸，凶。", "师左次，无咎。", "田有禽，利执言，无咎。", "大君有命，开国承家，小人勿用。"] },
-    { num: 8, name: "水地比", symbol: "☵☷", upper: "坎 (水)", lower: "坤 (地)", ci: "吉。原筮元永贞，无咎。不宁方来，后夫凶。", lines: [0,0,0,0,1,0], yaoCi: ["有孚比之，无咎。有孚盈缶，终来有它吉。", "比之自内，贞吉。", "比之匪人。", "外比之，贞吉。", "显比，王用三驱，失前禽，邑人不诫，吉。", "比之无首，凶。"] },
-    { num: 9, name: "风天小畜", symbol: "☴☰", upper: "巽 (风)", lower: "乾 (天)", ci: "亨。密云不雨，自我西郊。", lines: [1,1,1,0,1,1], yaoCi: ["复自道，何其咎，吉。", "牵复，吉。", "舆脱辐，夫妻反目。", "有孚，血去惕出，无咎。", "有孚孪如，富以其邻。", "既雨既处，尚德载，妇贞厉。"] },
-    { num: 10, name: "天泽履", symbol: "☰☱", upper: "乾 (天)", lower: "兑 (泽)", ci: "履虎尾，不咥人，亨。", lines: [1,1,0,1,1,1], yaoCi: ["素履，往无咎。", "履道坦坦，幽人贞吉。", "眇能视，跛能履，履虎尾，咥人，凶。", "履虎尾，愬愬终吉。", "夬履，贞厉。", "视履考祥，其旋元吉。"] },
-    { num: 11, name: "地天泰", symbol: "☷☰", upper: "坤 (地)", lower: "乾 (天)", ci: "小往大来，吉亨。", lines: [1,1,1,0,0,0], yaoCi: ["拔茅茹，以其汇，征吉。", "包荒，用冯河，不遐遗。", "无平不陂，无往不复，艰贞无咎。", "翩翩，不富以其邻，不戒以孚。", "帝乙归妹，以祉元吉。", "城复于隍，勿用师，自邑告命，贞吝。"] },
-    { num: 12, name: "天地否", symbol: "☰☷", upper: "乾 (天)", lower: "坤 (地)", ci: "否之匪人，不利君子贞，大往小来。", lines: [0,0,0,1,1,1], yaoCi: ["拔茅茹，以其汇，贞吉亨。", "包承，小人吉，大人否亨。", "包羞。", "有命无咎，畴离祉。", "休否，大人吉。其亡其亡，系于苞桑。", "倾否，先否后喜。"] },
-    { num: 13, name: "天火同人", symbol: "☰☲", upper: "乾 (天)", lower: "离 (火)", ci: "同人于野，亨。利涉大川，利君子贞。", lines: [1,0,1,1,1,1], yaoCi: ["同人于门，无咎。", "同人于宗，吝。", "伏戎于莽，升其高陵，三岁不兴。", "乘其墉，弗克攻，吉。", "同人，先号咀而后笑，大师克相遇。", "同人于郊，无悔。"] },
-    { num: 14, name: "火天大有", symbol: "☲☰", upper: "离 (火)", lower: "乾 (天)", ci: "元亨。", lines: [1,1,1,1,0,1], yaoCi: ["无交害，匪咎，艰则无咎。", "大车以载，有攸往，无咎。", "公用亨于天子，小人弗克。", "匪其彭，无咎。", "厥孚交如，威如，吉。", "自天祐之，吉无不利。"] },
-    { num: 15, name: "地山谦", symbol: "☷☶", upper: "坤 (地)", lower: "艮 (山)", ci: "亨，君子有终。", lines: [0,0,1,0,0,0], yaoCi: ["谦谦君子，用涉大川，吉。", "鸣谦，贞吉。", "劳谦君子，万民服，吉。", "无不利，撝谦。", "不富以其邻，利用侵伐，无不利。", "鸣谦，利用行师，征邑国。"] },
-    { num: 16, name: "雷地豫", symbol: "☳☷", upper: "震 (雷)", lower: "坤 (地)", ci: "利建侯行师。", lines: [0,0,0,1,0,0], yaoCi: ["鸣豫，凶。", "介于石，不终日，贞吉。", "盱豫，悔。迟有悔。", "由豫，大有得。勿疑，朋盍朋。", "贞疾，恒不死。", "冥豫，成有渝，无咎。"] },
-    { num: 17, name: "泽雷随", symbol: "☱☳", upper: "兑 (泽)", lower: "震 (雷)", ci: "元亨利贞，无咎。", lines: [1,0,0,1,1,0], yaoCi: ["官有渝，贞吉。出门交有功。", "系小子，失丈夫。", "系丈夫，失小子。随有求得，利居贞。", "随有获，贞凶。有孚在道，以明，何咎。", "孚于嘉，吉。", "拘系之，乃从维之。王用亨于西山。"] },
-    { num: 18, name: "山风蛊", symbol: "☶☴", upper: "艮 (山)", lower: "巽 (风)", ci: "元亨，利涉大川。先甲三日，后甲三日。", lines: [0,1,1,0,0,1], yaoCi: ["干父之蛊，有子，考无咎，厉终吉。", "干母之蛊，不可贞。", "干父之蛊，小有悔，无大咎。", "裕父之蛊，往见吝。", "干父之蛊，用誉。", "不事王侯，高尚其事。"] },
-    { num: 19, name: "地泽临", symbol: "☷☱", upper: "坤 (地)", lower: "兑 (泽)", ci: "元亨利贞。至于八月有凶。", lines: [1,1,0,0,0,0], yaoCi: ["咸临，贞吉。", "咸临，吉无不利。", "甘临，无攸利。既忧之，无咎。", "至临，无咎。", "知临，大君之宜，吉。", "敦临，吉，无咎。"] },
-    { num: 20, name: "风地观", symbol: "☴☷", upper: "巽 (风)", lower: "坤 (地)", ci: "盥而不荐，有孚颙若。", lines: [0,0,0,0,1,1], yaoCi: ["童观，小人无咎，君子吝。", "窥观，利女贞。", "观我生，进退。", "观国之光，利用宾于王。", "观我生，君子无咎。", "观其生，君子无咎。"] }
+    { num: 1, name: "乾为天", symbol: "", upper: "乾 (天)", lower: "乾 (天)", ci: "元亨利贞。", lines: [1,1,1,1,1,1], yaoCi: ["潜龙勿用。", "见龙在田，利见大人。", "君子终日乾乾，夕惕若厉无咎。", "或跃在渊，无咎。", "飞龙在天，利见大人。", "亢龙有悔。"] },
+    { num: 2, name: "坤为地", symbol: "", upper: "坤 (地)", lower: "坤 (地)", ci: "元亨，利贞马之贞。君子有攸往，先迷后得主。", lines: [0,0,0,0,0,0], yaoCi: ["履霜，坚冰至。", "直方大，不习无不利。", "含章可贞，或从王事，无成有终。", "括囊，无咎无誉。", "黄裳，元吉。", "龙战于野，其血玄黄。"] },
+    { num: 3, name: "水雷屯", symbol: "", upper: "坎 (水)", lower: "震 (雷)", ci: "元亨利贞，勿用有攸往，利建侯。", lines: [1,0,0,0,1,0], yaoCi: ["磐桓，利居贞，利建侯。", "屯如邅如，乘马班如。匪寇婚媾。", "即鹿无虞，惟入于林中。", "乘马班如，求婚媾，往吉无不利。", "屯其膏，小贞吉，大贞凶。", "乘马班如，泣血涟涟。"] },
+    { num: 4, name: "山水蒙", symbol: "", upper: "艮 (山)", lower: "坎 (水)", ci: "亨。匪我求童蒙，童蒙求我。初筮告，再三渎，渎则不告。", lines: [0,1,0,0,0,1], yaoCi: ["发蒙，利用刑人，用说桎梏。", "包蒙吉，纳妇吉，子克家。", "勿用取女，见金夫，不有躬，无攸利。", "困蒙，吝。", "童蒙，吉。", "击蒙，不利为寇，利御寇。"] },
+    { num: 5, name: "水天需", symbol: "", upper: "坎 (水)", lower: "乾 (天)", ci: "有孚，光亨，贞吉。利涉大川。", lines: [1,1,1,0,1,0], yaoCi: ["需于郊，利用恒，无咎。", "需于沙，小有言，终吉。", "需于泥，致寇至。", "需于血，出自穴。", "需于酒食，贞吉。", "入于穴，有不速之客三人来，敬之终吉。"] },
+    { num: 6, name: "天水讼", symbol: "", upper: "乾 (天)", lower: "坎 (水)", ci: "有孚，窒惕，中吉。终凶。利见大人，不利涉大川。", lines: [0,1,0,1,1,1], yaoCi: ["不永所事，小有言，终吉。", "不克讼，归而逋，其邑人三百户无眚。", "食旧德，贞厉，终吉。", "不克讼，复即命渝，安贞吉。", "讼，元吉。", "或锡之鞶带，终朝三褫之。"] },
+    { num: 7, name: "地水师", symbol: "", upper: "坤 (地)", lower: "坎 (水)", ci: "贞，丈人，吉无咎。", lines: [0,1,0,0,0,0], yaoCi: ["师出以律，否臧凶。", "在师中，吉无咎，王三锡命。", "师或舆尸，凶。", "师左次，无咎。", "田有禽，利执言，无咎。", "大君有命，开国承家，小人勿用。"] },
+    { num: 8, name: "水地比", symbol: "", upper: "坎 (水)", lower: "坤 (地)", ci: "吉。原筮元永贞，无咎。不宁方来，后夫凶。", lines: [0,0,0,0,1,0], yaoCi: ["有孚比之，无咎。有孚盈缶，终来有它吉。", "比之自内，贞吉。", "比之匪人。", "外比之，贞吉。", "显比，王用三驱，失前禽，邑人不诫，吉。", "比之无首，凶。"] },
+    { num: 9, name: "风天小畜", symbol: "", upper: "巽 (风)", lower: "乾 (天)", ci: "亨。密云不雨，自我西郊。", lines: [1,1,1,0,1,1], yaoCi: ["复自道，何其咎，吉。", "牵复，吉。", "舆脱辐，夫妻反目。", "有孚，血去惕出，无咎。", "有孚孪如，富以其邻。", "既雨既处，尚德载，妇贞厉。"] },
+    { num: 10, name: "天泽履", symbol: "", upper: "乾 (天)", lower: "兑 (泽)", ci: "履虎尾，不咥人，亨。", lines: [1,1,0,1,1,1], yaoCi: ["素履，往无咎。", "履道坦坦，幽人贞吉。", "眇能视，跛能履，履虎尾，咥人，凶。", "履虎尾，愬愬终吉。", "夬履，贞厉。", "视履考祥，其旋元吉。"] },
+    { num: 11, name: "地天泰", symbol: "", upper: "坤 (地)", lower: "乾 (天)", ci: "小往大来，吉亨。", lines: [1,1,1,0,0,0], yaoCi: ["拔茅茹，以其汇，征吉。", "包荒，用冯河，不遐遗。", "无平不陂，无往不复，艰贞无咎。", "翩翩，不富以其邻，不戒以孚。", "帝乙归妹，以祉元吉。", "城复于隍，勿用师，自邑告命，贞吝。"] },
+    { num: 12, name: "天地否", symbol: "", upper: "乾 (天)", lower: "坤 (地)", ci: "否之匪人，不利君子贞，大往小来。", lines: [0,0,0,1,1,1], yaoCi: ["拔茅茹，以其汇，贞吉亨。", "包承，小人吉，大人否亨。", "包羞。", "有命无咎，畴离祉。", "休否，大人吉。其亡其亡，系于苞桑。", "倾否，先否后喜。"] },
+    { num: 13, name: "天火同人", symbol: "", upper: "乾 (天)", lower: "离 (火)", ci: "同人于野，亨。利涉大川，利君子贞。", lines: [1,0,1,1,1,1], yaoCi: ["同人于门，无咎。", "同人于宗，吝。", "伏戎于莽，升其高陵，三岁不兴。", "乘其墉，弗克攻，吉。", "同人，先号咀而后笑，大师克相遇。", "同人于郊，无悔。"] },
+    { num: 14, name: "火天大有", symbol: "", upper: "离 (火)", lower: "乾 (天)", ci: "元亨。", lines: [1,1,1,1,0,1], yaoCi: ["无交害，匪咎，艰则无咎。", "大车以载，有攸往，无咎。", "公用亨于天子，小人弗克。", "匪其彭，无咎。", "厥孚交如，威如，吉。", "自天祐之，吉无不利。"] },
+    { num: 15, name: "地山谦", symbol: "", upper: "坤 (地)", lower: "艮 (山)", ci: "亨，君子有终。", lines: [0,0,1,0,0,0], yaoCi: ["谦谦君子，用涉大川，吉。", "鸣谦，贞吉。", "劳谦君子，万民服，吉。", "无不利，撝谦。", "不富以其邻，利用侵伐，无不利。", "鸣谦，利用行师，征邑国。"] },
+    { num: 16, name: "雷地豫", symbol: "", upper: "震 (雷)", lower: "坤 (地)", ci: "利建侯行师。", lines: [0,0,0,1,0,0], yaoCi: ["鸣豫，凶。", "介于石，不终日，贞吉。", "盱豫，悔。迟有悔。", "由豫，大有得。勿疑，朋盍朋。", "贞疾，恒不死。", "冥豫，成有渝，无咎。"] },
+    { num: 17, name: "泽雷随", symbol: "", upper: "兑 (泽)", lower: "震 (雷)", ci: "元亨利贞，无咎。", lines: [1,0,0,1,1,0], yaoCi: ["官有渝，贞吉。出门交有功。", "系小子，失丈夫。", "系丈夫，失小子。随有求得，利居贞。", "随有获，贞凶。有孚在道，以明，何咎。", "孚于嘉，吉。", "拘系之，乃从维之。王用亨于西山。"] },
+    { num: 18, name: "山风蛊", symbol: "", upper: "艮 (山)", lower: "巽 (风)", ci: "元亨，利涉大川。先甲三日，后甲三日。", lines: [0,1,1,0,0,1], yaoCi: ["干父之蛊，有子，考无咎，厉终吉。", "干母之蛊，不可贞。", "干父之蛊，小有悔，无大咎。", "裕父之蛊，往见吝。", "干父之蛊，用誉。", "不事王侯，高尚其事。"] },
+    { num: 19, name: "地泽临", symbol: "", upper: "坤 (地)", lower: "兑 (泽)", ci: "元亨利贞。至于八月有凶。", lines: [1,1,0,0,0,0], yaoCi: ["咸临，贞吉。", "咸临，吉无不利。", "甘临，无攸利。既忧之，无咎。", "至临，无咎。", "知临，大君之宜，吉。", "敦临，吉，无咎。"] },
+    { num: 20, name: "风地观", symbol: "", upper: "巽 (风)", lower: "坤 (地)", ci: "盥而不荐，有孚颙若。", lines: [0,0,0,0,1,1], yaoCi: ["童观，小人无咎，君子吝。", "窥观，利女贞。", "观我生，进退。", "观国之光，利用宾于王。", "观我生，君子无咎。", "观其生，君子无咎。"] }
 ];
 
 // 补齐 21-64 卦通用爻辞函数
@@ -88,7 +88,7 @@ for (let i = 21; i <= 64; i++) {
         HEXAGRAMS_64_DATA.push({
             num: i,
             name: defaultHexName,
-            symbol: "☯",
+            symbol: "",
             upper: "天道",
             lower: "地道",
             ci: `第${i}卦《${defaultHexName}》：元亨利贞，理法精微，气数周流。`,
@@ -225,14 +225,21 @@ class HexagramPureMath3DEngine {
         poleLine.computeLineDistances();
         this.celestialGridGroup.add(poleLine);
 
-        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
-        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        // 北极星微星核与星宿光环 (告别巨大白塑料球，无 emoji)
+        const northStarGeom = new THREE.SphereGeometry(0.14, 16, 16);
+        const northStarMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const northStar = new THREE.Mesh(northStarGeom, northStarMat);
         northStar.position.set(0, 0, 8.5);
         this.celestialGridGroup.add(northStar);
 
-        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
-        northSprite.position.set(0, 0, 9.8);
+        const northHaloGeom = new THREE.TorusGeometry(0.32, 0.02, 12, 36);
+        const northHaloMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.6 });
+        const northHalo = new THREE.Mesh(northHaloGeom, northHaloMat);
+        northHalo.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northHalo);
+
+        const northSprite = this.createTextSprite("北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.6);
         this.celestialGridGroup.add(northSprite);
     }
 
@@ -254,52 +261,71 @@ class HexagramPureMath3DEngine {
         lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
         this.lunarGroup.add(lunarMesh);
 
+        // 十二地支星宿位点：彻底移除死板塑料大球与斜金环，升华为【微光星宿晶核 + 浑天星曜玉璧】
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
-            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
-            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
-            orbMesh.position.copy(pos);
-            this.orbsGroup.add(orbMesh);
+            // 环上微型星宿光核 (半径仅 0.07，精致纯粹如恒星微芒，不遮挡轨道流线)
+            const starGeom = new THREE.SphereGeometry(0.07, 12, 12);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const starMesh = new THREE.Mesh(starGeom, starMat);
+            starMesh.position.copy(pos);
+            this.orbsGroup.add(starMesh);
 
-            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
-            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
-            ringMesh.position.copy(pos);
-            ringMesh.rotation.x = Math.PI / 2;
-            this.orbsGroup.add(ringMesh);
-
+            // 浑天星曜玉璧徽标 (贴合环轨外缘，比例优雅和谐)
             const sprite = this.createTextSprite(b.name, b.color);
-            sprite.position.copy(pos.clone().multiplyScalar(1.18));
+            sprite.position.copy(pos.clone().multiplyScalar(1.08));
             this.orbsGroup.add(sprite);
         });
     }
 
+    // 绘制高质感“浑天星曜玉璧”地支徽标
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
+        // 1. 柔和外围星辉光晕
+        const radGlow = ctx.createRadialGradient(64, 64, 28, 64, 64, 58);
+        radGlow.addColorStop(0, "rgba(0, 0, 0, 0)");
+        radGlow.addColorStop(0.65, colorHex + "33");
+        radGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = radGlow;
         ctx.beginPath();
-        ctx.arc(64, 64, 52, 0, Math.PI * 2);
+        ctx.arc(64, 64, 58, 0, Math.PI * 2);
         ctx.fill();
+
+        // 2. 浑天黑曜石半透明微透星盘底
+        ctx.fillStyle = "rgba(10, 16, 28, 0.88)";
+        ctx.beginPath();
+        ctx.arc(64, 64, 46, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. 双重同心浑天仪规金线
         ctx.strokeStyle = colorHex;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', serif";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(64, 64, 40, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 4. 正中温润书法地支大字 (带内辉)
+        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', 'SimSun', serif";
         ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = colorHex;
+        ctx.shadowBlur = 8;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(text, 64, 64);
+        ctx.fillText(text, 64, 65);
 
         const texture = new THREE.CanvasTexture(canvas);
         const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(spriteMat);
-        sprite.scale.set(1.35, 1.35, 1.35);
+        sprite.scale.set(1.4, 1.4, 1.4);
         return sprite;
     }
 
@@ -379,7 +405,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const matrixContainer = document.getElementById("taiyi-81-matrix");
 
-    function initLuoshuTaiyi9x9Matrix() {
+    let currentJu = 0;
+    let currentActivePositions = [];
+    let currentFocusedCell = null;
+    let currentActiveVal = 1;
+    let activeOverrideMap = {};
+
+    function renderLuoshuTaiyi9x9Matrix(juIndex = 0, activePositions = [], focusedPos = null, overrideMap = {}) {
         if (!matrixContainer) return;
         matrixContainer.className = "luoshu-taiyi-9x9-container";
         matrixContainer.innerHTML = "";
@@ -387,7 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
         LUOSHU_PALACES_EXACT.forEach(palace => {
             const block = document.createElement("div");
             block.className = `palace-block ${palace.class}`;
-            
+
             const title = document.createElement("div");
             title.className = "palace-block-title";
             title.innerText = palace.name;
@@ -396,26 +428,45 @@ document.addEventListener("DOMContentLoaded", () => {
             const grid3x3 = document.createElement("div");
             grid3x3.className = "palace-grid-3x3";
 
-            palace.numbers.forEach(num => {
+            palace.numbers.forEach((num, idx) => {
                 const cell = document.createElement("div");
                 cell.className = "taiyi-81-cell";
                 cell.dataset.pos = num;
-                cell.title = `数值 ${num} (${palace.name})`;
-                const subTag = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[num]) ? TAIYI_81_SUB_LABELS[num] : "";
-                cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-sub">${subTag}</div>`;
+
+                const baseNum = num;
+                const currentVal = (overrideMap && overrideMap[baseNum] !== undefined)
+                    ? overrideMap[baseNum]
+                    : (baseNum + juIndex * 81);
+
+                const palacePosText = `${palace.name}第${idx + 1}位`;
+                const rem12 = currentVal % 12 === 0 ? 12 : currentVal % 12;
+                const branch = EARTHLY_BRANCHES[rem12 - 1];
+                const subTag = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[baseNum]) ? TAIYI_81_SUB_LABELS[baseNum] : "";
+
+                cell.dataset.currentVal = currentVal;
+                cell.title = `宫位: 第 ${baseNum} 宫 (${palacePosText})\n当前数值: ${currentVal} (第 ${juIndex + 1} 矩)\n地支: ${branch.name}位 (${branch.system})\n太乙标志: ${subTag}`;
+
+                const palaceTagText = subTag.replace(/[()]/g, "");
+                const fontSize = currentVal >= 10000 ? '11px' : (currentVal >= 1000 ? '12.5px' : (currentVal >= 100 ? '14px' : '16px'));
+                cell.innerHTML = `
+                    <div class="cell-num" style="font-size: ${fontSize}; white-space: nowrap; overflow: hidden; text-overflow: clip;">${currentVal}</div>
+                    <div class="cell-sub" style="font-size: 10px; white-space: nowrap; display: flex; gap: 2px; align-items: center; justify-content: center; line-height: 1.1;">
+                        <span style="opacity: 0.85;">${palaceTagText}</span>
+                        <span class="cell-branch-name" style="color: ${branch.color}; font-weight: 900;">${branch.name}</span>
+                    </div>
+                `;
+
+                if (activePositions.includes(baseNum)) {
+                    cell.classList.add("active-pos");
+                }
+                if (focusedPos !== null && baseNum === focusedPos) {
+                    cell.classList.add("focused-cell");
+                }
+
                 cell.addEventListener("click", () => {
-                    // 支持再点 toggle 取消选择 81 宫单元格
-                    const isAlreadyActive = cell.classList.contains("active-pos");
-                    document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
-                    
-                    if (!isAlreadyActive) {
-                        cell.classList.add("active-pos");
-                        const mappedHexNum = ((num - 1) % 64) + 1;
-                        const hexSelect = document.getElementById("hex-select");
-                        if (hexSelect) hexSelect.value = mappedHexNum;
-                        renderHexagramDetail(mappedHexNum);
-                    }
+                    handleTaiyiCellClick(baseNum, currentVal, palace, palacePosText, branch);
                 });
+
                 grid3x3.appendChild(cell);
             });
             block.appendChild(grid3x3);
@@ -423,7 +474,70 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    initLuoshuTaiyi9x9Matrix();
+    function switchJuTier(juIndex, targetActivePositions = null, focusedPos = null, overrideMap = {}) {
+        currentJu = Math.max(0, juIndex);
+        activeOverrideMap = overrideMap || {};
+
+        const juBadge = document.getElementById("current-ju-badge");
+        if (juBadge) {
+            const start = currentJu * 81 + 1;
+            const end = (currentJu + 1) * 81;
+            juBadge.innerText = `第 ${currentJu + 1} 矩 (${start}~${end})`;
+        }
+
+        document.querySelectorAll(".ju-tier-btn").forEach(btn => {
+            const bJu = btn.dataset.ju;
+            if (bJu === "auto") {
+                btn.classList.remove("active");
+            } else {
+                btn.classList.toggle("active", parseInt(bJu, 10) === currentJu);
+            }
+        });
+
+        if (matrixContainer) {
+            matrixContainer.classList.remove("matrix-shift-anim");
+            void matrixContainer.offsetWidth;
+            matrixContainer.classList.add("matrix-shift-anim");
+        }
+
+        const positions = targetActivePositions !== null ? targetActivePositions : currentActivePositions;
+        const focus = focusedPos !== null ? focusedPos : currentFocusedCell;
+        renderLuoshuTaiyi9x9Matrix(currentJu, positions, focus, activeOverrideMap);
+    }
+
+    function setupJuTierControls() {
+        document.querySelectorAll(".ju-tier-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                this.classList.add("row-click-flash");
+                setTimeout(() => this.classList.remove("row-click-flash"), 450);
+
+                const bJu = this.dataset.ju;
+                if (bJu === "auto") {
+                    const nJu = Math.max(0, Math.floor((currentActiveVal - 1) / 81));
+                    switchJuTier(nJu, [currentFocusedCell], currentFocusedCell, { [currentFocusedCell]: currentActiveVal });
+                } else {
+                    const parsedJu = parseInt(bJu, 10);
+                    switchJuTier(parsedJu, [currentFocusedCell], currentFocusedCell);
+                }
+            });
+        });
+    }
+
+    function handleTaiyiCellClick(baseNum, currentVal, palace, palacePosText, branch) {
+        currentFocusedCell = baseNum;
+        currentActivePositions = [baseNum];
+        currentActiveVal = currentVal;
+
+        const mappedHexNum = ((currentVal - 1) % 64) + 1;
+        const hexSelect = document.getElementById("hex-select");
+        if (hexSelect) hexSelect.value = mappedHexNum;
+
+        switchJuTier(currentJu, [baseNum], baseNum);
+        renderHexagramDetail(mappedHexNum);
+    }
+
+    setupJuTierControls();
+    switchJuTier(0, [], null);
 
     const hexSelect = document.getElementById("hex-select");
     const hexDetailBox = document.getElementById("hex-detail-box");
@@ -477,10 +591,10 @@ document.addEventListener("DOMContentLoaded", () => {
             hexDetailBox.innerHTML = `
                 <div class="hex-header">
                     <div class="hex-name">${hex.symbol} 第 ${hex.num} 卦 · ${hex.name} (上 ${hex.upper} / 下 ${hex.lower})</div>
-                    <div class="hex-sum" style="color:#ffe066; font-size:13px; font-weight:800; margin-top:2px;">📜 【全卦卦辞】：${hex.ci}</div>
+                    <div class="hex-sum" style="color:#ffe066; font-size:13px; font-weight:800; margin-top:2px;">【文献】 【全卦卦辞】：${hex.ci}</div>
                 </div>
                 <div style="font-size:11px; color:#cbd5e1; margin: 4px 0 6px 0; background:rgba(255,224,102,0.12); padding:4px 8px; border-radius:4px;">
-                    👇 点击下方爻节点行查看该爻【爻辞】与数理落点，再次点击该爻可【取消选中】恢复全卦卦辞。
+                     点击下方爻节点行查看该爻【爻辞】与数理落点，再次点击该爻可【取消选中】恢复全卦卦辞。
                 </div>
                 <div class="hex-lines-grid">
                     ${rowsHtml}
@@ -499,11 +613,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.querySelectorAll(".interactive-yao-row").forEach(el => el.classList.remove("active-yao-row"));
 
                     if (isAlreadyActive) {
-                        // 【取消选中】逻辑：恢复默认全卦卦辞展示，恢复主阵图高亮
+                        // 【取消选中】逻辑：恢复默认全卦卦辞展示，恢复主阵图第 1 矩卦位高亮
                         renderDefaultGuaCiView();
-                        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-                            cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === rem81);
-                        });
+                        currentActivePositions = [rem81];
+                        currentFocusedCell = rem81;
+                        currentActiveVal = hex.num;
+                        switchJuTier(0, [rem81], rem81);
+
                         engine.renderHexagram3DTrajectory(hex.num);
                         if (hexBadgeTitle) hexBadgeTitle.innerText = `${hex.name} (${hex.symbol}) 3D 地支数据运动轨迹`;
                         if (hexBadgeDesc) hexBadgeDesc.innerText = `已取消爻高亮，恢复全卦 1~6 爻六维巡航拓扑轨迹`;
@@ -521,6 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const bIdx = parseInt(this.dataset.branch, 10);
                     const branch = EARTHLY_BRANCHES[bIdx];
                     const yRem81 = mVal % 81 === 0 ? 81 : mVal % 81;
+                    const nJu = Math.max(0, Math.floor((mVal - 1) / 81));
 
                     const isYang = hex.lines[yaoNum - 1] === 1;
                     const yaoTitle = isYang ? YAO_TITLES_YANG[yaoNum - 1] : YAO_TITLES_YIN[yaoNum - 1];
@@ -530,15 +647,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     const headerSumEl = hexDetailBox.querySelector(".hex-sum");
                     if (headerSumEl) {
                         headerSumEl.innerHTML = `
-                            <span style="color:#ffe066; font-weight:800;">📖 【${yaoTitle} 爻辞】：${yaoCiText}</span><br>
+                            <span style="color:#ffe066; font-weight:800;">【爻辞】 【${yaoTitle} 爻辞】：${yaoCiText}</span><br>
                             <span style="color:#94a3b8; font-size:11px;">(算式: ${hex.num} × ${yaoNum} = ${mVal} | 12地支余数: 余 ${r12} 【${branch.name}位】 | 81 宫落点: 第 ${yRem81} 宫)</span>
                         `;
                     }
 
-                    // 联动高亮太乙 81 宫 (平整无遮挡)
-                    document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-                        cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === yRem81);
-                    });
+                    // 联动高亮太乙 81 宫并跃迁至对应矩度，显示真实爻乘积数值
+                    currentActiveVal = mVal;
+                    currentFocusedCell = yRem81;
+                    currentActivePositions = [yRem81];
+                    switchJuTier(nJu, [yRem81], yRem81, { [yRem81]: mVal });
 
                     // 驱动 3D 定点节点
                     engine.highlightSingleYaoNode(bIdx);
@@ -551,10 +669,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         renderDefaultGuaCiView();
 
-        // 默认主阵图高亮
-        document.querySelectorAll(".taiyi-81-cell").forEach(cell => {
-            cell.classList.toggle("active-pos", parseInt(cell.dataset.pos, 10) === rem81);
-        });
+        // 默认主阵图高亮当前卦对应太乙 81 宫基数
+        currentActiveVal = hex.num;
+        currentFocusedCell = rem81;
+        currentActivePositions = [rem81];
+        switchJuTier(0, [rem81], rem81);
 
         engine.renderHexagram3DTrajectory(hex.num);
 

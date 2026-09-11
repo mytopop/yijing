@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易经数理秘笈 · 浑天天球三道立体耦合与十二地支全息解剖系统</title>
+    <!-- 引入 Three.js 与 OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            /* 摒弃暗沉死黑，采用极具深邃宇宙感的高明度星海穹顶渐变 */
+            background: radial-gradient(ellipse at 50% 40%, #1e293b 0%, #0f172a 45%, #020617 100%);
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        #webgl-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        /* 顶层 UI 容器 */
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 30px;
+        }
+
+        /* 顶部左侧主信息面板 */
+        .header-panel {
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px 26px;
+            max-width: 640px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.15);
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+        .header-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #facc15;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+        }
+        .header-desc {
+            font-size: 13.5px;
+            color: #e2e8f0;
+            line-height: 1.75;
+        }
+
+        /* 顶部右侧三道图例与图层开关 */
+        .tools-panel {
+            position: absolute;
+            right: 30px;
+            top: 24px;
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 18px 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 320px;
+        }
+        .tools-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #94a3b8;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .legend-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+        .legend-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #cbd5e1;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.2s;
+        }
+        .legend-row:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .legend-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .indicator-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-equator { background: #00f0ff; box-shadow: 0 0 12px #00f0ff; }
+        .dot-ecliptic { background: #ffb703; box-shadow: 0 0 12px #ffb703; }
+        .dot-horizon { background: #d946ef; box-shadow: 0 0 12px #d946ef; }
+        .dot-axis { background: #ff3366; box-shadow: 0 0 10px #ff3366; }
+
+        .layer-toggle {
+            cursor: pointer;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .layer-toggle.active {
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        /* 底部控制台 */
+        .control-panel {
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px 28px;
+            margin: 0 auto;
+            max-width: 1100px;
+            width: 100%;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+        .step-btn {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #cbd5e1;
+            padding: 12px 8px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .step-btn .step-seq {
+            font-size: 11px;
+            opacity: 0.65;
+            letter-spacing: 0.5px;
+        }
+        .step-btn:hover {
+            background: rgba(51, 65, 85, 0.95);
+            color: #ffffff;
+            border-color: rgba(250, 204, 21, 0.6);
+            transform: translateY(-2px);
+        }
+        .step-btn.active {
+            background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+            color: #0f172a;
+            font-weight: 800;
+            border-color: #facc15;
+            box-shadow: 0 0 24px rgba(250, 204, 21, 0.6);
+            transform: translateY(-2px);
+        }
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding-top: 14px;
+        }
+        .status-badge {
+            font-size: 14px;
+            color: #38bdf8;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .btn-action {
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-play {
+            background: #0284c7;
+            border: 1px solid #38bdf8;
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(2, 132, 199, 0.5);
+        }
+        .btn-play:hover {
+            background: #0369a1;
+        }
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e2e8f0;
+        }
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        /* 气泡说明小卡片 */
+        .tooltip-card {
+            position: absolute;
+            bottom: 120px;
+            left: 30px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 12.5px;
+            color: #94a3b8;
+            backdrop-filter: blur(12px);
+            pointer-events: auto;
+            max-width: 320px;
+            line-height: 1.6;
+        }
+        .tooltip-card strong {
+            color: #facc15;
+        }
+    </style>
+</head>
+<body>
+    <div id="webgl-container"></div>
+
+    <div class="ui-overlay">
+        <!-- 顶部左侧解剖信息面板 -->
+        <div class="header-panel">
+            <div class="header-badge" id="step-tag">三道耦合阶段 1 / 6</div>
+            <div class="header-title" id="step-title">地核球心与自转极轴立极</div>
+            <div class="header-desc" id="step-description">
+                球心确立为中心地球，红色自转轴（地轴）纵向贯通天枢天极。垂直于地轴切出地表赤道，这是中国古代浑天测影与周天自转的原始绝对基准。
+            </div>
+        </div>
+
+        <!-- 顶部右侧图层开关与三道图例 -->
+        <div class="tools-panel">
+            <div class="tools-title">
+                <span>三道系统 · 十二支空间管辖</span>
+                <span style="color:#38bdf8;">高精度 3D</span>
+            </div>
+            <div class="legend-list">
+                <div class="legend-row">
+                    <div class="legend-info">
+                        <span class="indicator-dot dot-equator"></span>
+                        <span><strong>赤道坐标</strong>：子 · 午 · 卯 · 酉</span>
+                    </div>
+                    <button class="layer-toggle active" id="toggle-equator">显示</button>
+                </div>
+                <div class="legend-row">
+                    <div class="legend-info">
+                        <span class="indicator-dot dot-ecliptic"></span>
+                        <span><strong>黄道坐标</strong>：丑 · 辰 · 未 · 戌</span>
+                    </div>
+                    <button class="layer-toggle active" id="toggle-ecliptic">显示</button>
+                </div>
+                <div class="legend-row">
+                    <div class="legend-info">
+                        <span class="indicator-dot dot-horizon"></span>
+                        <span><strong>白道地平</strong>：寅 · 巳 · 申 · 亥</span>
+                    </div>
+                    <button class="layer-toggle active" id="toggle-horizon">显示</button>
+                </div>
+                <div class="legend-row">
+                    <div class="legend-info">
+                        <span class="indicator-dot dot-axis"></span>
+                        <span><strong>南北极轴</strong>：通天彻地枢纽</span>
+                    </div>
+                    <span style="font-size:11px;color:#94a3b8;">常驻基准</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 悬浮提示卡 -->
+        <div class="tooltip-card">
+            <strong>视角操作提示</strong>：<br>
+            • 按住鼠标左键自由旋转浑天视角<br>
+            • 滚轮缩放查看地球地表或宏观天球<br>
+            • 点击底部按钮可逐步解剖三道空间咬合
+        </div>
+
+        <!-- 底部演进控制栏 -->
+        <div class="control-panel">
+            <div class="steps-container">
+                <button class="step-btn active" data-step="0">
+                    <span class="step-seq">第一步</span>
+                    <span>1. 地心与极轴</span>
+                </button>
+                <button class="step-btn" data-step="1">
+                    <span class="step-seq">第二步</span>
+                    <span>2. 扩展浑天天球</span>
+                </button>
+                <button class="step-btn" data-step="2">
+                    <span class="step-seq">第三步</span>
+                    <span>3. 赤道 · 子午卯酉</span>
+                </button>
+                <button class="step-btn" data-step="3">
+                    <span class="step-seq">第四步</span>
+                    <span>4. 黄道 · 丑辰未戌</span>
+                </button>
+                <button class="step-btn" data-step="4">
+                    <span class="step-seq">第五步</span>
+                    <span>5. 白道 · 寅巳申亥</span>
+                </button>
+                <button class="step-btn" data-step="5">
+                    <span class="step-seq">第六步</span>
+                    <span>6. 三道立体全息咬合</span>
+                </button>
+                <button class="step-btn" data-step="6" style="border-color: rgba(245, 158, 11, 0.6); background: rgba(245, 158, 11, 0.15);">
+                    <span class="step-seq" style="color: #fbbf24; font-weight: 700;">核心主线</span>
+                    <span style="color: #fef08a;">7. 天有十日 · 归一宫</span>
+                </button>
+            </div>
+            <div class="action-bar">
+                <div class="status-badge" id="status-text">
+                    <span>●</span> 演示状态：第一步【地核球心与自转极轴立极】
+                </div>
+                <div class="controls-right">
+                    <button class="btn-action btn-play" id="btn-play-pause">暂停自动演进</button>
+                    <button class="btn-action btn-reset" id="btn-reset">重置天球视角</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // -------------------------------------------------------------
+        // Three.js 场景、高端材质与渲染器初始化
+        // -------------------------------------------------------------
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+
+        // 相机配置
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(28, 22, 34);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.25;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxDistance = 100;
+        controls.minDistance = 6;
+
+        // 灯光系统：建立通透、高亮立体的专业天文观测馆光影
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+        scene.add(ambientLight);
+
+        const primarySunLight = new THREE.DirectionalLight(0xfffdf0, 1.8);
+        primarySunLight.position.set(40, 60, 30);
+        scene.add(primarySunLight);
+
+        const fillBlueLight = new THREE.DirectionalLight(0x38bdf8, 1.2);
+        fillBlueLight.position.set(-40, -30, -30);
+        scene.add(fillBlueLight);
+
+        const rimGoldLight = new THREE.PointLight(0xfacc15, 1.5, 80);
+        rimGoldLight.position.set(0, -30, 20);
+        scene.add(rimGoldLight);
+
+        // 璀璨星空背景场（多层深度粒子）
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 1800;
+        const starPos = new Float32Array(starCount * 3);
+        const starColors = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount * 3; i += 3) {
+            starPos[i] = (Math.random() - 0.5) * 260;
+            starPos[i+1] = (Math.random() - 0.5) * 260;
+            starPos[i+2] = (Math.random() - 0.5) * 260;
+
+            // 星星色彩冷暖微调
+            starColors[i] = 0.8 + Math.random() * 0.2;
+            starColors[i+1] = 0.85 + Math.random() * 0.15;
+            starColors[i+2] = 0.95 + Math.random() * 0.05;
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+        const starMat = new THREE.PointsMaterial({
+            size: 0.8,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.75
+        });
+        const starField = new THREE.Points(starGeo, starMat);
+        scene.add(starField);
+
+        // -------------------------------------------------------------
+        // 天体常量与核心几何对象
+        // -------------------------------------------------------------
+        const CELESTIAL_R = 15.0; // 天球半径
+        const EARTH_R = 3.6;     // 地球球心半径
+
+        // 1. 地球核心球体（带海洋、陆地发光层次与大气自转）
+        const earthGroup = new THREE.Group();
+        scene.add(earthGroup);
+
+        const earthGeo = new THREE.SphereGeometry(EARTH_R, 48, 48);
+        const earthMat = new THREE.MeshStandardMaterial({
+            color: 0x1d4ed8,
+            roughness: 0.3,
+            metalness: 0.15
+        });
+        const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+        earthGroup.add(earthMesh);
+
+        // 地表经纬网格（明亮科技蓝）
+        const earthGridGeo = new THREE.SphereGeometry(EARTH_R * 1.004, 24, 24);
+        const earthGridMat = new THREE.MeshBasicMaterial({
+            color: 0x60a5fa,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.4
+        });
+        const earthGrid = new THREE.Mesh(earthGridGeo, earthGridMat);
+        earthGroup.add(earthGrid);
+
+        // 地表赤道细光环
+        const earthEquatorGeo = new THREE.TorusGeometry(EARTH_R * 1.01, 0.09, 16, 80);
+        earthEquatorGeo.rotateX(Math.PI / 2);
+        const earthEquatorMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.95 });
+        const earthEquator = new THREE.Mesh(earthEquatorGeo, earthEquatorMat);
+        earthGroup.add(earthEquator);
+
+        // 2. 南北地轴（贯通两极，鲜明红金光柱）
+        const axisGroup = new THREE.Group();
+        scene.add(axisGroup);
+
+        const axisLen = CELESTIAL_R * 2.5;
+        const axisGeo = new THREE.CylinderGeometry(0.12, 0.12, axisLen, 24);
+        const axisMat = new THREE.MeshBasicMaterial({ color: 0xff3366 });
+        const axisMesh = new THREE.Mesh(axisGeo, axisMat);
+        axisGroup.add(axisMesh);
+
+        // 天球北极星（天枢）与南极发光标志球
+        const poleGeo = new THREE.SphereGeometry(0.45, 20, 20);
+        const poleMat = new THREE.MeshBasicMaterial({ color: 0xff4d6d });
+        const northPole = new THREE.Mesh(poleGeo, poleMat);
+        northPole.position.y = axisLen / 2;
+        axisGroup.add(northPole);
+
+        const southPole = new THREE.Mesh(poleGeo, poleMat);
+        southPole.position.y = -axisLen / 2;
+        axisGroup.add(southPole);
+
+        // 3. 赤道向外扩展投影光盘（波纹向深空扩展）
+        const expandDiskGeo = new THREE.RingGeometry(EARTH_R, EARTH_R + 0.1, 80);
+        expandDiskGeo.rotateX(Math.PI / 2);
+        const expandDiskMat = new THREE.MeshBasicMaterial({
+            color: 0x0284c7,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0
+        });
+        const expandDisk = new THREE.Mesh(expandDiskGeo, expandDiskMat);
+        scene.add(expandDisk);
+
+        // 扩展外圈动态光环
+        const expandRingGeo = new THREE.TorusGeometry(EARTH_R, 0.12, 16, 100);
+        expandRingGeo.rotateX(Math.PI / 2);
+        const expandRingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0 });
+        const expandRing = new THREE.Mesh(expandRingGeo, expandRingMat);
+        scene.add(expandRing);
+
+        // 4. 清澈通透的浑天天球穹顶外壳（解决原第四步模糊看不清的问题）
+        const celestialGroup = new THREE.Group();
+        scene.add(celestialGroup);
+
+        // 外层高对比度经纬网格（银蓝金属质感）
+        const celestialSphereGeo = new THREE.SphereGeometry(CELESTIAL_R, 36, 28);
+        const celestialSphereMat = new THREE.MeshBasicMaterial({
+            color: 0x94a3b8,
+            wireframe: true,
+            transparent: true,
+            opacity: 0
+        });
+        const celestialSphereMesh = new THREE.Mesh(celestialSphereGeo, celestialSphereMat);
+        celestialGroup.add(celestialSphereMesh);
+
+        // 晶体半透明内壁光晕（让整个天球立体感爆棚）
+        const celestialDomeGeo = new THREE.SphereGeometry(CELESTIAL_R * 0.998, 48, 36);
+        const celestialDomeMat = new THREE.MeshStandardMaterial({
+            color: 0x1e293b,
+            transparent: true,
+            opacity: 0,
+            roughness: 0.1,
+            metalness: 0.3,
+            side: THREE.DoubleSide
+        });
+        const celestialDome = new THREE.Mesh(celestialDomeGeo, celestialDomeMat);
+        celestialGroup.add(celestialDome);
+
+        // 天球子午圈（纵向大圆，连接南北极与子午二位）
+        const meridianGeo = new THREE.TorusGeometry(CELESTIAL_R * 1.002, 0.08, 16, 120);
+        meridianGeo.rotateY(Math.PI / 2);
+        const meridianMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0 });
+        const meridianCircle = new THREE.Mesh(meridianGeo, meridianMat);
+        celestialGroup.add(meridianCircle);
+
+        // -------------------------------------------------------------
+        // 高清双层 Canvas 气泡标牌生成器
+        // -------------------------------------------------------------
+        function createBranchSprite(char, subText, mainColorHex, strokeColorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 280;
+            canvas.height = 150;
+            const ctx = canvas.getContext('2d');
+
+            // 绘制气泡底板与发光边框
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+            ctx.strokeStyle = strokeColorHex || mainColorHex;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.roundRect(8, 8, 264, 134, 18);
+            ctx.fill();
+            ctx.stroke();
+
+            // 主地支大字（超清加粗）
+            ctx.fillStyle = mainColorHex;
+            ctx.font = 'bold 64px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char, 140, 56);
+
+            // 详细属性小字
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = 'bold 24px -apple-system, sans-serif';
+            ctx.fillText(subText, 140, 110);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0 });
+            const sprite = new THREE.Sprite(mat);
+            sprite.scale.set(3.6, 1.9, 1);
+            return sprite;
+        }
+
+        // -------------------------------------------------------------
+        // 坐标系 1：天赤道坐标系（法天 · 科技青蓝 · 子 · 午 · 卯 · 酉）
+        // -------------------------------------------------------------
+        const equatorGroup = new THREE.Group();
+        scene.add(equatorGroup);
+
+        // 天赤道主环（发光加厚管状大圆环）
+        const equatorRingGeo = new THREE.TorusGeometry(CELESTIAL_R, 0.22, 24, 140);
+        equatorRingGeo.rotateX(Math.PI / 2);
+        const equatorRingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0 });
+        const equatorRingMesh = new THREE.Mesh(equatorRingGeo, equatorRingMat);
+        equatorGroup.add(equatorRingMesh);
+
+        // 赤道四正十字金轴
+        const equatorCrossGeo = new THREE.CylinderGeometry(0.06, 0.06, CELESTIAL_R * 2, 16);
+        const equatorCrossMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0 });
+        const axisZiWu = new THREE.Mesh(equatorCrossGeo, equatorCrossMat);
+        axisZiWu.rotation.x = Math.PI / 2;
+        equatorGroup.add(axisZiWu);
+
+        const axisMaoYou = new THREE.Mesh(equatorCrossGeo, equatorCrossMat);
+        axisMaoYou.rotation.z = Math.PI / 2;
+        equatorGroup.add(axisMaoYou);
+
+        // 赤道 4 地支定义与标牌
+        const EQUATOR_BRANCHES = [
+            { name: "子", angle: 0, sub: "正北 · 冬至点" },
+            { name: "卯", angle: 90, sub: "正东 · 春分交点" },
+            { name: "午", angle: 180, sub: "正南 · 夏至点" },
+            { name: "酉", angle: 270, sub: "正西 · 秋分交点" }
+        ];
+        const equatorSprites = [];
+        const equatorNodes = [];
+
+        EQUATOR_BRANCHES.forEach(b => {
+            const rad = (b.angle * Math.PI) / 180;
+            const x = Math.sin(rad) * CELESTIAL_R;
+            const z = Math.cos(rad) * CELESTIAL_R;
+
+            // 发光球节点
+            const nodeGeo = new THREE.SphereGeometry(0.42, 16, 16);
+            const nodeMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0 });
+            const node = new THREE.Mesh(nodeGeo, nodeMat);
+            node.position.set(x, 0, z);
+            equatorGroup.add(node);
+            equatorNodes.push(node);
+
+            // 标牌
+            const sprite = createBranchSprite(b.name, b.sub, '#00f0ff', '#38bdf8');
+            sprite.position.set(x * 1.22, 0.6, z * 1.22);
+            equatorGroup.add(sprite);
+            equatorSprites.push(sprite);
+        });
+
+        // -------------------------------------------------------------
+        // 坐标系 2：黄道坐标系（法地 · 太阳琥珀金 · 丑 · 辰 · 未 · 戌）
+        // 围绕卯-酉轴（X 轴）倾斜 23.5 度，黄赤相交于【卯（春分）与酉（秋分）】！
+        // 在【子（冬至）与午（夏至）】两端呈现最大极距
+        // -------------------------------------------------------------
+        const eclipticGroup = new THREE.Group();
+        eclipticGroup.rotation.x = (23.5 * Math.PI) / 180; // 围绕卯-酉轴倾斜
+        scene.add(eclipticGroup);
+
+        // 黄道主环
+        const eclipticRingGeo = new THREE.TorusGeometry(CELESTIAL_R * 0.995, 0.22, 24, 140);
+        eclipticRingGeo.rotateX(Math.PI / 2);
+        const eclipticRingMat = new THREE.MeshBasicMaterial({ color: 0xffb703, transparent: true, opacity: 0 });
+        const eclipticRingMesh = new THREE.Mesh(eclipticRingGeo, eclipticRingMat);
+        eclipticGroup.add(eclipticRingMesh);
+
+        // 黄道 4 地支定义与标牌（直接镶嵌在黄道倾斜圆环上！）
+        const ECLIPTIC_BRANCHES = [
+            { name: "丑", angle: 30, sub: "东北 · 冬水之余" },
+            { name: "辰", angle: 120, sub: "东南 · 春木之余" },
+            { name: "未", angle: 210, sub: "西南 · 夏火之余" },
+            { name: "戌", angle: 300, sub: "西北 · 秋金之余" }
+        ];
+        const eclipticSprites = [];
+        const eclipticNodes = [];
+
+        ECLIPTIC_BRANCHES.forEach(b => {
+            const rad = (b.angle * Math.PI) / 180;
+            const x = Math.sin(rad) * CELESTIAL_R * 0.995;
+            const z = Math.cos(rad) * CELESTIAL_R * 0.995;
+
+            const nodeGeo = new THREE.SphereGeometry(0.42, 16, 16);
+            const nodeMat = new THREE.MeshBasicMaterial({ color: 0xffb703, transparent: true, opacity: 0 });
+            const node = new THREE.Mesh(nodeGeo, nodeMat);
+            node.position.set(x, 0, z);
+            eclipticGroup.add(node);
+            eclipticNodes.push(node);
+
+            const sprite = createBranchSprite(b.name, b.sub, '#ffb703', '#facc15');
+            sprite.position.set(x * 1.22, 0.7, z * 1.22);
+            eclipticGroup.add(sprite);
+            eclipticSprites.push(sprite);
+        });
+
+        // -------------------------------------------------------------
+        // 坐标系 3：白道地平坐标系（法人 · 极光紫罗兰 · 寅 · 巳 · 申 · 亥）
+        // 以四维倾角围绕斜轴倾斜，交错于天门（亥）与地户（巳）
+        // -------------------------------------------------------------
+        const horizonGroup = new THREE.Group();
+        horizonGroup.rotation.z = (18 * Math.PI) / 180;
+        horizonGroup.rotation.x = (-12 * Math.PI) / 180;
+        scene.add(horizonGroup);
+
+        // 白道主环
+        const horizonRingGeo = new THREE.TorusGeometry(CELESTIAL_R * 0.99, 0.20, 24, 140);
+        horizonRingGeo.rotateX(Math.PI / 2);
+        const horizonRingMat = new THREE.MeshBasicMaterial({ color: 0xd946ef, transparent: true, opacity: 0 });
+        const horizonRingMesh = new THREE.Mesh(horizonRingGeo, horizonRingMat);
+        horizonGroup.add(horizonRingMesh);
+
+        // 白道天门地户对穿轴（巳-亥贯通线，气数出入中枢）
+        const horizonAxisGeo = new THREE.CylinderGeometry(0.06, 0.06, CELESTIAL_R * 2, 16);
+        const horizonAxisMat = new THREE.MeshBasicMaterial({ color: 0xd946ef, transparent: true, opacity: 0 });
+        const horizonAxisMesh = new THREE.Mesh(horizonAxisGeo, horizonAxisMat);
+        horizonAxisMesh.rotation.z = Math.PI / 4;
+        horizonGroup.add(horizonAxisMesh);
+
+        // 白道 4 地支定义与标牌（直接镶嵌在白道倾斜圆环上！）
+        const HORIZON_BRANCHES = [
+            { name: "寅", angle: 60, sub: "东北 · 立春物始" },
+            { name: "巳", angle: 150, sub: "东南 · 地户立夏" },
+            { name: "申", angle: 240, sub: "西南 · 81矩始立秋" },
+            { name: "亥", angle: 330, sub: "西北 · 天门立冬" }
+        ];
+        const horizonSprites = [];
+        const horizonNodes = [];
+
+        HORIZON_BRANCHES.forEach(b => {
+            const rad = (b.angle * Math.PI) / 180;
+            const x = Math.sin(rad) * CELESTIAL_R * 0.99;
+            const z = Math.cos(rad) * CELESTIAL_R * 0.99;
+
+            const nodeGeo = new THREE.SphereGeometry(0.42, 16, 16);
+            const nodeMat = new THREE.MeshBasicMaterial({ color: 0xd946ef, transparent: true, opacity: 0 });
+            const node = new THREE.Mesh(nodeGeo, nodeMat);
+            node.position.set(x, 0, z);
+            horizonGroup.add(node);
+            horizonNodes.push(node);
+
+            const sprite = createBranchSprite(b.name, b.sub, '#d946ef', '#c084fc');
+            sprite.position.set(x * 1.22, 0.7, z * 1.22);
+            horizonGroup.add(sprite);
+            horizonSprites.push(sprite);
+        });
+
+        // -------------------------------------------------------------
+        // “天有十日 · 归一宫” 太阳动态仿真网格
+        // -------------------------------------------------------------
+        const sunLightGroup = new THREE.Group();
+        scene.add(sunLightGroup);
+
+        const sunCoreGeo = new THREE.SphereGeometry(1.2, 32, 32);
+        const sunCoreMat = new THREE.MeshBasicMaterial({ color: 0xfff000, transparent: true, opacity: 0 });
+        const sunCore = new THREE.Mesh(sunCoreGeo, sunCoreMat);
+        sunLightGroup.add(sunCore);
+
+        const sunCoronaGeo = new THREE.SphereGeometry(2.0, 32, 32);
+        const sunCoronaMat = new THREE.MeshBasicMaterial({ color: 0xff7700, transparent: true, opacity: 0, wireframe: true });
+        const sunCorona = new THREE.Mesh(sunCoronaGeo, sunCoronaMat);
+        sunLightGroup.add(sunCorona);
+
+        // 太阳四正轨迹高亮连接虚线框（酉-午-卯-子）
+        const fourCardinals = [
+            new THREE.Vector3(CELESTIAL_R * 0.998, 0, 0),  // 酉 (西)
+            new THREE.Vector3(0, 0, -CELESTIAL_R * 0.998), // 午 (南)
+            new THREE.Vector3(-CELESTIAL_R * 0.998, 0, 0), // 卯 (东)
+            new THREE.Vector3(0, 0, CELESTIAL_R * 0.998),  // 子 (北)
+            new THREE.Vector3(CELESTIAL_R * 0.998, 0, 0)   // 回酉
+        ];
+        const sunPathGeo = new THREE.BufferGeometry().setFromPoints(fourCardinals);
+        const sunPathMat = new THREE.LineDashedMaterial({ color: 0xfbbf24, dashSize: 0.8, gapSize: 0.4, transparent: true, opacity: 0 });
+        const sunPathLine = new THREE.Line(sunPathGeo, sunPathMat);
+        sunPathLine.computeLineDistances();
+        sunLightGroup.add(sunPathLine);
+
+        // -------------------------------------------------------------
+        // 三道交点标记（黄赤相交二分点、白道天门地户交接点）
+        // -------------------------------------------------------------
+        const crossMarkersGroup = new THREE.Group();
+        scene.add(crossMarkersGroup);
+
+        function createCrossingMarker(position, colorHex, labelText) {
+            const group = new THREE.Group();
+            group.position.copy(position);
+
+            const ringGeo = new THREE.RingGeometry(0.3, 0.6, 24);
+            const ringMat = new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            group.add(ring);
+
+            return { group, ringMat };
+        }
+
+        // -------------------------------------------------------------
+        // 六阶段演进状态机与教学文案
+        // -------------------------------------------------------------
+        const STEP_INFOS = [
+            {
+                tag: "三道耦合阶段 1 / 6",
+                title: "1. 地核球心与自转极轴立极",
+                desc: "确立球心为中心地球，红色自转轴（地轴）纵向贯通天枢天极。垂直于地轴切出地表赤道，这是中国古代浑天测影与周天自转的原始绝对基准。"
+            },
+            {
+                tag: "三道耦合阶段 2 / 6",
+                title: "2. 赤道光幕扩展 · 水晶浑天天球确立",
+                desc: "地表赤道如高亮脉冲光幕向深空无限扩展，抵达宏观天球边缘，构建起通透、清晰的浑天天球经纬穹顶与子午经线大圆。"
+            },
+            {
+                tag: "三道耦合阶段 3 / 6",
+                title: "3. 点亮【天赤道】· 专属标注四正（子 · 午 · 卯 · 酉）",
+                desc: "高亮电光青蓝天赤道大圆确立（法天）。在此圆环上专属标定四正：子（正北·冬至）、午（正南·夏至）、卯（正东·春分）、酉（正西·秋分）。四正十字金轴立极！"
+            },
+            {
+                tag: "三道耦合阶段 4 / 6",
+                title: "4. 点亮【黄道坐标】· 专属标注四季（丑 · 辰 · 未 · 戌）",
+                desc: "璀璨太阳金黄道大圆倾斜 23.5° 切入（法地·日行轨道）。属于黄道的四支绝不标在赤道上，而是直接镶嵌在黄道倾斜环上：丑（冬水余）、辰（春木余）、未（夏火余）、戌（秋金余）。"
+            },
+            {
+                tag: "三道耦合阶段 5 / 6",
+                title: "5. 点亮【白道地平】· 专属标注四维（寅 · 巳 · 申 · 亥）",
+                desc: "极光紫罗兰白道大圆倾斜切入（法人·陆地生化·非指月道）。在白道地平环上精确标定四维四白：寅（立春·物生之始）、巳（地户立夏）、申（立秋·81矩发端）、亥（天门立冬·六十节律）。"
+            },
+            {
+                tag: "三道耦合阶段 6 / 7",
+                title: "6. 三道立体全息咬合 · 天门地户大轴运转",
+                desc: "天赤道（蓝·四正）、黄道（金·四季）、白道（紫·四维）三大圆环立体交织！黄赤相交于两分（卯酉），天地之气在巳（地户）与亥（天门）循环对穿出入，天地人三才系统完整运转！"
+            },
+            {
+                tag: "易经全书核心主线",
+                title: "7. 天有十日 · 太阳在四正位逆跳循环（归一宫）",
+                desc: "【全书核心主线】：太阳能量（10 的次方 10^1 到 10^10...）经太乙 81 矩降维后，余数全部归入坎一宫！在天球空间中，太阳只在赤道四正位【酉 ➔ 午 ➔ 卯 ➔ 子】每步 90° 循环跳跃，十步周天，永远照临四方！"
+            }
+        ];
+
+        let currentStep = 0;
+        let isAutoPlaying = true;
+        let stepProgress = 0;
+        const STEP_DURATION = 360; // 每一阶段 6 秒流畅过渡
+
+        // 图层显隐状态
+        let layerVisibility = {
+            equator: true,
+            ecliptic: true,
+            horizon: true
+        };
+
+        function updateStepUI(stepIndex) {
+            document.querySelectorAll('.step-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === stepIndex);
+            });
+            const info = STEP_INFOS[stepIndex];
+            document.getElementById('step-tag').innerText = info.tag;
+            document.getElementById('step-title').innerText = info.title;
+            document.getElementById('step-description').innerText = info.desc;
+            const badge = document.getElementById('status-text');
+            badge.innerHTML = `<span>●</span> 演示状态：${info.title}`;
+        }
+
+        // 手动点击分步按钮
+        document.querySelectorAll('.step-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentStep = parseInt(btn.getAttribute('data-step'));
+                stepProgress = 0;
+                isAutoPlaying = false;
+                document.getElementById('btn-play-pause').innerText = "恢复自动演示";
+                updateStepUI(currentStep);
+            });
+        });
+
+        // 播放 / 暂停
+        document.getElementById('btn-play-pause').addEventListener('click', () => {
+            isAutoPlaying = !isAutoPlaying;
+            document.getElementById('btn-play-pause').innerText = isAutoPlaying ? "暂停自动演进" : "继续演示";
+        });
+
+        // 重置视角
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            camera.position.set(28, 22, 34);
+            controls.target.set(0, 0, 0);
+        });
+
+        // 图层独立开关
+        document.getElementById('toggle-equator').addEventListener('click', function() {
+            layerVisibility.equator = !layerVisibility.equator;
+            this.classList.toggle('active', layerVisibility.equator);
+            this.innerText = layerVisibility.equator ? "显示" : "隐藏";
+            equatorGroup.visible = layerVisibility.equator;
+        });
+
+        document.getElementById('toggle-ecliptic').addEventListener('click', function() {
+            layerVisibility.ecliptic = !layerVisibility.ecliptic;
+            this.classList.toggle('active', layerVisibility.ecliptic);
+            this.innerText = layerVisibility.ecliptic ? "显示" : "隐藏";
+            eclipticGroup.visible = layerVisibility.ecliptic;
+        });
+
+        document.getElementById('toggle-horizon').addEventListener('click', function() {
+            layerVisibility.horizon = !layerVisibility.horizon;
+            this.classList.toggle('active', layerVisibility.horizon);
+            this.innerText = layerVisibility.horizon ? "显示" : "隐藏";
+            horizonGroup.visible = layerVisibility.horizon;
+        });
+
+        function lerp(start, end, amt) {
+            return (1 - amt) * start + amt * end;
+        }
+
+        function setOpacity(objects, targetOpacity, speed = 0.08) {
+            objects.forEach(obj => {
+                if (obj.material) {
+                    obj.material.opacity = lerp(obj.material.opacity, targetOpacity, speed);
+                }
+            });
+        }
+
+        // -------------------------------------------------------------
+        // 主渲染演进循环
+        // -------------------------------------------------------------
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 地球自转
+            earthGroup.rotation.y += 0.003;
+            starField.rotation.y += 0.00015;
+
+            // 自动演进时钟
+            if (isAutoPlaying) {
+                stepProgress++;
+                if (stepProgress > STEP_DURATION) {
+                    stepProgress = 0;
+                    currentStep = (currentStep + 1) % 7;
+                    updateStepUI(currentStep);
+                }
+            }
+
+            const p = stepProgress / STEP_DURATION;
+            applyStepVisuals(currentStep, p);
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function applyStepVisuals(step, progress) {
+            // 阶段 0 到 5 隐藏太阳仿真
+            if (step < 6) {
+                sunCoreMat.opacity = lerp(sunCoreMat.opacity, 0, 0.1);
+                sunCoronaMat.opacity = lerp(sunCoronaMat.opacity, 0, 0.1);
+                sunPathMat.opacity = lerp(sunPathMat.opacity, 0, 0.1);
+            }
+
+            // 阶段 0: 地心与自转轴
+            if (step === 0) {
+                earthMat.opacity = 1.0;
+                earthEquatorMat.opacity = 0.95;
+                expandRingMat.opacity = 0;
+                expandDiskMat.opacity = 0;
+
+                celestialSphereMat.opacity = lerp(celestialSphereMat.opacity, 0.04, 0.08);
+                celestialDomeMat.opacity = 0;
+                meridianMat.opacity = 0;
+
+                equatorRingMat.opacity = 0;
+                equatorCrossMat.opacity = 0;
+                setOpacity(equatorSprites, 0);
+                setOpacity(equatorNodes, 0);
+
+                eclipticRingMat.opacity = 0;
+                setOpacity(eclipticSprites, 0);
+                setOpacity(eclipticNodes, 0);
+
+                horizonRingMat.opacity = 0;
+                horizonAxisMat.opacity = 0;
+                setOpacity(horizonSprites, 0);
+                setOpacity(horizonNodes, 0);
+            }
+            // 阶段 1: 赤道光幕扩展 · 天球成型
+            else if (step === 1) {
+                const curScale = lerp(1.0, CELESTIAL_R / EARTH_R, progress);
+                expandRing.scale.set(curScale, curScale, curScale);
+                expandRingMat.opacity = 0.95;
+
+                expandDisk.geometry.dispose();
+                expandDisk.geometry = new THREE.RingGeometry(EARTH_R, EARTH_R * curScale, 80);
+                expandDisk.geometry.rotateX(Math.PI / 2);
+                expandDiskMat.opacity = 0.35;
+
+                // 天球穹顶清晰显现
+                celestialSphereMat.opacity = lerp(celestialSphereMat.opacity, 0.45, 0.08);
+                celestialDomeMat.opacity = lerp(celestialDomeMat.opacity, 0.22, 0.08);
+                meridianMat.opacity = lerp(meridianMat.opacity, 0.55, 0.08);
+
+                equatorRingMat.opacity = 0;
+                setOpacity(equatorSprites, 0);
+                setOpacity(equatorNodes, 0);
+                eclipticRingMat.opacity = 0;
+                setOpacity(eclipticSprites, 0);
+                horizonRingMat.opacity = 0;
+                setOpacity(horizonSprites, 0);
+            }
+            // 阶段 2: 点亮天赤道与四正（子午卯酉）
+            else if (step === 2) {
+                expandRingMat.opacity = lerp(expandRingMat.opacity, 0, 0.08);
+                expandDiskMat.opacity = lerp(expandDiskMat.opacity, 0.04, 0.08);
+
+                celestialSphereMat.opacity = 0.45;
+                celestialDomeMat.opacity = 0.22;
+                meridianMat.opacity = 0.55;
+
+                // 青蓝天赤道高亮
+                equatorRingMat.opacity = lerp(equatorRingMat.opacity, 1.0, 0.08);
+                equatorCrossMat.opacity = lerp(equatorCrossMat.opacity, 0.7, 0.08);
+                setOpacity(equatorSprites, lerp(equatorSprites[0].material.opacity, 1.0, 0.08));
+                setOpacity(equatorNodes, lerp(equatorNodes[0].material.opacity, 1.0, 0.08));
+
+                eclipticRingMat.opacity = 0;
+                setOpacity(eclipticSprites, 0);
+                setOpacity(eclipticNodes, 0);
+                horizonRingMat.opacity = 0;
+                horizonAxisMat.opacity = 0;
+                setOpacity(horizonSprites, 0);
+                setOpacity(horizonNodes, 0);
+            }
+            // 阶段 3: 点亮黄道坐标系与四季（丑辰未戌）
+            else if (step === 3) {
+                equatorRingMat.opacity = 0.8;
+                equatorCrossMat.opacity = 0.4;
+                setOpacity(equatorSprites, 0.8);
+                setOpacity(equatorNodes, 0.8);
+
+                // 金色黄道高亮
+                eclipticRingMat.opacity = lerp(eclipticRingMat.opacity, 1.0, 0.08);
+                setOpacity(eclipticSprites, lerp(eclipticSprites[0].material.opacity, 1.0, 0.08));
+                setOpacity(eclipticNodes, lerp(eclipticNodes[0].material.opacity, 1.0, 0.08));
+
+                horizonRingMat.opacity = 0;
+                horizonAxisMat.opacity = 0;
+                setOpacity(horizonSprites, 0);
+                setOpacity(horizonNodes, 0);
+            }
+            // 阶段 4: 点亮白道地平与四维（寅巳申亥）
+            else if (step === 4) {
+                equatorRingMat.opacity = 0.7;
+                setOpacity(equatorSprites, 0.7);
+                eclipticRingMat.opacity = 0.7;
+                setOpacity(eclipticSprites, 0.7);
+
+                // 紫罗兰白道高亮与天门地户轴
+                horizonRingMat.opacity = lerp(horizonRingMat.opacity, 1.0, 0.08);
+                horizonAxisMat.opacity = lerp(horizonAxisMat.opacity, 0.65, 0.08);
+                setOpacity(horizonSprites, lerp(horizonSprites[0].material.opacity, 1.0, 0.08));
+                setOpacity(horizonNodes, lerp(horizonNodes[0].material.opacity, 1.0, 0.08));
+            }
+            // 阶段 5: 三道全息立体咬合
+            else if (step === 5) {
+                equatorRingMat.opacity = 1.0;
+                equatorCrossMat.opacity = 0.6;
+                setOpacity(equatorSprites, 1.0);
+                setOpacity(equatorNodes, 1.0);
+
+                eclipticRingMat.opacity = 1.0;
+                setOpacity(eclipticSprites, 1.0);
+                setOpacity(eclipticNodes, 1.0);
+
+                horizonRingMat.opacity = 1.0;
+                horizonAxisMat.opacity = 0.65;
+                setOpacity(horizonSprites, 1.0);
+                setOpacity(horizonNodes, 1.0);
+
+                // 浑天全景慢速旋转
+                celestialGroup.rotation.y += 0.001;
+                equatorGroup.rotation.y += 0.001;
+                eclipticGroup.rotation.y += 0.001;
+                horizonGroup.rotation.y += 0.001;
+            }
+            // 阶段 6: 天有十日 · 太阳在四正位逆跳（归一宫）
+            else if (step === 6) {
+                equatorRingMat.opacity = 1.0;
+                equatorCrossMat.opacity = 0.8;
+                setOpacity(equatorSprites, 1.0);
+                setOpacity(equatorNodes, 1.0);
+
+                // 虚化背景黄白两道，突出天赤道四正
+                eclipticRingMat.opacity = 0.3;
+                setOpacity(eclipticSprites, 0.3);
+                horizonRingMat.opacity = 0.3;
+                setOpacity(horizonSprites, 0.3);
+                horizonAxisMat.opacity = 0.2;
+
+                // 激活发光太阳模型与四正连接轨
+                sunCoreMat.opacity = 1.0;
+                sunCoronaMat.opacity = 0.85;
+                sunPathMat.opacity = 0.75;
+
+                // 计算太阳在四正四段中的跳跃位置：
+                // 10^1 酉 -> 10^2 午 -> 10^3 卯 -> 10^4 子 -> 10^5 酉...
+                const cycleP = (progress * 4) % 4;
+                const seg = Math.floor(cycleP);
+                const segP = cycleP - seg;
+                const smoothP = segP * segP * (3 - 2 * segP); // 平滑缓动
+
+                const pStart = fourCardinals[seg];
+                const pEnd = fourCardinals[seg + 1];
+                const curPos = new THREE.Vector3().lerpVectors(pStart, pEnd, smoothP);
+                sunLightGroup.position.copy(curPos);
+
+                // 太阳光晕自转闪烁
+                sunCorona.rotation.y += 0.04;
+                sunCorona.rotation.x += 0.02;
+
+                // 动态更新教学文字
+                const sunPositions = [
+                    "【10¹ 酉位（西）· 履卦】",
+                    "【10² 午位（南）· 临卦】",
+                    "【10³ 卯位（东）· 大过卦】",
+                    "【10⁴ 子位（北）· 家人卦】"
+                ];
+                document.getElementById('status-text').innerHTML = `<span>●</span> 太阳正运行至：<strong style="color:#facc15;font-size:15px;">${sunPositions[seg]}</strong> ➔ 模81全归坎一宫！`;
+            }
+        }
+
+        // 自适应窗口重绘
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 启动主渲染
+        animate();
+    </script>
+</body>
+</html>

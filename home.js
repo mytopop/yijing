@@ -43,16 +43,26 @@ const TAIYI_81_SUB_LABELS = {
 };
 
 
+// 天门-地户轴单位向量 (东南地户巳 -60°, 西北天门亥 120°)
+const AXIS_TIANMEN_DIHU = new THREE.Vector3(
+    Math.cos(THREE.MathUtils.degToRad(-60)), 
+    Math.sin(THREE.MathUtils.degToRad(-60)), 
+    0
+).normalize();
+
 function getBranch3DPos(branchIdx, radius = 6.0) {
     const angle = THREE.MathUtils.degToRad(90 - branchIdx * 30);
     const baseVec = new THREE.Vector3(radius * Math.cos(angle), radius * Math.sin(angle), 0);
     
     const remSystem = (branchIdx + 1) % 3;
     if (remSystem === 2) {
+        // 黄道四支 (丑, 辰, 未, 戌): 绕卯-酉轴 (春分-秋分, X 轴) 旋转 +23.5°
         baseVec.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.5));
     } else if (remSystem === 0) {
-        baseVec.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-15));
+        // 白道四支 (寅, 巳, 申, 亥): 绕天门-地户轴 (巳-亥, AXIS_TIANMEN_DIHU) 轴立体旋转 18°
+        baseVec.applyAxisAngle(AXIS_TIANMEN_DIHU, THREE.MathUtils.degToRad(18));
     }
+    // remSystem === 1 为赤道四支 (子, 卯, 午, 酉): 纯水平赤道面 Z = 0
     return baseVec;
 }
 
@@ -69,6 +79,7 @@ class HomePureMath3DEngine {
         this.renderer = null;
         this.controls = null;
 
+        this.frameworkGroup = new THREE.Group();
         this.equatorGroup = new THREE.Group();
         this.eclipticGroup = new THREE.Group();
         this.lunarGroup = new THREE.Group();
@@ -83,6 +94,7 @@ class HomePureMath3DEngine {
         this.dataPulseMesh = null;
 
         this.initScene();
+        this.createArmillaryFramework();
         this.createArmillaryRings();
         this.createCelestialGridAndPoles();
         this.setupDataMotionPulse();
@@ -110,6 +122,7 @@ class HomePureMath3DEngine {
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
 
+        this.scene.add(this.frameworkGroup);
         this.scene.add(this.equatorGroup);
         this.scene.add(this.eclipticGroup);
         this.scene.add(this.lunarGroup);
@@ -149,6 +162,67 @@ class HomePureMath3DEngine {
         this.scene.add(goldLight);
     }
 
+    // 浑天仪外层固定骨架 (六合仪支架与中黄地核)
+    createArmillaryFramework(radius = 6.0) {
+        const frameRadius = radius * 1.07;
+        const frameMat = new THREE.MeshStandardMaterial({
+            color: 0xd4af37,
+            metalness: 0.85,
+            roughness: 0.25,
+            emissive: 0x332200,
+            transparent: true,
+            opacity: 0.65
+        });
+
+        // 1. 地平基准大环 (Horizon Ring)
+        const horizonGeom = new THREE.TorusGeometry(frameRadius, 0.055, 12, 120);
+        const horizonMesh = new THREE.Mesh(horizonGeom, frameMat);
+        this.frameworkGroup.add(horizonMesh);
+
+        // 2. 子午立双环 (Meridian Dual Rings，在 YZ 垂直面)
+        const meridianGeom1 = new THREE.TorusGeometry(frameRadius, 0.05, 12, 120);
+        const meridianMesh1 = new THREE.Mesh(meridianGeom1, frameMat);
+        meridianMesh1.rotation.y = Math.PI / 2;
+        this.frameworkGroup.add(meridianMesh1);
+
+        const meridianGeom2 = new THREE.TorusGeometry(frameRadius * 0.98, 0.035, 12, 120);
+        const meridianMesh2 = new THREE.Mesh(meridianGeom2, frameMat);
+        meridianMesh2.rotation.y = Math.PI / 2;
+        this.frameworkGroup.add(meridianMesh2);
+
+        // 3. 四方地平天标
+        const cardinals = [
+            { name: "正北", vec: new THREE.Vector3(0, frameRadius * 1.06, 0), color: "#ffe066" },
+            { name: "正东", vec: new THREE.Vector3(frameRadius * 1.06, 0, 0), color: "#ffe066" },
+            { name: "正南", vec: new THREE.Vector3(0, -frameRadius * 1.06, 0), color: "#ffe066" },
+            { name: "正西", vec: new THREE.Vector3(-frameRadius * 1.06, 0, 0), color: "#ffe066" }
+        ];
+        cardinals.forEach(c => {
+            const sp = this.createTextSprite(c.name, c.color);
+            sp.position.copy(c.vec);
+            sp.scale.set(1.1, 1.1, 1.1);
+            this.frameworkGroup.add(sp);
+        });
+
+        // 4. 中黄地核球 (Terra Core，中黄居中)
+        const coreGeom = new THREE.SphereGeometry(0.85, 24, 24);
+        const coreMat = new THREE.MeshStandardMaterial({
+            color: 0x183050,
+            emissive: 0x0a1a30,
+            metalness: 0.6,
+            roughness: 0.3,
+            transparent: true,
+            opacity: 0.7
+        });
+        const coreMesh = new THREE.Mesh(coreGeom, coreMat);
+        this.frameworkGroup.add(coreMesh);
+
+        const coreWireGeom = new THREE.SphereGeometry(0.86, 12, 8);
+        const coreWireMat = new THREE.MeshBasicMaterial({ color: 0xffe066, wireframe: true, transparent: true, opacity: 0.25 });
+        const coreWireMesh = new THREE.Mesh(coreWireGeom, coreWireMat);
+        this.frameworkGroup.add(coreWireMesh);
+    }
+
     createCelestialGridAndPoles() {
         const radius = 6.0;
 
@@ -164,53 +238,59 @@ class HomePureMath3DEngine {
         poleLine.computeLineDistances();
         this.celestialGridGroup.add(poleLine);
 
-        const northStarGeom = new THREE.SphereGeometry(0.35, 16, 16);
-        const northStarMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.0 });
+        // 北极星微星核与星宿光环 (告别巨大白塑料球)
+        const northStarGeom = new THREE.SphereGeometry(0.14, 16, 16);
+        const northStarMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const northStar = new THREE.Mesh(northStarGeom, northStarMat);
         northStar.position.set(0, 0, 8.5);
         this.celestialGridGroup.add(northStar);
 
-        const northSprite = this.createTextSprite("⭐ 北极星", "#ffe066");
-        northSprite.position.set(0, 0, 9.8);
+        const northHaloGeom = new THREE.TorusGeometry(0.32, 0.02, 12, 36);
+        const northHaloMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.6 });
+        const northHalo = new THREE.Mesh(northHaloGeom, northHaloMat);
+        northHalo.position.set(0, 0, 8.5);
+        this.celestialGridGroup.add(northHalo);
+
+        const northSprite = this.createTextSprite("北极星", "#ffe066");
+        northSprite.position.set(0, 0, 9.6);
         this.celestialGridGroup.add(northSprite);
     }
 
     createArmillaryRings() {
         const radius = 6.0;
 
+        // 1. 赤道环 (水平 0° 面，金属赤红)
         const equatorGeom = new THREE.TorusGeometry(radius, 0.07, 16, 120);
         const equatorMat = new THREE.MeshStandardMaterial({ color: 0xff5252, metalness: 0.8, roughness: 0.2, emissive: 0x880000 });
         const equatorMesh = new THREE.Mesh(equatorGeom, equatorMat);
         this.equatorGroup.add(equatorMesh);
 
+        // 2. 黄道环 (绕春分-秋分 X 轴旋转 +23.5°，金属翠绿)
         const eclipticMat = new THREE.MeshStandardMaterial({ color: 0x40c057, metalness: 0.8, roughness: 0.2, emissive: 0x006600 });
         const eclipticMesh = new THREE.Mesh(equatorGeom.clone(), eclipticMat);
         eclipticMesh.rotation.x = THREE.MathUtils.degToRad(23.5);
         this.eclipticGroup.add(eclipticMesh);
 
+        // 3. 白道环 (解绑卯酉单轴！绕天门-地户轴立体旋转 18°，金属青蓝)
         const lunarMat = new THREE.MeshStandardMaterial({ color: 0x4dabf7, metalness: 0.8, roughness: 0.2, emissive: 0x0033aa });
         const lunarMesh = new THREE.Mesh(equatorGeom.clone(), lunarMat);
-        lunarMesh.rotation.x = THREE.MathUtils.degToRad(-15);
+        lunarMesh.quaternion.setFromAxisAngle(AXIS_TIANMEN_DIHU, THREE.MathUtils.degToRad(18));
         this.lunarGroup.add(lunarMesh);
 
+        // 4. 十二地支星宿位点：彻底移除死板塑料大球与斜金环，升华为【微光星宿晶核 + 浑天星曜玉璧】
         EARTHLY_BRANCHES.forEach((b) => {
             const pos = getBranch3DPos(b.idx, radius);
 
-            const orbGeom = new THREE.SphereGeometry(0.32, 16, 16);
-            const orbMat = new THREE.MeshStandardMaterial({ color: b.color, metalness: 0.9, roughness: 0.1, emissive: b.color, emissiveIntensity: 0.5 });
-            const orbMesh = new THREE.Mesh(orbGeom, orbMat);
-            orbMesh.position.copy(pos);
-            this.orbsGroup.add(orbMesh);
+            // 环上微型星宿光核 (半径仅 0.07，精致纯粹如恒星微芒，不遮挡轨道流线)
+            const starGeom = new THREE.SphereGeometry(0.07, 12, 12);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const starMesh = new THREE.Mesh(starGeom, starMat);
+            starMesh.position.copy(pos);
+            this.orbsGroup.add(starMesh);
 
-            const ringGeom = new THREE.TorusGeometry(0.48, 0.02, 12, 32);
-            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide });
-            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
-            ringMesh.position.copy(pos);
-            ringMesh.rotation.x = Math.PI / 2;
-            this.orbsGroup.add(ringMesh);
-
+            // 浑天星曜玉璧徽标 (贴合环轨外缘，比例优雅和谐)
             const sprite = this.createTextSprite(b.name, b.color);
-            sprite.position.copy(pos.clone().multiplyScalar(1.18));
+            sprite.position.copy(pos.clone().multiplyScalar(1.08));
             this.orbsGroup.add(sprite);
         });
     }
@@ -231,14 +311,14 @@ class HomePureMath3DEngine {
         motionLine.computeLineDistances();
         this.dataMotionGroup.add(motionLine);
 
-        // 创建地支间游走的光速数据粒子 (Data Motion Orb)
-        const pulseGeom = new THREE.SphereGeometry(0.48, 32, 32);
-        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5, metalness: 0.9 });
+        // 创建地支间游走的光速微型数据粒子 (轻盈通透)
+        const pulseGeom = new THREE.SphereGeometry(0.2, 20, 20);
+        const pulseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe066, emissiveIntensity: 1.5 });
         this.dataPulseMesh = new THREE.Mesh(pulseGeom, pulseMat);
         
         // 外围光晕圈
-        const haloGeom = new THREE.TorusGeometry(0.65, 0.04, 16, 32);
-        const haloMat = new THREE.MeshBasicMaterial({ color: 0xff5252, side: THREE.DoubleSide });
+        const haloGeom = new THREE.TorusGeometry(0.36, 0.02, 12, 32);
+        const haloMat = new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.7, side: THREE.DoubleSide });
         const haloMesh = new THREE.Mesh(haloGeom, haloMat);
         haloMesh.rotation.x = Math.PI / 2;
         this.dataPulseMesh.add(haloMesh);
@@ -246,30 +326,53 @@ class HomePureMath3DEngine {
         this.dataMotionGroup.add(this.dataPulseMesh);
     }
 
+    // 绘制高质感“浑天星曜玉璧”地支徽标
     createTextSprite(text, colorHex) {
         const canvas = document.createElement("canvas");
         canvas.width = 128;
         canvas.height = 128;
         const ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = "rgba(10, 16, 30, 0.95)";
+        // 1. 柔和外围星辉光晕
+        const radGlow = ctx.createRadialGradient(64, 64, 28, 64, 64, 58);
+        radGlow.addColorStop(0, "rgba(0, 0, 0, 0)");
+        radGlow.addColorStop(0.65, colorHex + "33");
+        radGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = radGlow;
         ctx.beginPath();
-        ctx.arc(64, 64, 52, 0, Math.PI * 2);
+        ctx.arc(64, 64, 58, 0, Math.PI * 2);
         ctx.fill();
+
+        // 2. 浑天黑曜石半透明微透星盘底
+        ctx.fillStyle = "rgba(10, 16, 28, 0.88)";
+        ctx.beginPath();
+        ctx.arc(64, 64, 46, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. 双重同心浑天仪规金线
         ctx.strokeStyle = colorHex;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', serif";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(64, 64, 40, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 4. 正中温润书法地支大字 (带内辉)
+        ctx.font = "Bold 44px 'Noto Serif SC', 'KaiTi', 'SimSun', serif";
         ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = colorHex;
+        ctx.shadowBlur = 8;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(text, 64, 64);
+        ctx.fillText(text, 64, 65);
 
         const texture = new THREE.CanvasTexture(canvas);
         const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(spriteMat);
-        sprite.scale.set(1.35, 1.35, 1.35);
+        sprite.scale.set(1.4, 1.4, 1.4);
         return sprite;
     }
 
@@ -327,8 +430,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.className = "taiyi-81-cell";
                 cell.dataset.pos = num;
                 cell.title = `数值 ${num} (${palace.name})`;
+                const rem12 = num % 12 === 0 ? 12 : num % 12;
+                const branch = EARTHLY_BRANCHES[rem12 - 1];
                 const subTag = (typeof TAIYI_81_SUB_LABELS !== "undefined" && TAIYI_81_SUB_LABELS[num]) ? TAIYI_81_SUB_LABELS[num] : "";
-                cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-sub">${subTag}</div>`;
+                const palaceTagText = subTag.replace(/[()]/g, "");
+                cell.title = `数值: ${num} (${palace.name} ${palaceTagText})
+地支: ${branch.name}位 (${branch.system})`;
+                cell.innerHTML = `
+                    <div class="cell-num" style="font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: clip;">${num}</div>
+                    <div class="cell-sub" style="font-size: 10px; white-space: nowrap; display: flex; gap: 2px; align-items: center; justify-content: center; line-height: 1.1;">
+                        <span style="opacity: 0.85;">${palaceTagText}</span>
+                        <span class="cell-branch-name" style="color: ${branch.color}; font-weight: 900;">${branch.name}</span>
+                    </div>
+                `;
                 cell.addEventListener("click", () => {
                     document.querySelectorAll(".taiyi-81-cell").forEach(c => c.classList.remove("active-pos"));
                     cell.classList.add("active-pos");

@@ -21,7 +21,7 @@
         <!-- 统一 100% 结构固定 Header 顶栏 (11 大 Tab 完备导航) -->
         <header class="app-header">
             <div class="header-brand">
-                <div class="logo-icon">☯</div>
+                <div class="logo-icon"></div>
                 <div class="brand-text">
                     <h1>易经数理秘笈 · 太乙九宫天象拓扑</h1>
                     <span class="subtitle">根据梁致堂原著解构 · 原书九宫纪气数一览表全景馆</span>
@@ -29,17 +29,17 @@
             </div>
             
             <nav class="header-nav-tabs">
-                <a href="index.html" class="nav-tab">🏠 首页</a>
-                <a href="pipeline.html" class="nav-tab">⚡ 流水线</a>
-                <a href="hexagrams.html" class="nav-tab">☰ 64卦拓扑</a>
-                <a href="laws.html" class="nav-tab">✨ 5大定律</a>
-                <a href="wuxing.html" class="nav-tab">☯ 五行三元</a>
-                <a href="jiugong_qi.html" class="nav-tab">📜 九宫七输入</a>
-                <a href="zhoutian360.html" class="nav-tab">🌀 周天360°</a>
-                <a href="qishu939697.html" class="nav-tab">🔢 939697七数</a>
-                <a href="coordinates12.html" class="nav-tab">🌌 12方位3坐标</a>
-                <a href="ju81.html" class="nav-tab">📐 用矩81</a>
-                <a href="jiugong_tables.html" class="nav-tab active">📊 九宫纪气大表</a>
+                <a href="index.html" class="nav-tab"> 首页</a>
+                <a href="pipeline.html" class="nav-tab"> 流水线</a>
+                <a href="hexagrams.html" class="nav-tab"> 64卦拓扑</a>
+                <a href="laws.html" class="nav-tab"> 5大定律</a>
+                <a href="wuxing.html" class="nav-tab"> 五行三元</a>
+                <a href="jiugong_qi.html" class="nav-tab"> 九宫七输入</a>
+                <a href="zhoutian360.html" class="nav-tab"> 周天360°</a>
+                <a href="qishu939697.html" class="nav-tab"> 939697七数</a>
+                <a href="coordinates12.html" class="nav-tab"> 12方位3坐标</a>
+                <a href="ju81.html" class="nav-tab"> 用矩81</a>
+                <a href="jiugong_tables.html" class="nav-tab active"> 九宫纪气大表</a>
             </nav>
         </header>
 
@@ -49,7 +49,7 @@
             <section class="col-left-3d">
                 <div class="panel-header-bar">
                     <div class="panel-title">
-                        <span>🌌</span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
+                        <span></span> 3D 浑天天象坐标仪 (纯粹数理逻辑)
                     </div>
                     <div class="orbit-legend">
                         <span class="legend-item equator">● 赤道(0°)</span>
@@ -71,13 +71,13 @@
                             <span class="dot blue"></span> 白道
                         </button>
                         <button id="btn-speed-control" class="control-icon-btn" title="点击调节小球移动速度 (0.5x / 1x / 2x / 4x)">
-                            ⚡ 速度: <span id="speed-val">1x</span>
+                             速度: <span id="speed-val">1x</span>
                         </button>
                         <button id="btn-reset-view" class="control-icon-btn" title="复位视角与自适应视角">
-                            🎯 复位视角
+                             复位视角
                         </button>
                         <button id="btn-toggle-autorotate" class="control-toggle-btn active" title="开启/关闭视角自动旋转">
-                            🔄 旋转
+                             旋转
                         </button>
                     </div>
 
@@ -96,10 +96,26 @@
             <section class="col-middle-taiyi">
                 <div class="glass-panel">
                     <div class="card-title">
-                        <span>📜</span> 太乙九宫八十一宫阵图 (原书精确排布)
+                        <span></span> 太乙九宫八十一宫阵图 (原书精确排布)
                     </div>
                     <div class="law-desc-text">
                         点击阵图中的 81 宫单元格，左侧 3D 地支节点与右侧纪气数大表将同步高亮闪耀。
+                    </div>
+
+                    <!-- 多重矩数时空跃迁切换栏 (动态维度层) -->
+                    <div class="ju-tier-controller">
+                        <div style="display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: #cbd5e1;">
+                            <span style="color: #ffd700; font-weight: 700;">矩度时空:</span>
+                            <span id="current-ju-badge" style="background: rgba(255, 215, 0, 0.18); border: 1px solid rgba(255, 215, 0, 0.4); color: #ffe066; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 800; display: inline-block;">第 1 矩 (1~81)</span>
+                        </div>
+                        <div id="ju-btn-group" class="ju-btn-group" style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                            <button type="button" class="ju-tier-btn active" data-ju="0">1矩基数</button>
+                            <button type="button" class="ju-tier-btn" data-ju="1">2矩(+81)</button>
+                            <button type="button" class="ju-tier-btn" data-ju="2">3矩(+162)</button>
+                            <button type="button" class="ju-tier-btn" data-ju="3">4矩(+243)</button>
+                            <button type="button" class="ju-tier-btn" data-ju="8">9矩(最高729)</button>
+                            <button type="button" id="btn-ju-current-val" class="ju-tier-btn" data-ju="auto">当前值所在矩</button>
+                        </div>
                     </div>
                 </div>
 
@@ -111,7 +127,7 @@
                 <!-- 原书 9 大张表格切选面板 -->
                 <div class="glass-panel">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div class="card-title"><span>📊</span> 原书《九宫纪气数一览表》9大表切选</div>
+                        <div class="card-title"><span></span> 原书《九宫纪气数一览表》9大表切选</div>
                         <div style="display:flex; gap:4px;">
                             <button id="btn-mode-matrix" class="sanhe-btn active" style="font-size:10px; padding:2px 6px;">原书9x9大表</button>
                             <button id="btn-mode-list" class="sanhe-btn" style="font-size:10px; padding:2px 6px;">明细名录表</button>
@@ -139,7 +155,7 @@
                 <!-- 搜索与筛选工具条 -->
                 <div class="glass-panel" style="margin-top: 4px;">
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="text" id="jgt-search-input" class="custom-select" placeholder="🔍 输入数值、算式、易卦或地支搜索..." style="flex:1; font-size:12px; padding:4px 8px;">
+                        <input type="text" id="jgt-search-input" class="custom-select" placeholder=" 输入数值、算式、易卦或地支搜索..." style="flex:1; font-size:12px; padding:4px 8px;">
                         <button id="jgt-reset-search" class="action-btn" style="padding:4px 12px; font-size:12px;">重置</button>
                     </div>
                 </div>
@@ -147,7 +163,7 @@
                 <!-- 原书九宫纪气数 9x9 巨型大表渲染区 -->
                 <div class="glass-panel" style="margin-top: 4px; padding: 4px 6px;">
                     <div class="card-title">
-                        <span id="jgt-table-title">📜 原书【一宫】9x9 纪气数倍积巨型大表 (点击行/单元格三向联动)</span>
+                        <span id="jgt-table-title"> 原书【一宫】9x9 纪气数倍积巨型大表 (点击行/单元格三向联动)</span>
                     </div>
                     <div class="sequence-table-container">
                         <table id="jgt-master-table" class="seq-table">
@@ -170,6 +186,6 @@
     </div>
 
     <!-- 九宫纪气大表引擎 (带版本防缓存) -->
-    <script src="jiugong_tables.js?v=20260804_v38"></script>
+    <script src="jiugong_tables.js?v=20260911_v45"></script>
 </body>
 </html>
